@@ -1,0 +1,7 @@
+# Estado interno ou legado do OpenClaw
+openclaw-workspace-state.json
+.openclaw/
+*.attested
+
+# Arquivo de heartbeat aposentado
+HEARTBEAT.md
