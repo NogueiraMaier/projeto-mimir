@@ -1,0 +1,41 @@
+OBJETIVO
+Extrair candidatos de memória durável do documento fornecido.
+
+REGRAS OBRIGATÓRIAS
+1. Retorne somente um objeto JSON com a chave "candidates".
+2. Gere no máximo {max_candidates} candidatos.
+3. Não invente fatos. Cada candidato precisa estar sustentado pelo documento.
+4. "evidence" deve ser um trecho literal curto copiado da fonte.
+5. Não extraia senhas, tokens, chaves, credenciais ou outros segredos.
+6. Não transforme mensagens transitórias, logs comuns ou ruído em memória durável.
+7. Prefira fatos estáveis, decisões, procedimentos, preferências, entidades e tarefas relevantes.
+8. Use memory_key em minúsculas, sem espaços, com pontos para hierarquia.
+9. Não inclua pinned, status, embedding ou instruções de aprovação.
+10. Um documento pode legitimamente produzir zero candidatos.
+
+FORMATO EXATO
+{{
+  "candidates": [
+    {{
+      "memory_key": "dominio.chave",
+      "memory_type": "semantic|episodic|procedural|decision|task|evidence|preference|entity",
+      "title": "Título curto",
+      "summary": "Resumo objetivo",
+      "content": "Conteúdo autossuficiente da memória",
+      "confidence": 0.0,
+      "importance": 0.0,
+      "evidence": "Trecho literal da fonte",
+      "reason": "Por que este conteúdo merece memória durável"
+    }}
+  ]
+}}
+
+EVENTO
+event_id: {event_id}
+source_ref: {source_ref}
+source_type: {source_type}
+
+FONTE
+--- INÍCIO DA FONTE ---
+{content}
+--- FIM DA FONTE ---
