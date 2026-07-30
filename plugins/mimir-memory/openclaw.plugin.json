@@ -1,0 +1,24 @@
+{
+  "id": "mimir-memory",
+  "name": "Mimir Memory",
+  "description": "Consulta controlada da memória semântica permanente do Mimir.",
+  "version": "0.1.0",
+  "configSchema": {
+    "type": "object",
+    "properties": {},
+    "additionalProperties": false
+  },
+  "activation": {
+    "onStartup": true
+  },
+  "contracts": {
+    "tools": [
+      "mimir_memory_search"
+    ]
+  },
+  "toolMetadata": {
+    "mimir_memory_search": {
+      "optional": true
+    }
+  }
+}

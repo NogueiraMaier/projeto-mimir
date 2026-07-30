@@ -1,0 +1,34 @@
+{
+  "name": "openclaw-plugin-mimir-memory",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "/opt/openclaw/node_modules/.bin/tsc -p tsconfig.json",
+    "plugin:build": "npm run build && /usr/bin/node /opt/openclaw/openclaw.mjs plugins build --entry ./dist/index.js",
+    "plugin:validate": "npm run build && /usr/bin/node /opt/openclaw/openclaw.mjs plugins validate --entry ./dist/index.js",
+    "test": "/opt/openclaw/node_modules/.bin/vitest run --config ./vitest.config.ts"
+  },
+  "files": [
+    "dist",
+    "openclaw.plugin.json",
+    "README.md"
+  ],
+  "peerDependencies": {
+    "openclaw": ">=2026.5.17"
+  },
+  "dependencies": {
+    "typebox": "^1.1.38"
+  },
+  "devDependencies": {
+    "openclaw": "latest",
+    "typescript": "^5.9.0",
+    "vitest": "^3.2.0"
+  },
+  "openclaw": {
+    "extensions": [
+      "./dist/index.js"
+    ]
+  },
+  "description": "Consulta controlada da memória semântica permanente do Mimir."
+}
