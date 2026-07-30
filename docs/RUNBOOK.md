@@ -35,10 +35,37 @@ Não administrar o gateway pelo comando openclaw gateway restart.
 
     su - openclaw -s /bin/bash -c '
     cd /var/lib/openclaw/workspace &&
-    git status --short &&
+    git status --short --branch &&
     git log --oneline --decorate -10 &&
     git tag --list
     '
+
+## Publicação no GitHub
+
+Repositório remoto:
+
+    git@github-projeto-mimir:NogueiraMaier/projeto-mimir.git
+
+Branch principal:
+
+    main
+
+Enviar alterações validadas:
+
+    cd /var/lib/openclaw/workspace
+    git push origin main
+
+Comparar os hashes local e remoto:
+
+    cd /var/lib/openclaw/workspace
+    local_commit=$(git rev-parse HEAD)
+    remote_commit=$(
+        git ls-remote origin refs/heads/main |
+        awk '{print $1}'
+    )
+    printf 'Local:  %s\n' "$local_commit"
+    printf 'Remoto: %s\n' "$remote_commit"
+    test "$local_commit" = "$remote_commit"
 
 ## Regra de alteração
 
@@ -47,7 +74,11 @@ Não administrar o gateway pelo comando openclaw gateway restart.
 3. Validar a sintaxe.
 4. Executar o teste funcional.
 5. Conferir os logs.
-6. Revisar o diff.
-7. Criar o commit.
-8. Criar uma tag para marcos estáveis.
-9. Enviar ao repositório remoto privado.
+6. Atualizar a documentação relacionada.
+7. Auditar segredos e dados sensíveis.
+8. Revisar o diff.
+9. Adicionar somente os arquivos da etapa.
+10. Criar o commit.
+11. Criar uma tag para marcos estáveis.
+12. Enviar ao repositório remoto público.
+13. Comparar os hashes local e remoto.

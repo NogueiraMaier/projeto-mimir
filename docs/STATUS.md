@@ -25,14 +25,28 @@ Data da consolidação: 2026-07-30
 - Teste funcional de consulta concluído
 - Promoção automática bloqueada
 
-## Estado do Git antes desta documentação
+## Estado do Git e publicação
 
-- Repositório em /var/lib/openclaw/workspace
+- Repositório local em /var/lib/openclaw/workspace
 - Proprietário openclaw:openclaw
-- Branch master
+- Branch principal main
+- Branch local rastreando origin/main
 - Identidade local Mimir System
-- Nenhum remoto configurado
+- Repositório remoto público NogueiraMaier/projeto-mimir
+- Origin configurado por SSH
+- Primeiro commit publicado: 3e2e84d46ac57936886389138dce384ae26c8f3a
+- Hash local e remoto conferidos
+- Deploy key Ed25519 restrita ao repositório
+- Deploy key configurada para leitura e escrita
+- Identidade SSH do GitHub validada
+- Árvore de trabalho limpa após o primeiro envio
 - Nenhuma tag existente
+
+## Regra de documentação
+
+Cada etapa concluída deve registrar objetivo, alterações, validações, resultado, riscos restantes e commit correspondente.
+
+Os documentos STATUS, RUNBOOK, ARCHITECTURE, SECURITY e ROADMAP devem ser atualizados conforme o componente alterado.
 
 ## Próxima etapa
 
