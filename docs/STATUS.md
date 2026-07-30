@@ -75,8 +75,21 @@ Os documentos STATUS, RUNBOOK, ARCHITECTURE, SECURITY e ROADMAP devem ser atuali
 - Evidência técnica: docs/CAPTURA_SESSOES.md
 
 
+
+## Ingestão protegida de sessões
+
+- Migração 008 criada
+- Tabela mimir.session_sources criada
+- Transcrições isoladas de memory_events
+- Escrita restrita à função mimir.ingest_session
+- Autenticação peer exigida
+- Classificação confidential obrigatória
+- Idempotência por session_id e SHA-256
+- Nenhuma sessão real importada
+- Evidência técnica: docs/INGESTAO_SESSOES.md
+
 ## Próxima etapa
 
-Criar a ingestão idempotente das sessões elegíveis e executar a consolidação em dry run.
+Criar o cliente de ingestão das sessões elegíveis, executar a primeira importação controlada e validar a consolidação local sem API externa.
 
 A automação não terá autorização para promover registros para active.

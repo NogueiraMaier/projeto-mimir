@@ -67,6 +67,21 @@ Comparar os hashes local e remoto:
     printf 'Remoto: %s\n' "$remote_commit"
     test "$local_commit" = "$remote_commit"
 
+
+## Validar ingestão protegida
+
+Versão do esquema:
+
+    psql -X -d mimir_memory -c         "SELECT version, description FROM mimir.schema_version WHERE version = 8;"
+
+Privilégios da fonte:
+
+    psql -X -d mimir_memory -c         "SELECT has_table_privilege('mimir_app', 'mimir.session_sources', 'SELECT');"
+
+A resposta esperada para SELECT é false.
+
+Nenhuma sessão deve ser importada sem execução explícita do cliente de ingestão.
+
 ## Regra de alteração
 
 1. Criar backup de configurações externas ao Git.

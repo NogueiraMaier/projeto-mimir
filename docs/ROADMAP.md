@@ -2,7 +2,7 @@
 
 ## Próxima etapa
 
-Automatizar o fluxo de sessão para candidato de memória, sem promoção automática.
+Criar o cliente de ingestão protegida e o consolidador local de sessões, sem promoção automática e sem API externa.
 
 ## Pipeline planejado
 

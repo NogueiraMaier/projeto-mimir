@@ -77,7 +77,7 @@ Nenhuma promoção para active foi implementada.
 
 ## Próxima etapa
 
-Criar a ingestão idempotente de sessões em área protegida e integrar o evento ao consolidador em dry run.
+Criar o cliente que envia sessões elegíveis para mimir.ingest_session e validar a primeira importação controlada.
 
 ## Rastreabilidade
 

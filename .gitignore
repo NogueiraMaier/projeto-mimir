@@ -9,3 +9,7 @@ HEARTBEAT.md
 # Backups temporários
 *.bak
 *.bak.*
+
+# Cache Python
+__pycache__/
+*.py[cod]

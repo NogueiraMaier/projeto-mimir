@@ -37,6 +37,19 @@ Componentes:
 - Auditoria
 - Aprovação humana
 
+
+## Ingestão protegida de sessões
+
+As sessões concluídas são armazenadas em mimir.session_sources.
+
+A tabela contém a transcrição original e não permite acesso direto para mimir_app.
+
+A função mimir.ingest_session executa a escrita com identidade peer validada.
+
+memory_events recebe somente o evento de proveniência e os metadados estruturais.
+
+A classificação inicial é confidential.
+
 ## Consulta semântica
 
 O plugin mimir-memory registra a ferramenta mimir_memory_search.

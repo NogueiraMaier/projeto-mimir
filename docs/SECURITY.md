@@ -50,6 +50,19 @@ Não liberar ao agente main:
 - Exigir revisão humana antes de qualquer promoção
 
 
+
+## Fonte protegida das sessões
+
+- Armazenar transcrições somente em mimir.session_sources
+- Negar SELECT direto para mimir_app
+- Gravar somente por mimir.ingest_session
+- Exigir autenticação peer do usuário openclaw
+- Manter o evento com classification confidential
+- Não copiar a transcrição para memory_events
+- Bloquear conteúdo divergente para o mesmo session_id
+- Não enviar sessões para API externa
+- Exigir fluxo humano antes de qualquer liberação
+
 ## Dados fora do Git
 
 Não versionar:
