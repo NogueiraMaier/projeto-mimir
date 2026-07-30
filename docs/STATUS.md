@@ -48,6 +48,18 @@ Cada etapa concluída deve registrar objetivo, alterações, validações, resul
 
 Os documentos STATUS, RUNBOOK, ARCHITECTURE, SECURITY e ROADMAP devem ser atualizados conforme o componente alterado.
 
+
+## Validação completa da memória permanente
+
+- Validação concluída em 30 de julho de 2026
+- Cinco memórias conhecidas recuperadas corretamente
+- Uma consulta sem correspondência retornou zero resultados
+- Nenhuma informação inexistente foi inventada
+- Nenhuma chamada a exec ou shell foi observada
+- Resultado final: 6 testes aprovados em 6
+- Evidência técnica: docs/VALIDACAO_MEMORIA.md
+
+
 ## Próxima etapa
 
 Automatizar a captura de novas sessões e a consolidação em dry run.
