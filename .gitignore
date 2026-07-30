@@ -5,3 +5,7 @@ openclaw-workspace-state.json
 
 # Arquivo de heartbeat aposentado
 HEARTBEAT.md
+
+# Backups temporários
+*.bak
+*.bak.*
