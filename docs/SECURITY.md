@@ -35,6 +35,21 @@ Não liberar ao agente main:
 - Credenciais administrativas
 - Acesso direto às tabelas da memória
 
+
+## Captura de sessões
+
+- Processar somente o diretório ativo do agente main
+- Excluir arquivos trajectory e prompts de sistema
+- Aceitar somente sessões concluídas
+- Aceitar mensagens do proprietário e respostas do agente
+- Excluir resultados e chamadas de ferramentas
+- Bloquear padrões de segredos e credenciais
+- Não exibir mensagens durante inventário ou dry run
+- Não versionar sessões, transcrições ou arquivos de staging
+- Manter qualquer staging futuro fora do workspace Git
+- Exigir revisão humana antes de qualquer promoção
+
+
 ## Dados fora do Git
 
 Não versionar:

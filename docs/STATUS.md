@@ -60,8 +60,23 @@ Os documentos STATUS, RUNBOOK, ARCHITECTURE, SECURITY e ROADMAP devem ser atuali
 - Evidência técnica: docs/VALIDACAO_MEMORIA.md
 
 
+
+## Captura estrutural de sessões
+
+- Capturador seguro implementado em dry run
+- Fonte restrita ao diretório ativo do agente main
+- Somente arquivos UUID.jsonl são analisados
+- Somente sessões com status done são elegíveis
+- Arquivos trajectory e dados de ferramentas são excluídos
+- Conteúdo de mensagens não aparece na saída
+- Padrões de credenciais bloqueiam a sessão
+- Nenhuma escrita no PostgreSQL foi implementada
+- Nenhuma promoção para candidate ou active foi implementada
+- Evidência técnica: docs/CAPTURA_SESSOES.md
+
+
 ## Próxima etapa
 
-Automatizar a captura de novas sessões e a consolidação em dry run.
+Criar a ingestão idempotente das sessões elegíveis e executar a consolidação em dry run.
 
 A automação não terá autorização para promover registros para active.
