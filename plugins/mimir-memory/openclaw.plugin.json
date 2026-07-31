@@ -1,8 +1,8 @@
 {
   "id": "mimir-memory",
   "name": "Mimir Memory",
-  "description": "Consulta controlada da memória semântica permanente do Mimir.",
-  "version": "0.1.0",
+  "description": "Consulta controlada da memória permanente e verificação em modo sombra.",
+  "version": "0.2.6",
   "configSchema": {
     "type": "object",
     "properties": {},

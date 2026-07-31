@@ -13,3 +13,6 @@ HEARTBEAT.md
 # Cache Python
 __pycache__/
 *.py[cod]
+
+# Backups transacionais locais
+backups/
