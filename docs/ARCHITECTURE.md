@@ -6,6 +6,10 @@ O agente main possui a identidade Mimir.
 
 Ele coordena tarefas, consulta memória e direciona agentes especializados.
 
+## Agentes especializados
+
+O repositório documenta especializações futuras para SOC, OSINT, Cyber-Lab, redes, operações, desenvolvimento, negócios e auditoria de memória/segurança. A documentação não deve inferir implantação somente pela ausência de evidência.
+
 ## Memória operacional
 
 O memory-core nativo do OpenClaw mantém contexto operacional de curto prazo.
@@ -37,6 +41,20 @@ Componentes:
 - Auditoria
 - Aprovação humana
 
+## Camada operacional
+
+A branch de fundação operacional adiciona um MVP separado da memória permanente:
+
+- inventário PostgreSQL de clientes, sites e equipamentos;
+- histórico de intervenções, ações, evidências e relatórios;
+- política READ / PLAN / EXECUTE;
+- executor SSH com verificação de host key e timeout;
+- adapters iniciais generic-linux e mikrotik-routeros;
+- relatórios JSON e Markdown.
+
+O modo EXECUTE exige aprovação explícita para alterações. Ações destrutivas permanecem bloqueadas por padrão.
+
+O MVP não contém credenciais e não foi validado contra equipamentos de produção.
 
 ## Ingestão protegida de sessões
 
