@@ -415,3 +415,360 @@ Memory v2 somente poderá ser considerada concluída quando:
 - ACL entre agentes estiver testada;
 - documentação refletir o estado real;
 - MIMIR-MEM-EVAL possuir resultados reproduzíveis.
+
+
+## Visualização — Mímir Memory Graph Explorer
+
+Status: **PLANEJADO**
+
+O Mímir deve possuir uma visualização gráfica inspirada na experiência de graph view de ferramentas de knowledge management, mas a visualização não será a fonte de verdade.
+
+A fonte de verdade continuará sendo PostgreSQL/pgvector.
+
+### Objetivo
+
+Permitir explorar visualmente:
+
+- memórias;
+- entidades;
+- relações;
+- clientes;
+- projetos;
+- sites;
+- equipamentos;
+- interfaces;
+- redes;
+- VLANs;
+- túneis;
+- intervenções;
+- incidentes;
+- evidências;
+- agentes.
+
+Exemplo conceitual:
+
+`cliente -> site -> equipamento -> interface -> VLAN -> serviço -> intervenção -> evidência`
+
+### Requisitos da primeira versão
+
+A primeira versão deve ser **somente leitura**.
+
+O grafo deve permitir:
+
+- zoom e pan;
+- pesquisa de nó;
+- filtros por tipo de memória;
+- filtros por cliente/projeto/site/device;
+- filtros por agente;
+- filtros por estado;
+- filtros por classificação;
+- filtros temporais;
+- exibição e ocultação de tipos de relação;
+- expansão de vizinhança de um nó;
+- painel lateral de detalhes;
+- navegação entre evidência, memória e entidade;
+- indicação de proveniência;
+- indicação de confiança;
+- indicação de última verificação;
+- indicação de memória superseded/stale;
+- linha do tempo ou controle temporal em fase posterior.
+
+### Representação visual sugerida
+
+A semântica visual deve ser estável e documentada.
+
+Exemplo:
+
+- cor do nó = tipo;
+- borda = status;
+- tamanho = importância;
+- opacidade = freshness/estado;
+- linha sólida = relação vigente;
+- linha tracejada = relação histórica ou não verificada;
+- ícone/marker = evidência disponível.
+
+A visualização nunca deve esconder que uma memória é:
+
+- não verificada;
+- stale;
+- superseded;
+- histórica;
+- candidate.
+
+### Segurança
+
+O Graph Explorer não deve:
+
+- exibir senha, token ou chave;
+- consultar tabelas protegidas diretamente no navegador;
+- conceder escrita no PostgreSQL;
+- permitir promoção de memória por clique na primeira versão;
+- expor conteúdo confidential sem autorização;
+- substituir controles de ACL existentes.
+
+Arquitetura sugerida:
+
+`PostgreSQL -> API/consulta read-only -> Graph Explorer`
+
+O frontend recebe somente os campos necessários à visualização e ao contexto autorizado.
+
+### Bibliotecas candidatas para visualização
+
+#### Sigma.js + Graphology
+
+Uso sugerido: candidato principal para uma experiência semelhante a graph view com grande número de nós.
+
+Pontos de interesse:
+
+- Sigma.js usa WebGL;
+- projetado para visualização de grafos com milhares de nós e arestas;
+- Graphology fornece a estrutura de dados e algoritmos;
+- apropriado para exploração visual fluida.
+
+Documentação:
+
+- https://www.sigmajs.org/
+- https://github.com/jacomyal/sigma.js
+- https://graphology.github.io/
+
+#### Cytoscape.js
+
+Uso sugerido: alternativa ou complemento quando precisarmos de maior capacidade de análise, seletores e layouts.
+
+Pontos de interesse:
+
+- biblioteca de teoria de grafos e visualização;
+- MIT;
+- layouts;
+- seletores;
+- filtros;
+- algoritmos de grafo;
+- uso no browser ou headless em Node.js.
+
+Documentação:
+
+- https://js.cytoscape.org/
+- https://github.com/cytoscape/cytoscape.js
+
+### Ferramentas de knowledge management como referência de UX
+
+Estas ferramentas devem ser estudadas principalmente como referência de navegação, organização e visualização. Não são dependências obrigatórias do Mímir.
+
+#### Logseq
+
+Referência:
+
+- knowledge graph;
+- links e referências;
+- organização em blocos;
+- consultas e views;
+- privacidade/local-first;
+- ecossistema de plugins.
+
+Documentação/código:
+
+- https://github.com/logseq/logseq
+- https://github.com/logseq/docs
+
+#### Joplin
+
+Referência:
+
+- Markdown;
+- organização de notas;
+- tags;
+- pesquisa;
+- exportação/importação;
+- armazenamento simples e auditável.
+
+Documentação/código:
+
+- https://joplinapp.org/help/
+- https://github.com/laurent22/joplin
+
+#### Anytype
+
+Referência de UX:
+
+- objetos;
+- tipos;
+- relações;
+- graph;
+- local-first;
+- navegação entre entidades.
+
+Observação de licença:
+
+O código atual do cliente Anytype está publicado sob **Any Source Available License 1.0**. Portanto, deve ser tratado como **source-available**, e não assumido automaticamente como FOSS/OSI para reutilização de código.
+
+Documentação/código:
+
+- https://doc.anytype.io/
+- https://github.com/anyproto/anytype-ts
+
+#### AFFiNE
+
+Referência:
+
+- documentos;
+- canvas;
+- blocos;
+- organização visual;
+- arquitetura local-first.
+
+Documentação/código:
+
+- https://github.com/toeverything/AFFiNE
+- https://github.com/toeverything/OctoBase
+
+## Catálogo de projetos open source para estudo de memória
+
+O objetivo deste catálogo é permitir comparação técnica antes de implementar cada etapa da Memory v2.
+
+### Graphiti
+
+Foco:
+
+- temporal knowledge graph;
+- entidades e relações;
+- provenance;
+- validade temporal;
+- atualizações incrementais;
+- recuperação semântica + keyword + graph.
+
+Partes especialmente relevantes para o Mímir:
+
+- bi-temporalidade;
+- episodes como fonte/proveniência;
+- relações com janela temporal;
+- consultas históricas.
+
+Documentação:
+
+- https://github.com/getzep/graphiti
+- https://help.getzep.com/graphiti/getting-started/welcome
+
+### Mem0 OSS
+
+Foco:
+
+- memória persistente de agentes;
+- extração de fatos;
+- add/search;
+- filtros/metadata;
+- reranking;
+- self-host.
+
+Partes relevantes:
+
+- lifecycle de memória;
+- scoping;
+- expiration;
+- comparação de providers;
+- avaliação de custo/contexto.
+
+Observação:
+
+A documentação atual informa que graph memory não faz parte do stack OSS básico; portanto o Mímir não deve assumir paridade entre a versão OSS e recursos da plataforma hospedada.
+
+Documentação:
+
+- https://github.com/mem0ai/mem0
+- https://docs.mem0.ai/open-source/overview
+
+### Letta
+
+Foco:
+
+- agentes stateful;
+- memória persistente;
+- memory blocks;
+- contexto gerenciado;
+- aprendizado contínuo.
+
+Partes relevantes:
+
+- core/context blocks;
+- separação entre contexto sempre carregado e memória recuperável;
+- agentes com estado persistente.
+
+Documentação:
+
+- https://github.com/letta-ai/letta
+- https://docs.letta.com/
+
+### LangMem
+
+Foco:
+
+- extração e consolidação de memória;
+- hot-path memory tools;
+- background memory manager;
+- integração com stores persistentes.
+
+Partes relevantes:
+
+- formação de memória durante a interação;
+- consolidação em background;
+- separação entre memória semântica, episódica e procedural;
+- uso de PostgreSQL como persistent store.
+
+Documentação:
+
+- https://github.com/langchain-ai/langmem
+
+### Cognee
+
+Foco:
+
+- knowledge graph;
+- memória para agentes;
+- graph + vector retrieval;
+- pipelines de ingestão e organização.
+
+Partes relevantes:
+
+- arquitetura de conhecimento relacional;
+- integração entre grafo e vetores;
+- desenho de pipeline ECL/ingestão.
+
+Documentação:
+
+- https://github.com/topoteretes/cognee
+- https://docs.cognee.ai/
+
+## Regra para adoção de componentes externos
+
+Antes de incorporar biblioteca ou framework externo à Memory v2:
+
+1. verificar licença;
+2. verificar manutenção ativa;
+3. avaliar compatibilidade com Gentoo/OpenRC;
+4. avaliar necessidade de container;
+5. avaliar dependências extras;
+6. avaliar possibilidade de uso com PostgreSQL/pgvector existente;
+7. verificar tratamento de dados sensíveis;
+8. executar benchmark local;
+9. comparar com implementação própria;
+10. documentar motivo da decisão.
+
+Preferência arquitetural:
+
+- reutilizar bibliotecas de visualização e algoritmos quando maduras;
+- manter dados e governança no PostgreSQL do Mímir;
+- evitar substituir todo o memory stack apenas para obter uma função isolada.
+
+## Prioridade do Graph Explorer
+
+O Graph Explorer deve entrar **depois de P2**, quando entidades e relações já possuírem modelo estável no PostgreSQL.
+
+Ordem sugerida:
+
+1. P1 — temporalidade e entity resolution;
+2. P2 — grafo de relações;
+3. **Graph Explorer v1 read-only**;
+4. P3 — retrieval híbrido + Context Builder;
+5. P4 — MIMIR-MEM-EVAL;
+6. fases posteriores.
+
+O Graph Explorer poderá também se tornar uma ferramenta importante de auditoria do MIMIR-MEM-EVAL, permitindo visualizar por que uma memória foi recuperada e quais relações sustentaram a resposta.
