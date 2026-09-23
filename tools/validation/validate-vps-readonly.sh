@@ -66,8 +66,19 @@ p=json.loads((root/'openclaw.plugin.json').read_text())
 assert p['id']=='mimir-memory'
 assert 'mimir_memory_search' in p['contracts']['tools']
 assert (root/'src/index.ts').is_file()
+package=json.loads((root/'package.json').read_text())
+assert package['openclaw']['extensions']==['./dist/index.js']
 PY
-check 'Plugin built entry exists' test -f "$repo/plugins/mimir-memory/dist/index.js"
+if [[ -f "$repo/plugins/mimir-memory/dist/index.js" ]]; then
+    echo 'PASS: Plugin built entry exists'
+elif tracked_dist=$(git_ro ls-files -- 'plugins/mimir-memory/dist/**' 2>/dev/null) \
+    && [[ -z $tracked_dist ]] \
+    && git_ro check-ignore -q -- plugins/mimir-memory/dist/; then
+    echo 'PARTIAL: Plugin built entry absent in source checkout (dist/ is an ignored, untracked build artifact)'
+else
+    echo 'FAIL: Plugin built entry missing without ignored, untracked build artifact evidence'
+    failures=$((failures+1))
+fi
 echo 'PARTIAL: plugin runtime loading and services health require separate authorized inspection'
 
 # Pure checks: no unittest TemporaryDirectory, Vitest cache, py_compile or tsc emission.

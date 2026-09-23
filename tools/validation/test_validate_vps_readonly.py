@@ -1,13 +1,64 @@
 """Never connect to a database or equipment, including when testing the validator."""
 import os
+import json
 from pathlib import Path
 import subprocess
+import tempfile
 import unittest
 
 SCRIPT = Path(__file__).with_name('validate-vps-readonly.sh')
 
 
 class ValidatorTests(unittest.TestCase):
+    def test_plugin_build_artifact_and_structure(self):
+        source = SCRIPT.read_text()
+        check = source[source.index('check() {'):source.index("check 'Gentoo marker'")]
+        plugin = source[source.index("check 'Plugin manifest/source structure'"):
+                        source.index("echo 'PARTIAL: plugin runtime loading")]
+        cases = (
+            ('present', True, True, False, None, 0, 'PASS: Plugin built entry exists'),
+            ('source checkout', False, True, False, None, 0, 'PARTIAL: Plugin built entry absent'),
+            ('not ignored', False, False, False, None, 1, 'FAIL: Plugin built entry missing'),
+            ('tracked dist', False, True, True, None, 1, 'FAIL: Plugin built entry missing'),
+            ('bad manifest', False, True, False, 'manifest', 1, 'FAIL: Plugin manifest/source structure'),
+            ('missing source', False, True, False, 'source', 1, 'FAIL: Plugin manifest/source structure'),
+            ('bad package', False, True, False, 'package', 1, 'FAIL: Plugin manifest/source structure'),
+        )
+        for name, present, ignored, tracked, broken, failures, expected in cases:
+            with self.subTest(name=name), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                plugin_root = root / 'plugins/mimir-memory'
+                (plugin_root / 'src').mkdir(parents=True)
+                if broken != 'source':
+                    (plugin_root / 'src/index.ts').write_text('export {};\n')
+                manifest = {'id': 'wrong' if broken == 'manifest' else 'mimir-memory',
+                            'contracts': {'tools': ['mimir_memory_search']}}
+                (plugin_root / 'openclaw.plugin.json').write_text(json.dumps(manifest))
+                package = {'openclaw': {'extensions': [] if broken == 'package' else ['./dist/index.js']}}
+                (plugin_root / 'package.json').write_text(json.dumps(package))
+                if ignored:
+                    (plugin_root / '.gitignore').write_text('dist/\n')
+                subprocess.run(['git', 'init', '-q', directory], check=True, capture_output=True)
+                if present or tracked:
+                    (plugin_root / 'dist').mkdir()
+                    entry = plugin_root / 'dist/index.js'
+                    entry.write_text('export {};\n')
+                    if tracked:
+                        subprocess.run(['git', '-C', directory, 'add', '-f',
+                                        'plugins/mimir-memory/dist/index.js'], check=True, capture_output=True)
+                        entry.unlink()
+                script = ('repo=$1\nfailures=0\n'
+                          'git_ro() { git -c core.fsmonitor=false -c core.untrackedCache=false -C "$repo" "$@"; }\n'
+                          + check + plugin + '\nprintf "failures=%s\\n" "$failures"\n')
+                result = subprocess.run(['bash', '-c', script, 'validator-test', directory],
+                                        capture_output=True, text=True, timeout=5)
+                self.assertEqual(result.returncode, 0, result.stderr)
+                self.assertIn(expected, result.stdout)
+                self.assertIn(f'failures={failures}\n', result.stdout)
+                if failures == 0:
+                    self.assertIn('PASS: Plugin manifest/source structure', result.stdout)
+                    self.assertNotIn('FAIL:', result.stdout)
+
     def test_syntax(self):
         result = subprocess.run(['bash', '-n', str(SCRIPT)], capture_output=True)
         self.assertEqual(result.returncode, 0)
