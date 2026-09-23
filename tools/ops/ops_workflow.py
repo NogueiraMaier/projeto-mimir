@@ -1,9 +1,9 @@
 """Journal before each action; fail closed if durable audit is unavailable."""
 from __future__ import annotations
 
-import getpass
 import json
 import os
+import pwd
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from ops_security import canonical
@@ -36,6 +36,14 @@ class LocalJournal:
 
     def finish(self, report):
         return report
+
+
+def effective_os_identity():
+    """Informational local identity; PostgreSQL system_user remains authoritative."""
+    try:
+        return pwd.getpwuid(os.geteuid()).pw_name
+    except (KeyError, OSError):
+        return 'uid:' + str(os.geteuid())
 
 
 def memory_handoff(report):
@@ -84,7 +92,7 @@ class InterventionRunner:
             'site': record.get('site', {'site_id': device.site_id, 'name': 'não informado'}),
             'device': asdict(device), 'objective': objective, 'mode': mode,
             'status': 'running', 'dry_run': dry_run,
-            'approval': {'plan_sha256': approval, 'reference': approval_ref, 'operator': getpass.getuser(),
+            'approval': {'plan_sha256': approval, 'reference': approval_ref, 'operator': effective_os_identity(),
                          'approved_at': now_iso()} if mode == 'EXECUTE' else None,
             'plan': plan, 'before': [], 'actions': [], 'results': [], 'snapshots': [],
             'backup': {'supported': adapter.backup_operation is not None,

@@ -22,8 +22,8 @@ migrations 002–008 e não concede ferramentas de execução ao agente OpenClaw
 ## Inventário / CMDB
 
 A migration **009** foi corrigida enquanto não implantada; não existe migration
-010 de correção. Ela recusa reaplicação quando versão 9 ou role operacional já
-existem, para impedir sobreposição silenciosa de um schema diferente.
+010 de correção. Ela recusa reaplicação quando a versão 9 já existe, para impedir
+sobreposição silenciosa de um schema diferente. A role é tratada separadamente.
 
 Entidades: clientes; sites; equipamentos; interfaces (MAC, MTU, função e VLAN);
 endereços IPv4/IPv6; sub-redes CIDR; VLANs; métodos SSH e referências de credencial;
@@ -31,6 +31,12 @@ dependências entre equipamentos do mesmo cliente, inclusive em sites diferentes
 Chaves estrangeiras compostas impedem IP/interface, rede/VLAN e equipamento/site
 incoerentes. IP associado a sub-rede deve pertencer a ela. Há identificação de
 fabricante/modelo/firmware/função, verificação, coleta e alteração mais recentes.
+
+`ops_accesses` é a fonte canônica de conexão. Cada equipamento exige
+`primary_access_id` apontando para um acesso SSH; host, porta, usuário e referência
+de credencial são derivados desse acesso. Os campos equivalentes do documento de
+equipamento são apenas uma projeção de leitura e, quando presentes na entrada,
+precisam coincidir exatamente.
 
 O cadastro nasce `unverified`. Coleta concluída registra `verified` com escopo
 `diagnostic_observation`: isso confirma a observação registrada, não toda a CMDB,
@@ -91,7 +97,9 @@ A identidade esperada é `peer:mimir-ops`, **desabilitada por padrão** em
 4. grants efetivos, defaults e identidade retornada pelo PostgreSQL 17;
 5. habilitação explícita da identidade somente depois dessas verificações.
 
-A aplicação da migration e essas configurações **não foram realizadas**.
+O schema é instalado por `009_operational_inventory.sql`; criação da role,
+CONNECT e grants específicos ficam separados em `009_operational_role.sql`.
+A aplicação das migrations e essas configurações **não foram realizadas**.
 O provisionamento não é feito pelo CLI ou pelo validador. Não executar a 009
 cegamente: um `schema_version=9` não comprova qual revisão da 009 foi aplicada.
 

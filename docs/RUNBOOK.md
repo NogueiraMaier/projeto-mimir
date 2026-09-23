@@ -117,8 +117,11 @@ com segredos. Use `--skip-db` para excluir conexão PostgreSQL. Falhas devem ser
 revisadas antes de qualquer correção. Presença de artefatos não confirma plugin
 carregado; versão 9 registrada não identifica a revisão aplicada da migration.
 
-O CLI usa uma role nova `mimir_ops`, inicialmente desabilitada; a revisão de
-schema, backup/restauração, grants e peer precisa preceder a habilitação.
+O schema é separado do provisionamento cluster-global: `009_operational_inventory.sql`
+cria apenas objetos; `009_operational_role.sql` cria `mimir_ops`, concede CONNECT
+no banco corrente e aplica os grants mínimos. A role permanece inicialmente
+desabilitada; revisão de schema, backup/restauração, grants e peer precisa
+preceder a habilitação.
 Não aplicar 009 sobre versão 9 existente: ela recusa reexecução deliberadamente.
 Não introduzir migration 010 para contornar essa proteção.
 

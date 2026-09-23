@@ -17,12 +17,24 @@ from mimir_ops import (ADAPTERS, ActionResult, Adapter, Device, MikroTikAdapter,
                        redact, render_report, write_report)
 from ops_security import ProcessResult, StoreError, bounded_run, digest, sanitize
 from ops_store import PostgresStore, normalize_inventory
-from ops_workflow import InterventionRunner, LocalJournal
+from ops_workflow import InterventionRunner, LocalJournal, effective_os_identity
 
 DID = '11111111-1111-4111-8111-111111111111'
 SID = '22222222-2222-4222-8222-222222222222'
 CID = '33333333-3333-4333-8333-333333333333'
 DEVICE = Device(DID, SID, 'lab', 'server', '192.0.2.10', 'mimir', 'generic-linux', permission_mode='EXECUTE')
+ACCESS_ID = '99999999-9999-4999-8999-999999999999'
+
+
+def inventory_device():
+    value = asdict(DEVICE)
+    for field in ('management_host', 'management_port', 'ssh_user', 'credential_ref'):
+        value.pop(field)
+    value['primary_access_id'] = ACCESS_ID
+    value['accesses'] = [{'access_id': ACCESS_ID, 'method': 'ssh', 'host': DEVICE.management_host,
+                          'port': DEVICE.management_port, 'username': DEVICE.ssh_user,
+                          'credential_ref': DEVICE.credential_ref}]
+    return value
 
 
 class FakeStore:
@@ -251,7 +263,10 @@ class InventoryStoreTests(unittest.TestCase):
     def test_client_site_device_validation(self):
         self.assertEqual(normalize_inventory('client',{'name':'Lab','slug':'lab'})['slug'],'lab')
         self.assertEqual(normalize_inventory('site',{'client_id':CID,'name':'Site','slug':'site','vlans':[{'tag':10,'name':'office'}]})['vlans'][0]['tag'],10)
-        self.assertEqual(normalize_inventory('device', asdict(DEVICE))['permission_mode'],'EXECUTE')
+        self.assertEqual(normalize_inventory('device', inventory_device())['permission_mode'],'EXECUTE')
+        self.assertEqual(normalize_inventory('device', inventory_device())['management_host'], DEVICE.management_host)
+        with self.assertRaises(PolicyError):
+            normalize_inventory('device', {**inventory_device(), 'management_host': '192.0.2.99'})
         for payload in ({'name':'Lab','slug':'BAD'}, {'name':'password=bad','slug':'lab'},
                         {'name':'Lab','slug':'lab','password':'bad'}):
             with self.assertRaises(PolicyError):
@@ -265,7 +280,7 @@ class InventoryStoreTests(unittest.TestCase):
             with self.assertRaises(PolicyError):
                 normalize_inventory('site',{'client_id':CID,'name':'Site','slug':'site',**payload})
         with self.assertRaises(PolicyError):
-            normalize_inventory('device',{**asdict(DEVICE),'interfaces':[{'name':'eth0','password':'bad'}]})
+            normalize_inventory('device',{**inventory_device(),'interfaces':[{'name':'eth0','password':'bad'}]})
 
     def test_postgres_input_and_environment_control(self):
         runner = Mock(return_value=ProcessResult(0,'{"name":"Lab"}',''))
@@ -308,7 +323,7 @@ class InventoryStoreTests(unittest.TestCase):
         self.assertEqual(methods, ['inventory.add','inventory.list','inventory.show'] * 3)
 
     def test_inventory_defaults_to_read_and_unverified(self):
-        item = asdict(DEVICE)
+        item = inventory_device()
         del item['permission_mode']
         result = normalize_inventory('device',item)
         self.assertEqual(result['permission_mode'],'READ')
@@ -326,6 +341,63 @@ class InventoryStoreTests(unittest.TestCase):
 
 
 class WorkflowTests(unittest.TestCase):
+    def test_persisted_sql_workflow_is_stateful_and_fail_closed(self):
+        migration = Path(__file__).parents[1] / 'memory' / 'migrations' / '009_operational_inventory.sql'
+        sql = migration.read_text()
+        for token in ('workflow_stage', 'workflow_state', 'workflow transition out of order',
+                      "workflow_state='failed'", "workflow_stage=CASE workflow_stage"):
+            self.assertIn(token, sql)
+        self.assertNotIn('count(DISTINCT stage)', sql)
+
+        stages = ('PRECHECK', 'SNAPSHOT', 'BACKUP', 'EXECUTE', 'VALIDATE')
+
+        def transition(stage, state, event, success, requested=None):
+            expected = stages[0] if stage is None else stage
+            if state in ('failed', 'complete'):
+                raise PolicyError('terminal')
+            if requested is not None and requested != expected:
+                raise PolicyError('wrong stage')
+            if event == 'intent':
+                if state != 'ready':
+                    raise PolicyError('duplicate intent')
+                return expected, 'intent'
+            if event != 'result' or state != 'intent':
+                raise PolicyError('result without intent')
+            if not success:
+                return expected, 'failed'
+            index = stages.index(expected)
+            return ('DONE', 'complete') if index == len(stages) - 1 else (stages[index + 1], 'ready')
+
+        stage, state = transition(None, 'ready', 'intent', True)
+        with self.assertRaises(PolicyError):
+            transition(stage, state, 'intent', True)
+        with self.assertRaises(PolicyError):
+            transition(stage, state, 'result', True, requested='SNAPSHOT')
+        stage, state = transition(stage, state, 'result', True)
+        stage, state = transition(stage, state, 'intent', True)
+        stage, state = transition(stage, state, 'result', False)
+        with self.assertRaises(PolicyError):
+            transition(stage, state, 'result', True)
+        with self.assertRaises(PolicyError):
+            transition('EXECUTE', 'ready', 'intent', True, requested='PRECHECK')
+
+    def test_schema_migration_keeps_role_and_access_provisioning_separate(self):
+        migration_dir = Path(__file__).parents[1] / 'memory' / 'migrations'
+        schema = (migration_dir / '009_operational_inventory.sql').read_text()
+        role = (migration_dir / '009_operational_role.sql').read_text()
+        self.assertNotIn('CREATE ROLE mimir_ops', schema)
+        self.assertNotIn('GRANT CONNECT', schema)
+        self.assertIn('GRANT CONNECT ON DATABASE', role)
+        self.assertIn('primary_access_id', schema)
+        self.assertIn('ops_devices_primary_access_fk', schema)
+
+    def test_approval_records_effective_os_identity(self):
+        with patch('ops_workflow.effective_os_identity', return_value='uid:synthetic') as identity:
+            report, _, _ = run_change()
+        identity.assert_called_once()
+        self.assertEqual(report['approval']['operator'], 'uid:synthetic')
+        self.assertNotIn('getpass.getuser', Path(__file__).with_name('ops_workflow.py').read_text())
+
     def test_read(self):
         store=FakeStore(); ssh=FakeSSH()
         report=InterventionRunner(store,ssh).run(asdict(DEVICE))

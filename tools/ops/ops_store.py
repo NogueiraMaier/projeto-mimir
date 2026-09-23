@@ -42,9 +42,12 @@ def normalize_inventory(kind, value):
         if value.get('location_note') is not None:
             safe_text(value['location_note'], 1000)
     if kind == 'device':
-        device = Device.from_record(value)
-        from dataclasses import asdict
-        value.update(asdict(device))
+        accesses = value.get('accesses')
+        if not isinstance(accesses, list) or not accesses:
+            raise PolicyError('equipamento exige um acesso primário')
+        primary = value.get('primary_access_id') or accesses[0].get('access_id') or new_id()
+        value['primary_access_id'] = primary
+        uuid_text(primary)
     specs = {
         'vlans': ({'vlan_id', 'tag', 'name'}, {'tag', 'name'}, 'vlan_id'),
         'networks': ({'network_id', 'prefix', 'vlan_id', 'name'}, {'prefix', 'name'}, 'network_id'),
@@ -54,6 +57,7 @@ def normalize_inventory(kind, value):
                      {'method', 'host', 'port', 'username', 'credential_ref'}, 'access_id'),
         'dependencies': ({'depends_on_device_id', 'relation'}, {'depends_on_device_id', 'relation'}, None),
     }
+    canonical_access = None
     for field, (allowed, required, identity) in specs.items():
         if field not in FIELDS[kind]:
             continue
@@ -89,9 +93,23 @@ def normalize_inventory(kind, value):
             if field == 'accesses':
                 if item['method'] != 'ssh':
                     raise PolicyError('somente acesso SSH implementado')
-                from dataclasses import replace
-                replace(device, management_host=item['host'], management_port=item['port'],
-                        ssh_user=item['username'], credential_ref=item['credential_ref'])
+                if item['access_id'] == value['primary_access_id']:
+                    canonical_access = item
+    if kind == 'device':
+        if canonical_access is None:
+            raise PolicyError('acesso primário não encontrado')
+        for field, expected in {
+            'management_host': canonical_access['host'],
+            'management_port': canonical_access['port'],
+            'ssh_user': canonical_access['username'],
+            'credential_ref': canonical_access['credential_ref'],
+        }.items():
+            if field in value and value[field] != expected:
+                raise PolicyError('campos de acesso duplicados não coincidem')
+            value[field] = expected
+        device = Device.from_record(value)
+        from dataclasses import asdict
+        value.update(asdict(device))
     return value
 
 

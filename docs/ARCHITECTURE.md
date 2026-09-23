@@ -45,7 +45,8 @@ Componentes:
 
 IMPLEMENTADO no repositório, NÃO VALIDADO EM PRODUÇÃO. A camada em `tools/ops`
 estende a fundação operacional e permanece separada do plugin e das funções de
-memória. A migration 009 modela CMDB e intervenções; a role dedicada `mimir_ops`
+memória. A migration de schema 009 modela CMDB e intervenções; o provisionamento
+da role dedicada `mimir_ops` fica em script separado.
 acessa somente uma API SQL controlada com autenticação peer e identidade
 inicialmente desabilitada. `mimir_app` não recebe acesso direto às tabelas ops.
 

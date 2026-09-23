@@ -44,10 +44,13 @@ class Device:
     model: str | None = None
     firmware: str | None = None
     role: str = 'unspecified'
+    primary_access_id: str | None = None
 
     def __post_init__(self):
         uuid_text(self.device_id)
         uuid_text(self.site_id)
+        if self.primary_access_id is not None:
+            uuid_text(self.primary_access_id)
         validate_host(self.management_host)
         safe_text(self.name)
         safe_text(self.device_type, 64)

@@ -1,6 +1,7 @@
 \set ON_ERROR_STOP on
 -- Development revision of unapplied 009. Deliberately refuses reapplication.
--- PostgreSQL 17 (system_user); existing memory schema/roles and pgcrypto required.
+-- PostgreSQL 17 (system_user); existing memory schema and pgcrypto required.
+-- Cluster-global role provisioning is intentionally separate in 009_operational_role.sql.
 BEGIN;
 DO $migration$
 BEGIN
@@ -10,16 +11,8 @@ BEGIN
     IF EXISTS (SELECT FROM mimir.schema_version WHERE version = 9) THEN
         RAISE EXCEPTION '009 already applied: stop and review schema; do not overwrite';
     END IF;
-    IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'mimir_ops') THEN
-        CREATE ROLE mimir_ops LOGIN NOINHERIT NOSUPERUSER NOCREATEDB NOCREATEROLE
-            NOREPLICATION NOBYPASSRLS CONNECTION LIMIT 3;
-    ELSE
-        RAISE EXCEPTION 'mimir_ops already exists: inspect before provisioning';
-    END IF;
 END
 $migration$;
-ALTER ROLE mimir_ops PASSWORD NULL;
-GRANT CONNECT ON DATABASE mimir_memory TO mimir_ops;
 SET ROLE mimir_owner;
 SET search_path = pg_catalog, mimir;
 
@@ -79,6 +72,7 @@ CREATE TABLE mimir.ops_devices (
     adapter text NOT NULL CHECK (adapter IN ('generic-linux', 'mikrotik-routeros')),
     permission_mode text NOT NULL DEFAULT 'READ' CHECK (permission_mode IN ('READ', 'PLAN', 'EXECUTE')),
     credential_ref text NOT NULL DEFAULT 'ssh-agent' CHECK (credential_ref ~ '^(ssh-agent|file-ref:[a-zA-Z0-9._-]{1,64})$'),
+    primary_access_id uuid NOT NULL,
     verification_state text NOT NULL DEFAULT 'unverified' CHECK (verification_state IN ('unverified', 'verified')),
     verified_at timestamptz, last_collected_at timestamptz, last_change_at timestamptz,
     observed_state jsonb NOT NULL DEFAULT '{}',
@@ -108,8 +102,14 @@ CREATE TABLE mimir.ops_accesses (
     host text NOT NULL CHECK (host ~ '^[a-zA-Z0-9:][a-zA-Z0-9.:-]{0,252}$'),
     port integer NOT NULL CHECK (port BETWEEN 1 AND 65535),
     username text NOT NULL CHECK (username ~ '^[a-zA-Z_][a-zA-Z0-9._-]{0,63}$'),
-    credential_ref text NOT NULL CHECK (credential_ref ~ '^(ssh-agent|file-ref:[a-zA-Z0-9._-]{1,64})$')
+    credential_ref text NOT NULL CHECK (credential_ref ~ '^(ssh-agent|file-ref:[a-zA-Z0-9._-]{1,64})$'),
+    UNIQUE (access_id, device_id)
 );
+ALTER TABLE mimir.ops_devices
+    ADD CONSTRAINT ops_devices_primary_access_fk
+    FOREIGN KEY (primary_access_id, device_id)
+    REFERENCES mimir.ops_accesses(access_id, device_id)
+    DEFERRABLE INITIALLY DEFERRED;
 CREATE TABLE mimir.ops_dependencies (
     site_id uuid NOT NULL, device_id uuid NOT NULL, depends_on_device_id uuid NOT NULL,
     relation text NOT NULL CHECK (length(btrim(relation)) BETWEEN 1 AND 200),
@@ -128,6 +128,8 @@ CREATE TABLE mimir.ops_interventions (
     initial_report jsonb NOT NULL, final_validation boolean NOT NULL DEFAULT false,
     inventory_updated boolean NOT NULL DEFAULT false,
     rollback_mode text NOT NULL DEFAULT 'manual' CHECK (rollback_mode = 'manual'),
+    workflow_stage text NOT NULL CHECK (workflow_stage IN ('READ','PRECHECK','SNAPSHOT','BACKUP','EXECUTE','VALIDATE','DONE')),
+    workflow_state text NOT NULL CHECK (workflow_state IN ('ready','intent','failed','complete')),
     started_at timestamptz NOT NULL DEFAULT clock_timestamp(), completed_at timestamptz,
     created_by name NOT NULL DEFAULT session_user,
     authentication_identity text NOT NULL DEFAULT system_user,
@@ -243,11 +245,28 @@ BEGIN
             SELECT to_jsonb(s) INTO result FROM mimir.ops_sites s WHERE site_id=id;
         ELSE
             PERFORM mimir.ops_assert_object(p,
-                ARRAY['device_id','site_id','name','device_type','management_host','ssh_user','adapter','management_port','permission_mode','credential_ref','vendor','model','firmware','role','interfaces','addresses','accesses','dependencies'],
-                ARRAY['device_id','site_id','name','device_type','management_host','ssh_user','adapter']);
+                ARRAY['device_id','site_id','name','device_type','adapter','permission_mode','vendor','model','firmware','role','interfaces','addresses','accesses','dependencies','primary_access_id','management_host','management_port','ssh_user','credential_ref'],
+                ARRAY['device_id','site_id','name','device_type','adapter','primary_access_id','accesses']);
             id := (p->>'device_id')::uuid; sid := (p->>'site_id')::uuid;
-            INSERT INTO mimir.ops_devices(device_id,site_id,name,device_type,role,vendor,model,firmware,management_host,management_port,ssh_user,adapter,permission_mode,credential_ref)
-            VALUES (id,sid,p->>'name',p->>'device_type',coalesce(p->>'role','unspecified'),p->>'vendor',p->>'model',p->>'firmware',p->>'management_host',coalesce((p->>'management_port')::int,22),p->>'ssh_user',p->>'adapter',coalesce(p->>'permission_mode','READ'),coalesce(p->>'credential_ref','ssh-agent'));
+            IF jsonb_array_length(p->'accesses') < 1 OR NOT EXISTS (
+                SELECT FROM jsonb_array_elements(p->'accesses') access
+                WHERE access->>'access_id' = p->>'primary_access_id'
+            ) THEN RAISE EXCEPTION 'primary access must be present in accesses'; END IF;
+            IF EXISTS (
+                SELECT FROM jsonb_array_elements(p->'accesses') access
+                WHERE access->>'access_id' = p->>'primary_access_id'
+                  AND ((p ? 'management_host' AND p->>'management_host' IS DISTINCT FROM access->>'host')
+                    OR (p ? 'management_port' AND p->>'management_port' IS DISTINCT FROM access->>'port')
+                    OR (p ? 'ssh_user' AND p->>'ssh_user' IS DISTINCT FROM access->>'username')
+                    OR (p ? 'credential_ref' AND p->>'credential_ref' IS DISTINCT FROM access->>'credential_ref'))
+            ) THEN RAISE EXCEPTION 'duplicated access projection does not match primary access'; END IF;
+            INSERT INTO mimir.ops_devices(device_id,site_id,name,device_type,role,vendor,model,firmware,
+                management_host,management_port,ssh_user,adapter,permission_mode,credential_ref,primary_access_id)
+            SELECT id,sid,p->>'name',p->>'device_type',coalesce(p->>'role','unspecified'),p->>'vendor',p->>'model',p->>'firmware',
+                access->>'host',coalesce((access->>'port')::int,22),access->>'username',p->>'adapter',
+                coalesce(p->>'permission_mode','READ'),access->>'credential_ref',(p->>'primary_access_id')::uuid
+            FROM jsonb_array_elements(p->'accesses') access
+            WHERE access->>'access_id' = p->>'primary_access_id';
             FOR item IN SELECT value FROM jsonb_array_elements(coalesce(p->'interfaces','[]')) LOOP
                 PERFORM mimir.ops_assert_object(item, ARRAY['interface_id','name','mac','mtu','role','vlan_id'], ARRAY['interface_id','name']);
                 INSERT INTO mimir.ops_interfaces VALUES ((item->>'interface_id')::uuid,sid,id,item->>'name',(item->>'mac')::macaddr,(item->>'mtu')::int,item->>'role',(item->>'vlan_id')::uuid);
@@ -332,8 +351,10 @@ BEGIN
             OR coalesce(length(p#>>'{approval,reference}'),0)=0
             OR p#>>'{approval,plan_sha256}' IS NULL
         ) THEN RAISE EXCEPTION 'execution not authorized'; END IF;
-        INSERT INTO mimir.ops_interventions(intervention_id,device_id,objective,requested_mode,plan,approval,initial_report)
-        VALUES(id,(p#>>'{device,device_id}')::uuid,p->>'objective',p->>'mode',p->'plan',nullif(p->'approval','null'),p);
+        INSERT INTO mimir.ops_interventions(intervention_id,device_id,objective,requested_mode,plan,approval,initial_report,
+            workflow_stage,workflow_state)
+        VALUES(id,(p#>>'{device,device_id}')::uuid,p->>'objective',p->>'mode',p->'plan',nullif(p->'approval','null'),p,
+            CASE WHEN p->>'mode'='EXECUTE' THEN 'PRECHECK' ELSE 'READ' END, 'ready');
         INSERT INTO mimir.ops_audit(method,object_id,after_state) VALUES(method,id,p);
         RETURN jsonb_build_object('intervention_id',id);
     ELSIF method IN ('intervention.event','intervention.finish') THEN
@@ -343,27 +364,42 @@ BEGIN
             RAISE EXCEPTION 'intervention unavailable or already finalized';
         END IF;
         IF method='intervention.event' THEN
+            IF p->>'event' NOT IN ('intent','result') OR p->>'stage' IS NULL
+               OR intervention.workflow_state IN ('failed','complete') THEN
+                RAISE EXCEPTION 'invalid or already terminal workflow state';
+            END IF;
             SELECT * INTO last_action FROM mimir.ops_actions WHERE intervention_id=id ORDER BY sequence_no DESC LIMIT 1;
-            IF p->>'event'='result' AND (last_action.event_type IS DISTINCT FROM 'intent'
-                OR last_action.stage IS DISTINCT FROM p->>'stage'
-                OR last_action.payload->>'operation' IS DISTINCT FROM p#>>'{action,operation}') THEN
-                RAISE EXCEPTION 'result requires matching intent';
+            IF p->>'stage' IS DISTINCT FROM intervention.workflow_stage
+               OR (p->>'event'='intent' AND intervention.workflow_state IS DISTINCT FROM 'ready')
+               OR (p->>'event'='result' AND (intervention.workflow_state IS DISTINCT FROM 'intent'
+                   OR last_action.event_type IS DISTINCT FROM 'intent'
+                   OR last_action.stage IS DISTINCT FROM p->>'stage'
+                   OR last_action.payload->>'operation' IS DISTINCT FROM p#>>'{action,operation}')) THEN
+                RAISE EXCEPTION 'workflow transition out of order';
             END IF;
-            IF p->>'event'='intent' AND last_action.event_type='intent' THEN
-                RAISE EXCEPTION 'prior action requires reconciliation';
-            END IF;
-            IF p->>'stage'='EXECUTE' AND p->>'event'='intent' THEN
-                IF intervention.requested_mode<>'EXECUTE' OR EXISTS (
-                    SELECT FROM mimir.ops_actions WHERE intervention_id=id AND stage='EXECUTE'
-                ) THEN RAISE EXCEPTION 'execution not authorized or already attempted'; END IF;
-                SELECT count(DISTINCT stage) INTO n FROM mimir.ops_actions
-                WHERE intervention_id=id AND stage IN ('PRECHECK','SNAPSHOT','BACKUP') AND event_type='result'
-                    AND payload#>>'{action,exit_code}'='0' AND payload#>'{action,error}'='null'::jsonb
-                    AND payload#>'{action,dry_run}'='false'::jsonb;
-                IF n<>3 THEN RAISE EXCEPTION 'preparation incomplete'; END IF;
+            IF p->>'stage'='EXECUTE' AND p->>'event'='intent' AND intervention.requested_mode<>'EXECUTE' THEN
+                RAISE EXCEPTION 'execution not authorized';
             END IF;
             INSERT INTO mimir.ops_actions(intervention_id,sequence_no,stage,event_type,payload)
             VALUES(id,coalesce(last_action.sequence_no,0)+1,p->>'stage',p->>'event',p);
+            IF p->>'event'='intent' THEN
+                UPDATE mimir.ops_interventions SET workflow_state='intent' WHERE intervention_id=id;
+            ELSIF p#>'{action,exit_code}'='0'::jsonb
+                AND p#>'{action,error}'='null'::jsonb
+                AND p#>'{action,dry_run}'='false'::jsonb THEN
+                UPDATE mimir.ops_interventions SET
+                    workflow_stage=CASE workflow_stage
+                        WHEN 'READ' THEN 'READ' WHEN 'PRECHECK' THEN 'SNAPSHOT'
+                        WHEN 'SNAPSHOT' THEN 'BACKUP' WHEN 'BACKUP' THEN 'EXECUTE'
+                        WHEN 'EXECUTE' THEN 'VALIDATE' WHEN 'VALIDATE' THEN 'DONE' END,
+                    workflow_state=CASE WHEN workflow_stage='VALIDATE' OR workflow_stage='READ'
+                        AND requested_mode='READ' AND p->>'stage'='READ' THEN
+                        CASE WHEN workflow_stage='VALIDATE' THEN 'complete' ELSE 'ready' END
+                        ELSE 'ready' END
+                WHERE intervention_id=id;
+            ELSE
+                UPDATE mimir.ops_interventions SET workflow_state='failed' WHERE intervention_id=id;
+            END IF;
             RETURN jsonb_build_object('recorded',true);
         END IF;
         report := p->'report'; body := p->>'json_text'; md := p->>'markdown';
@@ -381,6 +417,9 @@ BEGIN
         success := report->>'status' IN ('collected','validated');
         IF report->>'status' NOT IN ('collected','validated','failed') OR report->>'completed_at' IS NULL THEN
             RAISE EXCEPTION 'invalid final state';
+        END IF;
+        IF success AND intervention.workflow_state IS DISTINCT FROM 'complete' THEN
+            RAISE EXCEPTION 'workflow not complete';
         END IF;
         IF success THEN
             IF report#>'{validation,passed}' IS DISTINCT FROM 'true'::jsonb
@@ -460,15 +499,12 @@ END
 $api$;
 
 REVOKE ALL ON FUNCTION mimir.ops_assert_identity(), mimir.ops_assert_object(jsonb,text[],text[]),
-    mimir.ops_device_document(uuid), mimir.ops_api(jsonb) FROM PUBLIC, mimir_app, mimir_search, mimir_ops;
+    mimir.ops_device_document(uuid), mimir.ops_api(jsonb) FROM PUBLIC;
 REVOKE ALL ON mimir.ops_identities, mimir.ops_clients, mimir.ops_sites, mimir.ops_devices,
     mimir.ops_interfaces, mimir.ops_addresses, mimir.ops_networks, mimir.ops_vlans, mimir.ops_accesses,
     mimir.ops_dependencies, mimir.ops_interventions, mimir.ops_actions, mimir.ops_evidence,
-    mimir.ops_reports, mimir.ops_audit FROM PUBLIC, mimir_app, mimir_search, mimir_ops;
-REVOKE ALL ON SEQUENCE mimir.ops_actions_action_id_seq, mimir.ops_audit_audit_id_seq
-    FROM PUBLIC, mimir_app, mimir_search, mimir_ops;
-GRANT USAGE ON SCHEMA mimir TO mimir_ops;
-GRANT EXECUTE ON FUNCTION mimir.ops_api(jsonb) TO mimir_ops;
+    mimir.ops_reports, mimir.ops_audit FROM PUBLIC;
+REVOKE ALL ON SEQUENCE mimir.ops_actions_action_id_seq, mimir.ops_audit_audit_id_seq FROM PUBLIC;
 INSERT INTO mimir.schema_version(version,description)
 VALUES(9,'Inventário operacional e intervenções por API peer controlada; memória preservada');
 RESET ROLE;
