@@ -29,9 +29,18 @@ deve existir um problema concreto que a arquitetura atual não resolve de forma 
 
 Critério geral:
 
-`problema observado -> medir -> tentar solução simples -> comparar -> adotar somente se melhorar`
+`necessidade atual ou previsível -> impacto de adiar -> preparar fronteiras -> medir -> implementar quando o benefício justificar`
 
-Se a solução atual atender com segurança, auditabilidade, desempenho e manutenção aceitáveis, ela deve permanecer.
+A regra **não** é esperar a arquitetura quebrar para só então evoluir.
+
+O Mímir deve distinguir:
+
+- **não implementar ainda**;
+- **não preparar ainda**.
+
+Uma tecnologia pode não precisar ser implementada hoje e, mesmo assim, sua futura adoção pode exigir decisões de arquitetura agora para evitar retrabalho caro.
+
+Se a solução atual atender com segurança, auditabilidade, desempenho e manutenção aceitáveis, ela pode permanecer como implementação corrente. Porém, quando houver alta probabilidade de uma capacidade futura e alto custo de adaptação tardia, o projeto deve preparar interfaces, contratos e limites antecipadamente.
 
 ## 1. Como um agente se torna especialista
 
@@ -361,23 +370,77 @@ Portanto, Memory v2 deve contemplar memória procedural versionada e ligada a:
 - intervention;
 - evidence.
 
-## 11. Critério para adotar MCP
+## 11. Critério para preparar e adotar MCP
 
-Adotar MCP se pelo menos um destes problemas aparecer:
+A decisão sobre MCP possui duas etapas diferentes.
+
+### Preparar para MCP
+
+Mesmo antes de existir servidor MCP, a camada operacional deve ser construída de forma que possa ser exposta posteriormente sem reescrever os adapters.
+
+Preparar agora significa:
+
+- operações com schemas explícitos;
+- adapters separados do orquestrador;
+- inputs e outputs estruturados;
+- políticas fora da lógica do LLM;
+- separação entre READ, PLAN e EXECUTE;
+- erros e resultados serializáveis;
+- identidade estável de tools/operações;
+- nenhuma dependência de prompt para executar regra de segurança.
+
+Isso reduz o custo de introduzir MCP futuramente.
+
+### Adotar MCP
+
+Implementar MCP quando houver necessidade atual **ou previsível com alta probabilidade**, como:
 
 - duplicação de integrações;
-- múltiplos consumidores precisam das mesmas ferramentas;
+- OpenClaw, Codex, Claude Code ou outros consumidores precisarem das mesmas tools;
+- expansão rápida de agentes especialistas;
 - acoplamento forte ao OpenClaw;
 - necessidade de contrato estável de tools;
-- necessidade de interoperabilidade externa.
+- necessidade de interoperabilidade externa;
+- expectativa concreta de múltiplos frontends/clientes sobre o mesmo executor.
 
-Caso contrário, manter chamada direta ao módulo operacional.
+Não esperar necessariamente o segundo ou terceiro consumidor entrar em produção para só então redesenhar a camada.
 
-## 12. Critério para adotar A2A
+Se o roadmap já indicar que vários consumidores serão necessários em breve, a preparação deve ocorrer antes e a implementação pode ser antecipada quando o custo de adiar superar o custo de introduzir MCP.
 
-Adotar A2A somente quando existir fronteira real entre agentes independentes.
+## 12. Critério para preparar e adotar A2A
 
-Não adotar para agentes internos apenas por tendência tecnológica.
+A2A não deve ser introduzido apenas por tendência tecnológica, mas também não deve ser ignorado até o momento em que agentes independentes já estejam bloqueando o projeto.
+
+### Preparar para A2A
+
+Mesmo com orquestração interna, agentes devem possuir contratos claros:
+
+- agent_id;
+- domínio;
+- capacidades;
+- inputs aceitos;
+- outputs;
+- políticas;
+- owner da tarefa;
+- status;
+- correlation/task id;
+- handoff estruturado.
+
+Esses contratos tornam uma futura migração para A2A muito mais simples.
+
+### Adotar A2A
+
+Introduzir A2A quando houver necessidade atual ou previsível de:
+
+- agentes em processos independentes;
+- agentes em máquinas diferentes;
+- agentes em frameworks diferentes;
+- agentes de terceiros;
+- descoberta dinâmica;
+- delegação padronizada externa;
+- escala em que a orquestração interna esteja se tornando um acoplamento ou gargalo.
+
+O gatilho deve considerar não apenas a dor atual, mas também o custo de esperar.
 
 ## 13. Critério para criar novo agente especialista
 
@@ -394,30 +457,42 @@ Se essas condições não existirem, manter a função dentro de um agente mais 
 
 ## 14. Regra de evolução do projeto
 
-Toda evolução deve passar por:
+Toda evolução deve considerar duas dimensões:
 
-1. problema real;
-2. evidência;
-3. baseline;
-4. alternativa simples;
-5. benchmark;
-6. avaliação de risco;
-7. teste;
-8. decisão documentada.
+1. **necessidade funcional** — o que o projeto precisa agora ou provavelmente precisará em breve;
+2. **custo de postergação** — quanto retrabalho, interrupção ou risco surgirá se a capacidade for adicionada tarde demais.
 
-Tecnologia sem problema associado permanece **PLANEJADA**, não implementada.
+Fluxo de decisão:
+
+1. necessidade atual ou previsível;
+2. evidência e probabilidade;
+3. impacto de não fazer;
+4. custo de fazer agora;
+5. baseline;
+6. alternativa simples;
+7. preparação arquitetural mínima;
+8. benchmark;
+9. avaliação de risco;
+10. teste;
+11. decisão documentada.
+
+Tecnologia sem benefício relevante permanece **PLANEJADA**.
+
+Tecnologia ainda não necessária, mas com forte probabilidade futura e alto custo de adaptação tardia, deve receber **PREPARAÇÃO ARQUITETURAL**, sem obrigatoriamente receber implementação completa.
 
 ## 15. Ordem sugerida
 
 1. concluir fundação operacional;
 2. validar adapters atuais;
 3. estruturar knowledge base e memória procedural;
-4. criar agente Redes/MikroTik em modo READ/PLAN;
-5. validar benchmark e segurança;
-6. habilitar EXECUTE controlado;
-7. avaliar MCP somente se houver ganho;
-8. ampliar outros especialistas;
-9. avaliar A2A somente quando agentes realmente se tornarem independentes.
+4. manter os adapters e operações já compatíveis com futura exposição via MCP;
+5. criar agente Redes/MikroTik em modo READ/PLAN;
+6. validar benchmark e segurança;
+7. habilitar EXECUTE controlado;
+8. reavaliar MCP antes da entrada de múltiplos consumidores, e não somente depois;
+9. ampliar outros especialistas conforme necessidade;
+10. manter contratos de agentes compatíveis com futura delegação externa;
+11. avaliar A2A antes que a separação entre agentes vire gargalo operacional.
 
 ## Princípio final
 
@@ -433,4 +508,10 @@ O objetivo é executar tarefas com:
 - baixo acoplamento;
 - manutenção viável.
 
-A arquitetura deve crescer apenas quando o funcionamento real justificar a complexidade adicional.
+A arquitetura deve crescer quando o funcionamento real **ou uma necessidade futura altamente provável** justificar a complexidade adicional.
+
+O princípio é **just-in-time, não too-late**:
+
+- não construir infraestrutura prematuramente;
+- não deixar para projetar uma capacidade crítica quando ela já estiver bloqueando a operação;
+- preparar hoje as fronteiras que evitam uma reescrita amanhã.
