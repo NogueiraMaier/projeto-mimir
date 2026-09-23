@@ -49,3 +49,17 @@ O Vitest 4.1.9 vem da instalação compartilhada do OpenClaw. Nenhuma dependênc
 O manifesto declara `activation.onStartup`, `contracts.tools` e
 `toolMetadata.mimir_memory_search.optional`. A validação combina testes,
 compilação, importação estrutural e `plugins inspect --runtime`.
+
+## Testes no servidor de desenvolvimento
+
+Os scripts `npm test` e `npm run build` procuram Vitest/TypeScript nas dependências
+locais e depois em `/opt/openclaw`. Não executam instalação nem download.
+Isso permite testar fora do VPS sem alterar a configuração do OpenClaw.
+O runtime e as funções de memória do plugin permanecem inalterados.
+
+Na revisão operacional de 2026-09-22, os seis testes e o build foram executados
+com pacotes já disponíveis em cache local: OpenClaw 2026.9.5, Vitest 4.1.9,
+TypeScript 5.9.3, typebox 1.3.34 e @types/node 24.13.3. Esse resultado não
+comprova a versão instalada, o carregamento do plugin ou seu funcionamento no VPS.
+O manifesto de dependências continua sem lockfile; reprodutibilidade completa
+permanece uma pendência anterior, não resolvida por essa validação offline.

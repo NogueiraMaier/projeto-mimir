@@ -14,7 +14,7 @@ O repositório documenta especializações futuras para SOC, OSINT, Cyber-Lab, r
 
 O memory-core nativo do OpenClaw mantém contexto operacional de curto prazo.
 
-Características confirmadas:
+Características do snapshot documentado em 2026-07-30, não revalidadas nesta revisão local:
 
 - Backend builtin
 - Banco SQLite local
@@ -43,18 +43,24 @@ Componentes:
 
 ## Camada operacional
 
-A branch de fundação operacional adiciona um MVP separado da memória permanente:
+IMPLEMENTADO no repositório, NÃO VALIDADO EM PRODUÇÃO. A camada em `tools/ops`
+estende a fundação operacional e permanece separada do plugin e das funções de
+memória. A migration 009 modela CMDB e intervenções; a role dedicada `mimir_ops`
+acessa somente uma API SQL controlada com autenticação peer e identidade
+inicialmente desabilitada. `mimir_app` não recebe acesso direto às tabelas ops.
 
-- inventário PostgreSQL de clientes, sites e equipamentos;
-- histórico de intervenções, ações, evidências e relatórios;
-- política READ / PLAN / EXECUTE;
-- executor SSH com verificação de host key e timeout;
-- adapters iniciais generic-linux e mikrotik-routeros;
-- relatórios JSON e Markdown.
+O CLI mantém entradas JSON para plano/diagnóstico legado e adiciona inventário,
+histórico e relatórios PostgreSQL. Catálogos por adapter restringem READ, PLAN e
+EXECUTE; alteração exige plano aprovado, preparação, auditoria e validação.
+Somente `set-hostname` transitório no adapter Linux está implementado para
+alteração. MikroTik permanece em diagnóstico. Rollback é manual.
 
-O modo EXECUTE exige aprovação explícita para alterações. Ações destrutivas permanecem bloqueadas por padrão.
-
-O MVP não contém credenciais e não foi validado contra equipamentos de produção.
+A finalização associa estado encontrado, ações, validação, observação atualizada
+do inventário, histórico e relatório. Intervenções técnicas `validated` não são
+promovidas à memória automaticamente: `memory_handoff` v1 é interface PARCIAL,
+confidential, para revisão humana, duplicidade, contradições e preservação de
+versões. `closed` permanece false. Nenhuma ferramenta de shell foi adicionada
+ao agente main. Detalhes e limites: [OPERATIONS.md](OPERATIONS.md).
 
 ## Ingestão protegida de sessões
 

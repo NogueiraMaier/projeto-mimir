@@ -97,3 +97,40 @@ Nenhuma sessão deve ser importada sem execução explícita do cliente de inges
 11. Criar uma tag para marcos estáveis.
 12. Enviar ao repositório remoto público.
 13. Comparar os hashes local e remoto.
+
+## Validação operacional antes de implantação da 009
+
+Estado: IMPLEMENTADO localmente, NÃO VALIDADO EM PRODUÇÃO. Os procedimentos
+históricos de reinício e publicação acima não fazem parte da revisão local.
+Nenhuma migration, configuração, reinício ou push foi executado nessa etapa.
+
+Primeiro comando posterior, já no VPS e sob identidade peer autorizada:
+
+```bash
+cd /var/lib/openclaw/workspace
+bash tools/validation/validate-vps-readonly.sh --db-user mimir_app
+```
+
+O validador não aplica SQL de alteração, não executa scripts de serviço, não
+reinicia OpenClaw, não muda branch, não acessa equipamentos e não lê configuração
+com segredos. Use `--skip-db` para excluir conexão PostgreSQL. Falhas devem ser
+revisadas antes de qualquer correção. Presença de artefatos não confirma plugin
+carregado; versão 9 registrada não identifica a revisão aplicada da migration.
+
+O CLI usa uma role nova `mimir_ops`, inicialmente desabilitada; a revisão de
+schema, backup/restauração, grants e peer precisa preceder a habilitação.
+Não aplicar 009 sobre versão 9 existente: ela recusa reexecução deliberadamente.
+Não introduzir migration 010 para contornar essa proteção.
+
+Consulta posterior de intervenção sob identidade operacional habilitada:
+
+```bash
+python3 tools/ops/mimir-ops.py ops history DEVICE_UUID
+python3 tools/ops/mimir-ops.py ops report INTERVENTION_UUID --format markdown
+```
+
+Após timeout, perda de auditoria ou confirmação incerta da transação, não
+repetir EXECUTE. Consultar o diário pelo UUID, verificar o dispositivo sob
+nova autorização e registrar reconciliação administrativa preservando evidências.
+Rollback é manual; backup implementado cobre apenas hostname em execução.
+Procedimentos, simulações e requisitos: [OPERATIONS.md](OPERATIONS.md).

@@ -96,3 +96,32 @@ Toda ação exigirá:
 5. Registro de execução.
 6. Evidências.
 7. Relatório técnico.
+
+## Camada operacional — revisão local 2026-09-22
+
+IMPLEMENTADO no repositório; NÃO VALIDADO EM PRODUÇÃO. A execução operacional
+não é exposta pelo plugin de memória nem concedida permanentemente ao agente
+main. CLI administrativo separado, identidade peer dedicada inicialmente
+desabilitada, sem grants diretos nas tabelas ops e sem novos grants em memória.
+
+A autorização vincula hash do plano, equipamento, operação, parâmetros e
+objetivo. Não é assinatura criptográfica nem prova independente de aprovação
+por duas pessoas. A conta Linux operacional e seu SSH Agent são fronteiras de
+confiança; não compartilhar essa conta com entradas não confiáveis de agentes.
+
+Operações remotas são um catálogo fechado. Configuração SSH do usuário é
+ignorada; verificação de host é obrigatória; não há senha, forwarding, proxy ou
+shell local. Há timeouts e limites durante a leitura de stdout/stderr. Não há
+export de configuração MikroTik, comandos arbitrários ou rollback automático.
+
+Falha na auditoria impede continuar; falha após alteração exige reconciliação
+manual. O banco não permite finalização validada sem validação e observação de
+inventário. Intentos/resultados e revisões de inventário são preservados; a API
+não oferece exclusão de histórico. Retenção e proteção operacional do banco
+precisam ser aprovadas antes de produção.
+
+Redaction é recursiva, mas padrões não detectam todo segredo sem marcação.
+Não cadastrar segredos em campos livres e não ampliar coleta para backups ou
+configurações completas. Relatórios são confidenciais, com diretório local
+0700 e arquivos 0600. `memory_handoff` é PARCIAL e exige revisão antes de
+qualquer promoção; nenhum dado é enviado a API externa por esta camada.

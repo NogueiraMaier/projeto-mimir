@@ -3,7 +3,9 @@
 Data da consolidação original: 2026-07-30
 Última atualização documental: 2026-09-22
 
-## Concluído anteriormente
+## Declarações históricas de 2026-07-30
+
+Os itens abaixo preservam o registro anterior; não constituem comprovação do estado atual do VPS.
 
 - OpenClaw instalado
 - Serviço administrado pelo OpenRC
@@ -42,24 +44,36 @@ A validação documentada em 30 de julho de 2026 recuperou cinco memórias conhe
 - cliente tools/memory/mimir-ingest-session.py presente em modo dry run;
 - promoção automática para candidate/active continua bloqueada.
 
-## Camada operacional — MVP no repositório
+## Camada operacional — revisão local de 2026-09-22
 
-Em 2026-09-22 a branch de fundação operacional passou a conter:
+- **IMPLEMENTADO:** CMDB com clientes/sites/equipamentos, interfaces, IPs,
+  sub-redes, VLANs, acessos por referência e dependências; migration 009 corrigida.
+- **IMPLEMENTADO:** CLI PostgreSQL de cadastro/listagem/consulta, histórico e
+  relatório, por API controlada e role operacional dedicada inicialmente desabilitada.
+- **IMPLEMENTADO:** catálogo por operação/adapter, aprovação por hash de plano,
+  SSH limitado, redaction e fluxo precheck/snapshot/backup/execute/validate/report.
+- **IMPLEMENTADO:** alteração transitória de hostname Linux e diagnóstico Linux/MikroTik.
+- **IMPLEMENTADO:** evidências, diário, relatórios JSON/Markdown e atualização
+  transacional da observação de inventário, com estado incerto em falhas de alteração.
+- **IMPLEMENTADO:** validador de VPS somente leitura e testes locais sem equipamentos.
+- **PARCIAL:** rollback manual, backup somente do estado alterado, normalização
+  automática de topologia e integração de intervenção à memória permanente.
+- **PLANEJADO:** backup completo/restauração, adapters adicionais, reconciliação
+  assistida de intervenções interrompidas e integração humana da memória.
+- **NÃO VALIDADO EM PRODUÇÃO:** migration 009, identidade peer operacional,
+  PostgreSQL real e comandos SSH em equipamentos.
 
-- migration 009 para inventário, intervenções, ações, evidências e relatórios;
-- política READ / PLAN / EXECUTE;
-- executor SSH controlado;
-- adapters generic-linux e mikrotik-routeros;
-- testes unitários da política e relatórios;
-- documentação em docs/OPERATIONS.md.
+Código de memória, migrations 002–008 e runtime do plugin foram preservados.
+Scripts de teste/build do plugin agora aceitam dependências locais, mantendo a
+instalação compartilhada de `/opt/openclaw` como alternativa.
 
-Estado: implementado na branch de desenvolvimento, ainda não validado em produção.
+Validação e evidências locais: [revisão operacional](review/operations/2026-09-22.md).
+Operação e instalação futura: [OPERATIONS.md](OPERATIONS.md).
 
 ## Próximas etapas
 
-- aplicar e validar a migration 009 em ambiente controlado;
-- conectar o CLI operacional ao PostgreSQL;
-- implementar backup/rollback específicos por adapter;
-- validar primeiro equipamento de laboratório em READ;
-- integrar encerramento de intervenção com memória permanente;
-- somente depois ampliar EXECUTE para comandos específicos.
+Validar primeiro o VPS com `tools/validation/validate-vps-readonly.sh`, sob
+identidade peer existente e autorizada. Testar SQL em banco descartável antes
+de qualquer implantação, revisar backup/restauração e provisionamento da role,
+e somente então autorizar equipamento de laboratório em READ. As lacunas
+históricas da memória e de governança não foram encerradas por esta revisão.

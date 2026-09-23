@@ -4,13 +4,14 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "build": "/opt/openclaw/node_modules/.bin/tsc -p tsconfig.json",
-    "test": "/opt/openclaw/node_modules/.bin/vitest run --config ./vitest.config.ts"
+    "build": "node tools/run-tool.mjs build -p tsconfig.json",
+    "test": "node tools/run-tool.mjs test run --config ./vitest.config.ts"
   },
   "files": [
     "dist",
     "openclaw.plugin.json",
-    "README.md"
+    "README.md",
+    "tools"
   ],
   "peerDependencies": {
     "openclaw": ">=2026.5.17"
@@ -30,5 +31,5 @@
       "./dist/index.js"
     ]
   },
-  "description": "Consulta controlada da memória permanente e verificação em modo sombra."
+  "description": "Consulta controlada da mem\u00f3ria permanente e verifica\u00e7\u00e3o em modo sombra."
 }
