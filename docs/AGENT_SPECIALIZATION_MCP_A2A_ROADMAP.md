@@ -515,3 +515,82 @@ O princípio é **just-in-time, não too-late**:
 - não construir infraestrutura prematuramente;
 - não deixar para projetar uma capacidade crítica quando ela já estiver bloqueando a operação;
 - preparar hoje as fronteiras que evitam uma reescrita amanhã.
+
+
+## 16. Regra anti-bloat — preparar sem acumular função inútil
+
+O princípio de preparação arquitetural **não autoriza** adicionar serviços, dependências, protocolos, adapters, agentes ou código especulativo apenas porque podem ser úteis no futuro.
+
+A preparação antecipada deve ser mínima, barata e preferencialmente neutra.
+
+### Estados de decisão
+
+Toda ideia nova deve cair em um destes estados:
+
+- **IMPLEMENTAR AGORA** — necessidade real, benefício mensurável e prioridade operacional;
+- **PREPARAR INTERFACE** — necessidade futura com probabilidade relevante e alto custo de adaptação tardia, mas sem implementar a tecnologia completa;
+- **WATCHLIST** — ideia plausível, porém sem evidência suficiente para mexer na arquitetura;
+- **DESCARTAR / NÃO ADOTAR** — custo, complexidade ou risco não justificam o benefício.
+
+### O que significa "preparar interface"
+
+Preparar não significa:
+
+- instalar serviço;
+- adicionar daemon;
+- criar dependência;
+- manter código morto;
+- criar agente sem uso;
+- criar MCP vazio;
+- criar A2A sem pares reais;
+- criar tabela ou schema especulativo sem caso de uso;
+- introduzir abstração genérica sem pelo menos um consumidor concreto.
+
+Preparar significa apenas preservar boas fronteiras onde isso já faz sentido:
+
+- contratos claros;
+- separação entre policy, adapter e executor;
+- inputs/outputs estruturados;
+- identificadores estáveis;
+- evitar acoplamento desnecessário.
+
+### Critério de evidência
+
+Uma melhoria futura só deve sair de WATCHLIST para PREPARAR INTERFACE quando houver pelo menos um dos seguintes:
+
+1. segunda integração ou segundo consumidor concreto já planejado;
+2. roadmap aprovado com prazo razoável para a capacidade;
+3. problema repetido que mostra tendência de crescimento;
+4. custo de adaptação tardia comprovadamente alto;
+5. requisito de interoperabilidade, segurança ou auditoria já identificado.
+
+Sem isso, a ideia permanece documentada e **não altera runtime nem arquitetura**.
+
+### Princípio YAGNI com consciência de arquitetura
+
+Aplicar YAGNI:
+
+**You Aren't Gonna Need It — até existir evidência de que provavelmente vai precisar.**
+
+A meta é evitar dois extremos:
+
+- construir tudo antecipadamente e transformar o Mímir em um agregador de funções sem uso;
+- esperar a operação travar para só então refatorar uma base mal acoplada.
+
+O padrão desejado é:
+
+`documentar cedo -> observar -> preparar minimamente quando justificado -> implementar somente quando necessário`.
+
+### Métrica de saúde arquitetural
+
+Toda nova capacidade deve justificar:
+
+- quem usa;
+- para qual problema;
+- com que frequência;
+- qual dependência adiciona;
+- qual superfície de ataque cria;
+- como será testada;
+- como será removida se deixar de ser útil.
+
+Funcionalidade sem consumidor real, sem teste ou sem dono deve ser tratada como dívida arquitetural, não como progresso.
