@@ -94,6 +94,33 @@ for command in ('ip address; reboot','rc-service sshd restart','/system reset-co
 assert redact('token=synthetic')=='<redacted>'
 PY
 
+validate_schema_history() {
+    local can_select
+    if ! can_select=$(psql_ro "BEGIN READ ONLY; SELECT has_table_privilege(current_user, 'mimir.schema_version', 'SELECT'); ROLLBACK;" 2>/dev/null); then
+        echo 'FAIL: schema_version privilege inspection failed'
+        failures=$((failures+1))
+        return
+    fi
+    case "$can_select" in
+        t)
+            check 'schema_version history 001-012 complete' psql_ro \
+                "BEGIN READ ONLY; SELECT 1 / (count(DISTINCT version)=12)::int FROM mimir.schema_version WHERE version BETWEEN 1 AND 12; ROLLBACK;"
+            if psql_ro "BEGIN READ ONLY; SELECT 1 / EXISTS(SELECT FROM mimir.schema_version WHERE version=13)::int; ROLLBACK;" >/dev/null 2>&1; then
+                echo 'PASS: schema_version 013 present (does not attest migration contents)'
+            else
+                echo 'PARTIAL: schema_version 013 absent or inspection failed; no migration applied'
+            fi
+            ;;
+        f)
+            echo 'PARTIAL: schema_version is not directly readable by this role due to least privilege (expected for mimir_app after migration 009); version confirmation requires separate administrative read-only inspection'
+            ;;
+        *)
+            echo 'FAIL: schema_version privilege inspection returned unexpected output'
+            failures=$((failures+1))
+            ;;
+    esac
+}
+
 if ((skip_db)); then
     echo 'SKIP: PostgreSQL/pgvector/schema checks explicitly disabled'
 else
@@ -116,13 +143,7 @@ else
             "BEGIN READ ONLY; SELECT 1 / (current_setting('server_version_num')::int >= 170000)::int; ROLLBACK;"
         check 'pgvector extension' psql_ro \
             "BEGIN READ ONLY; SELECT 1 / EXISTS(SELECT FROM pg_extension WHERE extname='vector')::int; ROLLBACK;"
-        check 'schema_version includes 008' psql_ro \
-            "BEGIN READ ONLY; SELECT 1 / EXISTS(SELECT FROM mimir.schema_version WHERE version=8)::int; ROLLBACK;"
-        if psql_ro "BEGIN READ ONLY; SELECT 1 / EXISTS(SELECT FROM mimir.schema_version WHERE version=9)::int; ROLLBACK;" >/dev/null 2>&1; then
-            echo 'PASS: schema_version 009 present (does not attest migration contents)'
-        else
-            echo 'PARTIAL: schema_version 009 absent or not readable; no migration applied'
-        fi
+        validate_schema_history
     fi
 fi
 printf 'Readonly validation finished: %s failed checks\n' "$failures"

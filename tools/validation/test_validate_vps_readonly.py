@@ -28,6 +28,43 @@ class ValidatorTests(unittest.TestCase):
         self.assertNotIn(b'PostgreSQL local socket', result.stdout)
         self.assertNotIn(b'synthetic-private-marker', result.stdout + result.stderr)
 
+    def test_schema_history_with_simulated_privileges(self):
+        # Extract only pure shell functions. Never source/run the database branch.
+        source = SCRIPT.read_text()
+        check = source[source.index('check() {'):source.index("check 'Gentoo marker'")]
+        history = source[source.index('validate_schema_history() {'):source.index('if ((skip_db));')]
+        mock = r'''psql_ro() {
+            case "$1" in
+                *has_table_privilege*) echo "$PRIVILEGE"; return "$PROBE_CODE" ;;
+                *"BETWEEN 1 AND 12"*) echo history >&3; return "$HISTORY_CODE" ;;
+                *"version=13"*) echo operational >&3; return "$OPS_CODE" ;;
+                *) return 99 ;;
+            esac
+        }
+        '''
+        for privilege, probe, history_code, ops, expected, failures in (
+            ('f', 0, 99, 99, 'PARTIAL: schema_version is not directly readable', 0),
+            ('t', 0, 0, 0, 'PASS: schema_version 013 present', 0),
+            ('t', 0, 0, 1, 'PARTIAL: schema_version 013 absent', 0),
+            ('t', 0, 1, 0, 'FAIL: schema_version history 001-012 complete', 1),
+            ('', 1, 99, 99, 'FAIL: schema_version privilege inspection failed', 1),
+            ('unexpected', 0, 99, 99, 'FAIL: schema_version privilege inspection returned', 1),
+        ):
+            with self.subTest(privilege=privilege, history=history_code, ops=ops):
+                script = (f'failures=0; PRIVILEGE={privilege!r}; PROBE_CODE={probe}; '
+                          f'HISTORY_CODE={history_code}; OPS_CODE={ops}\n'
+                          + check + mock + history
+                          + '\nvalidate_schema_history 3>&2\necho failures=$failures\n')
+                result = subprocess.run(['bash', '-c', script], capture_output=True, text=True, timeout=5)
+                self.assertEqual(result.returncode, 0)
+                self.assertIn(expected, result.stdout)
+                self.assertIn(f'failures={failures}', result.stdout)
+                if privilege == 'f':
+                    self.assertNotIn('FAIL:', result.stdout)
+                    self.assertIn('separate administrative read-only inspection', result.stdout)
+                    self.assertNotIn('history', result.stderr)
+                    self.assertNotIn('operational', result.stderr)
+
     def test_no_deployment_mutations(self):
         source = SCRIPT.read_text()
         lines = []

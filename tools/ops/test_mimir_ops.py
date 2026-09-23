@@ -349,7 +349,7 @@ class InventoryStoreTests(unittest.TestCase):
 
 class WorkflowTests(unittest.TestCase):
     def test_persisted_sql_workflow_is_stateful_and_fail_closed(self):
-        migration = Path(__file__).parents[1] / 'memory' / 'migrations' / '009_operational_inventory.sql'
+        migration = Path(__file__).parents[1] / 'memory' / 'migrations' / '013_operational_inventory.sql'
         sql = migration.read_text()
         for token in ('workflow_stage', 'workflow_state', 'workflow transition out of order',
                       "workflow_state='failed'", "workflow_stage=CASE workflow_stage",
@@ -390,7 +390,7 @@ class WorkflowTests(unittest.TestCase):
             transition('EXECUTE', 'ready', 'intent', True, requested='PRECHECK')
 
     def test_read_workflow_reaches_done_and_complete(self):
-        migration = Path(__file__).parents[1] / 'memory' / 'migrations' / '009_operational_inventory.sql'
+        migration = Path(__file__).parents[1] / 'memory' / 'migrations' / '013_operational_inventory.sql'
         sql = migration.read_text()
         self.assertIn("WHEN 'READ' THEN 'DONE'", sql)
         self.assertIn("workflow_stage IN ('VALIDATE','READ')", sql)
@@ -403,8 +403,11 @@ class WorkflowTests(unittest.TestCase):
 
     def test_schema_migration_keeps_role_and_access_provisioning_separate(self):
         migration_dir = Path(__file__).parents[1] / 'memory' / 'migrations'
-        schema = (migration_dir / '009_operational_inventory.sql').read_text()
-        role = (migration_dir / '009_operational_role.sql').read_text()
+        schema = (migration_dir / '013_operational_inventory.sql').read_text()
+        role = (migration_dir / '013_operational_role.sql').read_text()
+        self.assertIn('WHERE version = 12', schema)
+        self.assertIn('WHERE version = 13', schema)
+        self.assertIn("VALUES(13,'Inventário", schema)
         self.assertNotIn('CREATE ROLE mimir_ops', schema)
         self.assertNotIn('GRANT CONNECT', schema)
         self.assertIn('GRANT CONNECT ON DATABASE', role)

@@ -47,7 +47,7 @@ A validação documentada em 30 de julho de 2026 recuperou cinco memórias conhe
 ## Camada operacional — revisão local de 2026-09-22
 
 - **IMPLEMENTADO:** CMDB com clientes/sites/equipamentos, interfaces, IPs,
-  sub-redes, VLANs, acessos por referência e dependências; migration 009 corrigida.
+  sub-redes, VLANs, acessos por referência e dependências; migration 013 corrigida.
 - **IMPLEMENTADO:** CLI PostgreSQL de cadastro/listagem/consulta, histórico e
   relatório, por API controlada e role operacional dedicada inicialmente desabilitada.
 - **IMPLEMENTADO:** catálogo por operação/adapter, aprovação por hash de plano,
@@ -60,7 +60,7 @@ A validação documentada em 30 de julho de 2026 recuperou cinco memórias conhe
   automática de topologia e integração de intervenção à memória permanente.
 - **PLANEJADO:** backup completo/restauração, adapters adicionais, reconciliação
   assistida de intervenções interrompidas e integração humana da memória.
-- **NÃO VALIDADO EM PRODUÇÃO:** migration 009, identidade peer operacional,
+- **NÃO VALIDADO EM PRODUÇÃO:** migration 013, identidade peer operacional,
   PostgreSQL real e comandos SSH em equipamentos.
 
 Código de memória, migrations 002–008 e runtime do plugin foram preservados.

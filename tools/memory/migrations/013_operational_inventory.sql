@@ -1,15 +1,15 @@
 \set ON_ERROR_STOP on
--- Development revision of unapplied 009. Deliberately refuses reapplication.
+-- Development revision of unapplied 013. Deliberately refuses reapplication.
 -- PostgreSQL 17 (system_user); existing memory schema and pgcrypto required.
--- Cluster-global role provisioning is intentionally separate in 009_operational_role.sql.
+-- Cluster-global role provisioning is intentionally separate in 013_operational_role.sql.
 BEGIN;
 DO $migration$
 BEGIN
-    IF NOT EXISTS (SELECT FROM mimir.schema_version WHERE version = 8) THEN
-        RAISE EXCEPTION 'migration 008 required';
+    IF NOT EXISTS (SELECT FROM mimir.schema_version WHERE version = 12) THEN
+        RAISE EXCEPTION 'migration 012 required';
     END IF;
-    IF EXISTS (SELECT FROM mimir.schema_version WHERE version = 9) THEN
-        RAISE EXCEPTION '009 already applied: stop and review schema; do not overwrite';
+    IF EXISTS (SELECT FROM mimir.schema_version WHERE version = 13) THEN
+        RAISE EXCEPTION '013 already applied: stop and review schema; do not overwrite';
     END IF;
 END
 $migration$;
@@ -511,6 +511,6 @@ REVOKE ALL ON mimir.ops_identities, mimir.ops_clients, mimir.ops_sites, mimir.op
     mimir.ops_reports, mimir.ops_audit FROM PUBLIC;
 REVOKE ALL ON SEQUENCE mimir.ops_actions_action_id_seq, mimir.ops_audit_audit_id_seq FROM PUBLIC;
 INSERT INTO mimir.schema_version(version,description)
-VALUES(9,'Inventário operacional e intervenções por API peer controlada; memória preservada');
+VALUES(13,'Inventário operacional e intervenções por API peer controlada; memória preservada');
 RESET ROLE;
 COMMIT;

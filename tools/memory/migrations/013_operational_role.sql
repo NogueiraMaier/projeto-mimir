@@ -1,6 +1,6 @@
 \set ON_ERROR_STOP on
--- Cluster-global/privilege provisioning for migration 009.
--- Run only after 009_operational_inventory.sql in the reviewed target database.
+-- Cluster-global/privilege provisioning for migration 013.
+-- Run only after 013_operational_inventory.sql in the reviewed target database.
 -- This file is deliberately separate so disposable schema tests never create or
 -- alter the production role or assume a database name.
 BEGIN;

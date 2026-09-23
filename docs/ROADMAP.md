@@ -43,7 +43,7 @@ PRODUÇÃO. Escopo detalhado em [OPERATIONS.md](OPERATIONS.md).
 Próximos marcos, cada um com autorização própria:
 
 1. Executar o validador somente leitura no VPS; resolver divergências sem aplicar mudanças automaticamente.
-2. Validar 009, grants/peer e constraints em banco descartável com o schema real de memória preservado.
+2. Validar 013, grants/peer e constraints em banco descartável com o schema real de memória preservado.
 3. Demonstrar backup/restauração e provisionar a identidade operacional dedicada.
 4. Autorizar um equipamento de laboratório em READ, conferindo host key independentemente.
 5. Homologar a operação de hostname transitório e recuperação manual antes de ampliar EXECUTE.

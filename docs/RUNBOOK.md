@@ -98,7 +98,7 @@ Nenhuma sessão deve ser importada sem execução explícita do cliente de inges
 12. Enviar ao repositório remoto público.
 13. Comparar os hashes local e remoto.
 
-## Validação operacional antes de implantação da 009
+## Validação operacional antes de implantação da 013
 
 Estado: IMPLEMENTADO localmente, NÃO VALIDADO EM PRODUÇÃO. Os procedimentos
 históricos de reinício e publicação acima não fazem parte da revisão local.
@@ -115,15 +115,20 @@ O validador não aplica SQL de alteração, não executa scripts de serviço, n�
 reinicia OpenClaw, não muda branch, não acessa equipamentos e não lê configuração
 com segredos. Use `--skip-db` para excluir conexão PostgreSQL. Falhas devem ser
 revisadas antes de qualquer correção. Presença de artefatos não confirma plugin
-carregado; versão 9 registrada não identifica a revisão aplicada da migration.
+carregado; versão 13 registrada não identifica a revisão aplicada da migration.
+Antes de consultar o histórico, o validador verifica SELECT em `schema_version`.
+Sem esse privilégio, emite PARTIAL e exige inspeção administrativa read-only
+separada para confirmar versões. Isso é esperado para `mimir_app` após a 009;
+não conceder SELECT para eliminar o PARTIAL. Com leitura autorizada, verifica
+a presença das versões 1–12 e informa separadamente a presença da 013.
 
-O schema é separado do provisionamento cluster-global: `009_operational_inventory.sql`
-cria apenas objetos; `009_operational_role.sql` cria `mimir_ops`, concede CONNECT
+O schema é separado do provisionamento cluster-global: `013_operational_inventory.sql`
+cria apenas objetos; `013_operational_role.sql` cria `mimir_ops`, concede CONNECT
 no banco corrente e aplica os grants mínimos. A role permanece inicialmente
 desabilitada; revisão de schema, backup/restauração, grants e peer precisa
 preceder a habilitação.
-Não aplicar 009 sobre versão 9 existente: ela recusa reexecução deliberadamente.
-Não introduzir migration 010 para contornar essa proteção.
+Não aplicar 013 sobre versão 13 existente: ela recusa reexecução deliberadamente.
+A migration operacional exige a versão 12; as versões 009–012 pertencem à memória.
 
 Consulta posterior de intervenção sob identidade operacional habilitada:
 
@@ -137,3 +142,10 @@ repetir EXECUTE. Consultar o diário pelo UUID, verificar o dispositivo sob
 nova autorização e registrar reconciliação administrativa preservando evidências.
 Rollback é manual; backup implementado cobre apenas hostname em execução.
 Procedimentos, simulações e requisitos: [OPERATIONS.md](OPERATIONS.md).
+
+## Versionamento de migrations
+
+Nenhuma migration pode ser aplicada a um ambiente persistente antes de
+existir como arquivo versionado no repositório.
+
+Recuperação histórica: [migrations 009–012](recovery/MEMORY_MIGRATIONS_009_012_RECOVERY.md).

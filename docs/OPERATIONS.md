@@ -21,8 +21,9 @@ migrations 002–008 e não concede ferramentas de execução ao agente OpenClaw
 
 ## Inventário / CMDB
 
-A migration **009** foi corrigida enquanto não implantada; não existe migration
-010 de correção. Ela recusa reaplicação quando a versão 9 já existe, para impedir
+A migration operacional **013** exige a versão 12 e foi renumerada após a
+recuperação das migrations de memória 009–012. Ela recusa reaplicação quando
+a versão 13 já existe, para impedir
 sobreposição silenciosa de um schema diferente. A role é tratada separadamente.
 
 Entidades: clientes; sites; equipamentos; interfaces (MAC, MTU, função e VLAN);
@@ -85,23 +86,23 @@ livre ou colocado nos argumentos do processo. Consultas usam `BEGIN READ ONLY`.
 `mimir.ops_api(jsonb)`. Não recebe SELECT/INSERT/UPDATE/DELETE nas tabelas, acesso
 às sequências, role de owner nem permissões na memória. As funções usam nomes
 qualificados, `search_path` fixo e checam `session_user` e `system_user`.
-`mimir_app` não recebe os grants operacionais amplos da versão anterior da 009.
+`mimir_app` não recebe os grants operacionais amplos de uma revisão anterior da migration operacional.
 
 A identidade esperada é `peer:mimir-ops`, **desabilitada por padrão** em
 `ops_identities`. A instalação futura requer revisão humana de:
 
 1. schema real e migrations anteriores, incluindo a ausência da 001 no Git;
-2. backup/restauração do banco e teste da 009 em ambiente descartável;
+2. backup/restauração do banco e teste da 013 em ambiente descartável;
 3. conta Linux dedicada, regras existentes de `pg_hba.conf`/`pg_ident.conf` e
    mapeamento peer local; preservar as regras de memória existentes;
 4. grants efetivos, defaults e identidade retornada pelo PostgreSQL 17;
 5. habilitação explícita da identidade somente depois dessas verificações.
 
-O schema é instalado por `009_operational_inventory.sql`; criação da role,
-CONNECT e grants específicos ficam separados em `009_operational_role.sql`.
+O schema é instalado por `013_operational_inventory.sql`; criação da role,
+CONNECT e grants específicos ficam separados em `013_operational_role.sql`.
 A aplicação das migrations e essas configurações **não foram realizadas**.
-O provisionamento não é feito pelo CLI ou pelo validador. Não executar a 009
-cegamente: um `schema_version=9` não comprova qual revisão da 009 foi aplicada.
+O provisionamento não é feito pelo CLI ou pelo validador. Não executar a 013
+cegamente: um `schema_version=13` não comprova qual revisão da 013 foi aplicada.
 
 ## Política e aprovação
 
@@ -268,6 +269,6 @@ Python/Node, sintaxe e self-tests puros. Não inicia runtime, não executa scrip
 de serviço, não imprime configuração, SQL errors, nomes de arquivos Git ou
 segredos. Presença do plugin não comprova carregamento no gateway.
 
-Aplicação da 009, peer, backup/restauração, integração SQL real e laboratório SSH
+Aplicação da 013, peer, backup/restauração, integração SQL real e laboratório SSH
 continuam dependentes de autorização e validação posteriores. Não usar o
 resultado dos mocks como evidência de implantação ou de compatibilidade real.
