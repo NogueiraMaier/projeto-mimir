@@ -772,3 +772,370 @@ Ordem sugerida:
 6. fases posteriores.
 
 O Graph Explorer poderá também se tornar uma ferramenta importante de auditoria do MIMIR-MEM-EVAL, permitindo visualizar por que uma memória foi recuperada e quais relações sustentaram a resposta.
+
+
+## Referência adicional — Ulpia
+
+Status: **ESTUDADO / APROVEITAMENTO PARCIAL PLANEJADO**
+
+Referência:
+
+- https://github.com/richard-wollyce/ulpia
+- https://ulpia.io/
+- vídeo de apresentação analisado em 2026-09-23.
+
+A Ulpia confirma vários princípios já adotados no Mímir e oferece mecanismos que podem melhorar a Memory v2 sem substituir PostgreSQL/pgvector.
+
+### O que deve ser aproveitado
+
+#### 1. Retrieval determinístico antes ou ao lado do retrieval semântico
+
+A Ulpia separa retrieval de geração e evita colocar um LLM no caminho da seleção inicial de memória. A ideia é útil para o Mímir, mas deve ser **adaptada**, não copiada.
+
+Proposta para o Mímir:
+
+- manter embeddings e pgvector;
+- adicionar um scorer lexical determinístico no PostgreSQL;
+- usar PostgreSQL Full Text Search e, se necessário, pg_trgm;
+- combinar lexical + vector + graph + temporal;
+- registrar os motivos de cada candidato recuperado;
+- permitir que a busca diga explicitamente `no_evidence`.
+
+O objetivo é obter simultaneamente:
+
+- semântica;
+- explicabilidade;
+- reprodutibilidade;
+- baixa latência;
+- abstention segura.
+
+O Mímir não deve abandonar embeddings apenas para obter determinismo.
+
+#### 2. Retrieval hints e aliases derivados de falhas reais
+
+A Ulpia usa uma linha manual `Search for:` em cada nota.
+
+No Mímir, a ideia deve ser convertida em metadados opcionais, por exemplo:
+
+- `search_terms`;
+- `question_aliases`;
+- `retrieval_hints`.
+
+Esses termos não devem virar a única forma de encontrar uma memória.
+
+Preferência:
+
+- aliases humanos;
+- aliases obtidos de consultas reais que falharam;
+- revisão antes de promoção;
+- auditoria da origem do alias.
+
+Evitar geração indiscriminada de dezenas de palavras-chave por memória.
+
+#### 3. Índices derivados e descartáveis
+
+A Ulpia trata índice de busca como derivado da fonte de verdade.
+
+No Mímir:
+
+- PostgreSQL permanece fonte de verdade;
+- embeddings, tsvector, caches e projeções de grafo são derivados;
+- todo artefato derivado deve poder ser reconstruído;
+- registrar versão do modelo de embedding;
+- registrar hash do conteúdo que originou o embedding;
+- reindexar apenas conteúdo alterado quando possível.
+
+Perder um índice não deve significar perder memória.
+
+#### 4. Separar provenance, stage e status
+
+A Ulpia separa proveniência do estágio da informação.
+
+A Memory v2 deve formalizar três eixos independentes:
+
+**Provenance**
+
+- human;
+- agent;
+- external;
+- system/operational, se necessário.
+
+**Stage**
+
+- raw;
+- captured;
+- distilled;
+- derived.
+
+**Status**
+
+- candidate;
+- active;
+- superseded;
+- stale;
+- rejected;
+- expired.
+
+Um campo nunca deve tentar representar os três conceitos ao mesmo tempo.
+
+#### 5. ADD / UPDATE / NOOP / SUPERSEDE como proposta explícita
+
+A Ulpia trata `NOOP` como resultado de primeira classe para evitar regravar a mesma memória.
+
+A Memory v2 deve avaliar proposta explícita antes de mutação:
+
+- ADD;
+- UPDATE;
+- NOOP;
+- SUPERSEDE;
+- CONFLICT.
+
+Para o Mímir, **hard DELETE automático não deve ser adotado como fluxo normal**.
+
+Motivo:
+
+- a memória está ligada a operações, auditoria e evidência;
+- informação antiga pode ser necessária para troubleshooting;
+- PostgreSQL não oferece a mesma semântica operacional de “arquivo apagado mas preservado no git”;
+- a preferência é supersede/expire/tombstone com histórico.
+
+#### 6. Small-to-big context windowing
+
+A Ulpia recupera um trecho pequeno e depois expande até uma seção/parágrafo coerente antes de entregar contexto ao modelo.
+
+Aplicação no Mímir:
+
+- encontrar o menor trecho relevante;
+- expandir até a unidade semântica mínima suficiente;
+- evitar entregar documento inteiro;
+- preservar heading/path/provenance;
+- limitar tokens por memória;
+- fundir trechos contíguos do mesmo contexto.
+
+Essa técnica deve ser testada dentro do Memory Context Builder.
+
+#### 7. Short memory explicitamente marcada
+
+A Ulpia diferencia memória curta ainda não julgada da biblioteca consolidada.
+
+No Mímir, isso deve ser alinhado ao pipeline já existente:
+
+`session/event -> sanitized capture -> candidate -> review/consolidation -> active`
+
+Memória curta ou capturada deve carregar rótulo visível como:
+
+- unverified;
+- short;
+- candidate;
+- source/session.
+
+Ela não pode parecer memória consolidada.
+
+Transcrições confidenciais continuam protegidas e não devem se tornar contexto livre apenas por estarem na memória curta.
+
+#### 8. Consolidação baseada em recorrência entre fontes independentes
+
+A Ulpia exige múltiplas sessões distintas antes de admitir certos padrões consolidados.
+
+Para o Mímir, considerar:
+
+- recorrência em 2+ sessões/eventos independentes como sinal de consolidação;
+- nunca usar apenas repetição do próprio agente como evidência nova;
+- contar fontes distintas, não apenas ocorrências;
+- preservar links para cada evidência de origem.
+
+Isso é especialmente útil para:
+
+- preferências;
+- padrões operacionais;
+- procedimentos recorrentes;
+- decisões arquiteturais;
+- problemas repetitivos.
+
+#### 9. Capture de conclusão sanitizada
+
+Adicionar uma forma controlada de capturar ao fim de uma sessão:
+
+- decisão;
+- resultado;
+- blocker;
+- próxima ação;
+- fatos novos;
+- mudanças confirmadas.
+
+Antes de persistir:
+
+- redaction de segredos;
+- classificação;
+- origem;
+- vínculo com sessão/intervenção;
+- status candidate.
+
+A conclusão do assistente nunca deve ser tratada como fato humano apenas porque foi gerada ao final da sessão.
+
+#### 10. Miss telemetry e abstention telemetry
+
+A Ulpia registra consultas que:
+
+- não encontraram resposta;
+- foram roteadas ao agente errado;
+- ficaram abaixo da confiança;
+- exigiram alias posterior.
+
+Adicionar ao MIMIR-MEM-EVAL e à operação real:
+
+- `retrieval_miss`;
+- `abstention`;
+- `misroute`;
+- `low_confidence`;
+- `corrected_retrieval`.
+
+Esses eventos devem alimentar melhoria da memória e dos aliases.
+
+A regra deve ser:
+
+**corrigir retrieval a partir de falhas observadas, não de listas hipotéticas geradas em massa.**
+
+#### 11. Handoff transacional entre agentes
+
+A Ulpia usa:
+
+`Pending -> Claimed -> Completed`
+
+A ideia deve ser estudada para o Mímir multiagente.
+
+Aplicações:
+
+- continuidade de tarefas entre sessões;
+- evitar dois agentes executarem a mesma intervenção;
+- registrar owner;
+- blockers;
+- decisões;
+- próximo passo;
+- conclusão.
+
+Esse mecanismo pertence à integração entre memória e orquestração, não apenas ao retrieval.
+
+#### 12. MCP read-only como porta secundária
+
+A Ulpia expõe retrieval por MCP local e mantém escrita fora da superfície read-only.
+
+A Memory v2 deve avaliar um **Mímir Memory MCP read-only** para permitir que ferramentas como Codex, Claude Code ou outros clientes consultem memória sem acoplar diretamente ao OpenClaw.
+
+Superfície inicial candidata:
+
+- search;
+- retrieve;
+- list;
+- context;
+- explain-retrieval.
+
+Não expor inicialmente:
+
+- write;
+- approve;
+- promote;
+- delete;
+- credential access.
+
+Importante:
+
+Mesmo com servidor MCP local, se o cliente usar um LLM cloud, o conteúdo retornado pela ferramenta pode ser enviado ao provedor do modelo.
+
+Portanto:
+
+- ACL;
+- classification;
+- scope;
+- redaction;
+- minimização de contexto
+
+devem ser aplicados **antes** de qualquer retorno MCP.
+
+#### 13. Benchmark de abstention e explicabilidade
+
+A Ulpia mede separadamente acerto de retrieval e capacidade de não responder quando a base não cobre o assunto.
+
+Adicionar ao MIMIR-MEM-EVAL:
+
+- coverage abstention;
+- false abstention;
+- false confidence;
+- score overlap entre hits e misses;
+- motivo do ranking;
+- estabilidade/reprodutibilidade da recuperação;
+- judge test-retest quando houver LLM judge.
+
+Não adotar threshold global sem benchmark.
+
+### O que não deve ser copiado diretamente
+
+#### Markdown como fonte de verdade
+
+Não adotar.
+
+No Mímir, PostgreSQL continua sendo a fonte estruturada, temporal e auditável.
+
+Markdown pode continuar sendo:
+
+- documentação;
+- export;
+- relatório;
+- material de referência.
+
+#### `Search for:` obrigatório em toda memória
+
+Não adotar literalmente.
+
+Seria trabalho manual excessivo e criaria dependência da qualidade de tags.
+
+Usar hints/aliases como sinal adicional.
+
+#### Abandonar embeddings
+
+Não adotar.
+
+O determinismo lexical melhora explicabilidade e custo, mas perde equivalência semântica.
+
+A estratégia do Mímir deve ser híbrida.
+
+#### Rust como requisito imediato
+
+Não adotar por linguagem.
+
+A Ulpia mostra que um hot path em Rust pode ter latência muito baixa, mas o Mímir só deve migrar componentes críticos para Rust quando benchmark provar necessidade.
+
+Critério:
+
+- medir primeiro;
+- otimizar SQL/índices/caches;
+- identificar gargalo;
+- só então considerar serviço/binário Rust.
+
+### Alteração recomendada na prioridade da Memory v2
+
+Depois de P2, incluir um subprojeto:
+
+**P2.5 — Deterministic Retrieval & Explainability Layer**
+
+Escopo:
+
+- PostgreSQL FTS;
+- aliases/hints;
+- retrieval score explicável;
+- abstention determinística;
+- miss telemetry;
+- small-to-big context windowing;
+- comparação lexical vs vector vs hybrid no MIMIR-MEM-EVAL.
+
+O Graph Explorer poderá exibir não apenas relações de memória, mas também **por que um resultado foi recuperado**:
+
+- termo lexical;
+- similaridade vetorial;
+- relação de grafo;
+- fator temporal;
+- confidence;
+- evidence;
+- score final.
+
+Isso transforma o grafo em ferramenta de auditoria do retrieval, e não apenas visualização.
