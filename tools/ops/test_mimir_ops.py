@@ -330,6 +330,13 @@ class InventoryStoreTests(unittest.TestCase):
         with self.assertRaises(PolicyError):
             normalize_inventory('device',{**item,'verification_state':'verified'})
 
+    def test_missing_access_id_is_generated_once_as_primary(self):
+        item = inventory_device()
+        del item['primary_access_id']
+        del item['accesses'][0]['access_id']
+        result = normalize_inventory('device', item)
+        self.assertEqual(result['primary_access_id'], result['accesses'][0]['access_id'])
+
     def test_history_report_and_pagination(self):
         runner = Mock(return_value=ProcessResult(0,'[]',''))
         store = PostgresStore(runner)
@@ -345,7 +352,8 @@ class WorkflowTests(unittest.TestCase):
         migration = Path(__file__).parents[1] / 'memory' / 'migrations' / '009_operational_inventory.sql'
         sql = migration.read_text()
         for token in ('workflow_stage', 'workflow_state', 'workflow transition out of order',
-                      "workflow_state='failed'", "workflow_stage=CASE workflow_stage"):
+                      "workflow_state='failed'", "workflow_stage=CASE workflow_stage",
+                      "WHEN 'READ' THEN 'DONE'"):
             self.assertIn(token, sql)
         self.assertNotIn('count(DISTINCT stage)', sql)
 
@@ -380,6 +388,18 @@ class WorkflowTests(unittest.TestCase):
             transition(stage, state, 'result', True)
         with self.assertRaises(PolicyError):
             transition('EXECUTE', 'ready', 'intent', True, requested='PRECHECK')
+
+    def test_read_workflow_reaches_done_and_complete(self):
+        migration = Path(__file__).parents[1] / 'memory' / 'migrations' / '009_operational_inventory.sql'
+        sql = migration.read_text()
+        self.assertIn("WHEN 'READ' THEN 'DONE'", sql)
+        self.assertIn("workflow_stage IN ('VALIDATE','READ')", sql)
+        self.assertIn("workflow_state='complete'", sql)
+        stage, state = 'READ', 'ready'
+        state = 'intent'
+        self.assertEqual((stage, state), ('READ', 'intent'))
+        stage, state = 'DONE', 'complete'
+        self.assertEqual((stage, state), ('DONE', 'complete'))
 
     def test_schema_migration_keeps_role_and_access_provisioning_separate(self):
         migration_dir = Path(__file__).parents[1] / 'memory' / 'migrations'

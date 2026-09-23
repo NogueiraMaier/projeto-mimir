@@ -365,12 +365,17 @@ BEGIN
         END IF;
         IF method='intervention.event' THEN
             IF p->>'event' NOT IN ('intent','result') OR p->>'stage' IS NULL
-               OR intervention.workflow_state IN ('failed','complete') THEN
+               OR intervention.workflow_state='failed'
+               OR (intervention.workflow_state='complete' AND intervention.requested_mode<>'READ') THEN
                 RAISE EXCEPTION 'invalid or already terminal workflow state';
             END IF;
             SELECT * INTO last_action FROM mimir.ops_actions WHERE intervention_id=id ORDER BY sequence_no DESC LIMIT 1;
-            IF p->>'stage' IS DISTINCT FROM intervention.workflow_stage
-               OR (p->>'event'='intent' AND intervention.workflow_state IS DISTINCT FROM 'ready')
+            IF (p->>'stage' IS DISTINCT FROM intervention.workflow_stage
+                    AND NOT (intervention.requested_mode='READ' AND intervention.workflow_stage='DONE'
+                        AND p->>'stage'='READ'))
+               OR (p->>'event'='intent' AND intervention.workflow_state IS DISTINCT FROM 'ready'
+                    AND NOT (intervention.requested_mode='READ' AND intervention.workflow_state='complete'
+                        AND p->>'stage'='READ'))
                OR (p->>'event'='result' AND (intervention.workflow_state IS DISTINCT FROM 'intent'
                    OR last_action.event_type IS DISTINCT FROM 'intent'
                    OR last_action.stage IS DISTINCT FROM p->>'stage'
@@ -389,12 +394,12 @@ BEGIN
                 AND p#>'{action,dry_run}'='false'::jsonb THEN
                 UPDATE mimir.ops_interventions SET
                     workflow_stage=CASE workflow_stage
-                        WHEN 'READ' THEN 'READ' WHEN 'PRECHECK' THEN 'SNAPSHOT'
+                        WHEN 'READ' THEN 'DONE' WHEN 'DONE' THEN 'DONE' WHEN 'PRECHECK' THEN 'SNAPSHOT'
                         WHEN 'SNAPSHOT' THEN 'BACKUP' WHEN 'BACKUP' THEN 'EXECUTE'
                         WHEN 'EXECUTE' THEN 'VALIDATE' WHEN 'VALIDATE' THEN 'DONE' END,
-                    workflow_state=CASE WHEN workflow_stage='VALIDATE' OR workflow_stage='READ'
-                        AND requested_mode='READ' AND p->>'stage'='READ' THEN
-                        CASE WHEN workflow_stage='VALIDATE' THEN 'complete' ELSE 'ready' END
+                    workflow_state=CASE WHEN workflow_stage IN ('VALIDATE','READ')
+                        OR (workflow_stage='DONE' AND requested_mode='READ') THEN
+                        'complete'
                         ELSE 'ready' END
                 WHERE intervention_id=id;
             ELSE

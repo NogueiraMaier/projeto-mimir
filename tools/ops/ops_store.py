@@ -45,7 +45,9 @@ def normalize_inventory(kind, value):
         accesses = value.get('accesses')
         if not isinstance(accesses, list) or not accesses:
             raise PolicyError('equipamento exige um acesso primário')
-        primary = value.get('primary_access_id') or accesses[0].get('access_id') or new_id()
+        if not value.get('primary_access_id') and not accesses[0].get('access_id'):
+            accesses[0]['access_id'] = new_id()
+        primary = value.get('primary_access_id') or accesses[0].get('access_id')
         value['primary_access_id'] = primary
         uuid_text(primary)
     specs = {
