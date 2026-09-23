@@ -1139,3 +1139,16 @@ O Graph Explorer poderá exibir não apenas relações de memória, mas também 
 - score final.
 
 Isso transforma o grafo em ferramenta de auditoria do retrieval, e não apenas visualização.
+
+
+## Documento relacionado — agentes especialistas e interoperabilidade
+
+A evolução da Memory v2 deve permanecer alinhada com:
+
+- `docs/AGENT_SPECIALIZATION_MCP_A2A_ROADMAP.md`
+
+Esse documento registra como conhecimento especializado, memória procedural, adapters, MCP e eventual A2A devem ser introduzidos somente quando houver necessidade técnica comprovada.
+
+Princípio compartilhado:
+
+**a arquitetura do Mímir evolui por problema observado e benchmark, não por adoção antecipada de tecnologia.**
