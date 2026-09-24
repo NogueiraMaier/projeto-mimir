@@ -344,6 +344,10 @@ BEGIN
             RAISE EXCEPTION 'plan digest or binding mismatch';
         END IF;
         IF previous->>'permission_mode'='PLAN' THEN RAISE EXCEPTION 'device restricted to PLAN'; END IF;
+        IF p->>'mode'='EXECUTE'
+           AND previous#>>'{observed_state,state}'='unknown_requires_manual_verification' THEN
+            RAISE EXCEPTION 'device requires manual verification';
+        END IF;
         IF p->>'mode'='EXECUTE' AND (
             previous->>'permission_mode' IS DISTINCT FROM 'EXECUTE' OR previous->>'adapter' IS DISTINCT FROM 'generic-linux'
             OR p#>>'{plan,operation}' IS DISTINCT FROM 'set-hostname'

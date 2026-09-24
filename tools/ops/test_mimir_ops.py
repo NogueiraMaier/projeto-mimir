@@ -427,6 +427,24 @@ class WorkflowTests(unittest.TestCase):
             finish.index("INSERT INTO mimir.ops_reports")
         )
 
+    def test_execute_is_blocked_after_uncertain_change_until_reverified(self):
+        migration = Path(__file__).parents[1] / 'memory' / 'migrations' / '013_operational_inventory.sql'
+        sql = migration.read_text()
+        begin = sql[
+            sql.index("ELSIF method='intervention.begin'"):
+            sql.index("ELSIF method IN ('intervention.event','intervention.finish')")
+        ]
+        guard = "previous#>>'{observed_state,state}'='unknown_requires_manual_verification'"
+        self.assertIn(guard, begin)
+        self.assertIn(
+            "RAISE EXCEPTION 'device requires manual verification'",
+            begin
+        )
+        self.assertLess(
+            begin.index(guard),
+            begin.index("IF p->>'mode'='EXECUTE' AND (")
+        )
+
     def test_schema_migration_keeps_role_and_access_provisioning_separate(self):
         migration_dir = Path(__file__).parents[1] / 'memory' / 'migrations'
         schema = (migration_dir / '013_operational_inventory.sql').read_text()
