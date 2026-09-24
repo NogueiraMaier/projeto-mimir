@@ -77,7 +77,7 @@ A documentação do Maestro deve ser retomada somente após a estabilização do
 - [x] Aplicar e validar `013_operational_role.sql` somente no cluster temporário.
 - [x] Verificar grants mínimos efetivos da role `mimir_ops`.
 - [x] Verificar ausência de SELECT/INSERT/UPDATE/DELETE direto nas tabelas ops.
-- [ ] Validar autenticação/identidade peer de laboratório sem reutilizar a identidade do OpenClaw.
+- [x] Validar autenticação/identidade peer de laboratório sem reutilizar a identidade do OpenClaw.
 - [ ] Testar a API `mimir.ops_api(jsonb)` com dados sintéticos.
 - [ ] Testar constraints e rejeições de segurança com casos negativos.
 - [ ] Testar fluxo READ sintético completo.
@@ -175,3 +175,23 @@ Preflight de autenticação peer no laboratório concluído sem alterações no 
 - identidade operacional cadastrada no schema: `db_role=mimir_ops`, `authentication_identity=peer:mimir-ops`, `enabled=false`.
 
 Decisão de segurança: não criar ainda o usuário Linux persistente `mimir-ops` no VPS apenas para o laboratório. O próximo teste deve validar o mecanismo peer usando uma identidade sintética restrita ao cluster temporário; a identidade definitiva `peer:mimir-ops` só será provisionada no host durante a implantação autorizada.
+
+
+## Checkpoint MIMIR-V1-013-LAB-03 — concluído
+
+Autenticação peer foi validada exclusivamente no cluster PostgreSQL temporário, sem criação da conta Linux definitiva `mimir-ops`.
+
+Configuração sintética de laboratório:
+
+- usuário Linux usado para o teste: `jarvisdev`;
+- role PostgreSQL: `mimir_ops`;
+- mapeamento `pg_ident`: `jarvisdev -> mimir_ops`;
+- HBA alterado somente no cluster temporário;
+- conexão administrativa via peer confirmou `system_user=peer:postgres`;
+- conexão operacional confirmou `current_user=mimir_ops`, `session_user=mimir_ops`, `system_user=peer:jarvisdev`;
+- API permaneceu bloqueada enquanto a identidade lógica estava desabilitada;
+- SELECT direto permaneceu bloqueado.
+
+Conclusão: peer authentication + pg_ident + least privilege funcionam no desenho esperado. A identidade definitiva `peer:mimir-ops` ainda não foi provisionada no host real.
+
+**Próxima atividade:** habilitar temporariamente `peer:jarvisdev` somente no laboratório, exercitar `mimir.ops_api(jsonb)` com dados totalmente sintéticos e depois executar casos negativos.
