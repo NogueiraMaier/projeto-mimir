@@ -148,43 +148,34 @@ No real equipment has been contacted.
 
 ## NEXT_ACTION
 
-Resolve the historical absence of migration 001 from Git, or document a canonical bootstrap equivalent supported by repository/history evidence.
+Validate the new canonical memory-v1 bootstrap reconstruction in an isolated PostgreSQL database.
 
-Do not invent a migration 001 from assumptions.
+Versioned artifacts:
 
-The next investigation must:
+- tools/memory/bootstrap/memory_v1_canonical.sql
+- tools/memory/test_memory_bootstrap.py
 
-1. inspect the current migrations 002 through 013 and determine the objects that migration 002 assumes already exist;
-2. inspect Git history, recovery documentation and bootstrap/install scripts for evidence of how schema version 1 was originally created;
-3. inspect the production schema only read-only if necessary and only to describe current version-1 objects, not to infer unsupported historical SQL;
-4. distinguish historical evidence from a new canonical bootstrap design;
-5. choose one of two outcomes:
-   - recover and version an evidence-backed migration 001; or
-   - document a canonical bootstrap procedure that reproduces the required pre-002 schema without pretending it is the historical migration;
-6. add tests/validation for a fresh bootstrap path before considering the P0 item closed.
+Historical conclusion:
+
+The original migration 001 was not recovered from Git or the local recovery directory. The canonical bootstrap is a reconstruction and must not be described as the historical migration.
+
+Validation requirements:
+
+1. use only the temporary PostgreSQL cluster;
+2. create an empty database named mimir_memory inside that temporary cluster;
+3. apply the canonical v1 bootstrap;
+4. confirm schema version 1;
+5. apply migrations 002 through 012 unchanged and in order;
+6. confirm schema versions 1..12;
+7. confirm key objects and privileges match the observed production state;
+8. run the static bootstrap regression test;
+9. confirm real production remains untouched.
 
 Working checkpoint:
 
 MIMIR-V1-MEMORY-BOOTSTRAP-01
 
-## Planned sequence
-
-1. Inspect migration 002 preconditions and schema dependencies
-2. Search Git history and repository artifacts for version-1/bootstrap evidence
-3. Compare with current production schema read-only only if repository evidence is insufficient
-4. Write a recovery/design note separating historical facts from canonical reconstruction
-5. Implement the smallest evidence-backed bootstrap artifact
-6. Validate a clean bootstrap through current migrations in an isolated PostgreSQL database
-7. Update the master plan and handoff
-8. Then address plugin metadata drift and explicit plugins.allow
-
-## Expected next checkpoint
-
-MIMIR-V1-MEMORY-BOOTSTRAP-01
-
-Purpose:
-
-Close the P0 bootstrap/versioning gap without fabricating historical migration content.
+Do not apply the canonical bootstrap to production.
 
 ## PostgreSQL laboratory
 
