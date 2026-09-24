@@ -1,7 +1,7 @@
 # Bootstrap canônico da memória v1
 
 Data: 2026-09-24
-Status: reconstrução versionada; validação runtime pendente
+Status: reconstrução versionada e validada em laboratório isolado
 
 ## Conclusão
 
@@ -66,3 +66,36 @@ O P0 só fecha após replay em banco descartável:
 4. comparação de objetos e privilégios relevantes;
 5. testes estáticos;
 6. confirmação de produção intacta.
+
+
+## Validação runtime concluída
+
+Checkpoint: `MIMIR-V1-MEMORY-BOOTSTRAP-01`.
+
+O bootstrap canônico foi validado em banco descartável dentro do cluster
+PostgreSQL temporário em `gentoo-Dragon_vm`, sem alterar produção.
+
+Resultado:
+
+- teste estático local: 9 testes, OK;
+- bootstrap v1 aplicado com sucesso em banco vazio `mimir_memory` do cluster temporário;
+- após bootstrap: `schema_versions=1`;
+- migrations 002–012 aplicadas sem edição e em ordem;
+- estado final: `schema_versions=1,2,3,4,5,6,7,8,9,10,11,12`;
+- tabelas finais: `memory_audit`, `memory_events`, `memory_records`,
+  `memory_relations`, `memory_reviews`, `reviewer_identities`,
+  `schema_version`, `session_sources`;
+- funções finais: ingestão de documento/sessão, proposta, consolidação,
+  revisão humana, busca semântica e armazenamento de embedding;
+- `search_document` e `content_sha256` confirmados como colunas geradas;
+- `mimir_app` terminou sem SELECT/INSERT/UPDATE/DELETE direto nas cinco tabelas base;
+- USAGE no schema preservado;
+- EXECUTE de `ingest_document`, `ingest_session` e `propose_memory` preservado;
+- produção permaneceu em versões 1–12;
+- produção permaneceu sem schema_version 13;
+- produção permaneceu sem role `mimir_ops`.
+
+Conclusão: o Git agora possui um caminho reprodutível de bootstrap da memória v1
+até a versão 12. A lacuna histórica continua documentada corretamente: o SQL
+original da migration 001 não foi recuperado, mas existe um bootstrap canônico
+equivalente validado para reconstrução.
