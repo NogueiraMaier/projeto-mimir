@@ -253,3 +253,27 @@ Validações aprovadas:
 - produção permaneceu com `schema_version=1..12` e sem role `mimir_ops`.
 
 **Próxima atividade:** validar o fluxo READ sintético completo, incluindo abertura de intervenção, journal de intent/result, finalização, atualização do inventário e relatório, ainda sem acessar equipamento real.
+
+
+## Checkpoint MIMIR-V1-013-LAB-06 — bloqueado por bug encontrado
+
+O primeiro teste de fluxo READ persistido encontrou uma falha real na máquina de estados da migration 013.
+
+Sequência observada:
+
+- `intervention.begin`: aceito;
+- evento READ `intent`: aceito;
+- evento READ `result`: rejeitado com `workflow transition out of order`.
+
+Causa localizada no SQL versionado de `mimir.ops_api(jsonb)`: na validação do evento `result`, a operação anterior é lida como `last_action.payload->>'operation'`, porém o journal persiste o evento completo e a operação está aninhada em `payload.action.operation`. A comparação correta precisa usar o caminho aninhado correspondente.
+
+Consequência: um fluxo READ válido não consegue avançar de `intent` para `result`.
+
+Estado do teste:
+
+- a intervenção sintética LAB-06 ficou aberta/running no laboratório;
+- o `trap` restaurou a identidade operacional para o estado desabilitado;
+- produção não foi usada para esse fluxo;
+- o item “Testar fluxo READ sintético completo” permanece pendente.
+
+**Próxima atividade:** corrigir a migration 013 no desenvolvimento local, adicionar teste de regressão para a transição intent → result e somente depois recriar/revalidar o laboratório a partir de um estado limpo.
