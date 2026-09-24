@@ -223,8 +223,12 @@ Relatórios locais usam diretório 0700 e arquivos 0600, criação exclusiva e
 recusa de symlinks/sobrescrita. O padrão `reports/ops/` é ignorado pelo Git.
 Falha de exportação local não elimina o relatório persistido no PostgreSQL.
 Hashes conferem bytes sanitizados, não conteúdo bruto removido pela redaction.
-Histórico/auditoria não têm API de alteração/exclusão. Retenção administrativa
-precisa ser definida antes de produção; o MVP não faz expurgo automático.
+Histórico/auditoria não têm API de alteração/exclusão. A política v1 está
+definida em [OPERATIONS_RETENTION.md](OPERATIONS_RETENTION.md): registros
+operacionais persistidos não expiram automaticamente, purge automático é
+proibido e failed/interrupted devem ser preservados. Laboratórios totalmente
+sintéticos podem ser removidos depois que as evidências exigidas forem
+versionadas e os checkpoints de recuperação forem concluídos.
 
 ## Integração com memória — PARCIAL
 
