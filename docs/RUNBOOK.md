@@ -137,6 +137,25 @@ python3 tools/ops/mimir-ops.py ops history DEVICE_UUID
 python3 tools/ops/mimir-ops.py ops report INTERVENTION_UUID --format markdown
 ```
 
+## Retenção operacional v1
+
+A política canônica está em [OPERATIONS_RETENTION.md](OPERATIONS_RETENTION.md).
+
+Enquanto a v1 estiver ativa:
+
+- não configurar purge automático de `ops_interventions`, `ops_actions`,
+  `ops_evidence`, `ops_reports` ou `ops_audit`;
+- preservar intervenções failed/interrupted e seus journals;
+- não usar a role `mimir_ops` para exclusão administrativa;
+- não versionar evidências/relatórios reais no Git;
+- tratar exports e backups operacionais como confidenciais;
+- laboratório totalmente sintético só pode ser removido após registrar as
+  evidências necessárias e concluir os testes de recuperação previstos.
+
+Qualquer purge futuro precisa ser procedimento administrativo versionado,
+pré-visualizado, auditado e validado em laboratório. A v1 não implementa esse
+mecanismo.
+
 Após timeout, perda de auditoria ou confirmação incerta da transação, não
 repetir EXECUTE. Consultar o diário pelo UUID, verificar o dispositivo sob
 nova autorização e registrar reconciliação administrativa preservando evidências.
