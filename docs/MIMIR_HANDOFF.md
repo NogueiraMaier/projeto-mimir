@@ -75,9 +75,9 @@ Milestone:
 MIMIR-V1-013
 
 Last completed laboratory:
-MIMIR-V1-013-LAB-06B
+MIMIR-V1-013-LAB-08
 
-LAB-06B status:
+LAB-08 status:
 COMPLETED
 
 The persistent READ workflow was validated end to end in the isolated PostgreSQL laboratory.
@@ -117,61 +117,101 @@ Regression fix commit:
 
 LAB-06 subsequently validated the fix.
 
-## Current hardening state
+## Current validation state
 
-Temporal integrity hardening is implemented and validated.
+LAB-07 validated the complete synthetic EXECUTE workflow without contacting real equipment.
 
-Code commit:
-
-bbe6c2a90bd7e3f237c6f02b97bc93d11db6fd13
-
-LAB-06B validated that completed_at earlier than intervention.started_at is rejected before finalization side effects.
-
-Negative path remained running at DONE/complete with completed_at NULL, two journal actions, zero reports, zero evidence, and the device still unverified.
-
-Positive path completed with status collected, final_validation=true, inventory_updated=true, one report, one evidence, verification_state=verified and verification_scope=diagnostic_observation.
-
-Synthetic identity was restored to peer:mimir-ops with enabled=false.
-
-Production remained unchanged: schema_version 13 absent and mimir_ops role absent.
-
-A second accidental attempt to finish the already completed intervention was rejected as already finalized. This is expected terminal behavior and does not invalidate LAB-06B.
-
-## NEXT_ACTION
-
-Run MIMIR-V1-013-LAB-07: synthetic EXECUTE only with doubles/simulation in the isolated PostgreSQL laboratory.
-
-No real equipment may be contacted.
-
-Validate the full state machine:
+Validated state machine:
 
 PRECHECK -> SNAPSHOT -> BACKUP -> EXECUTE -> VALIDATE -> DONE
 
-Each stage must persist coherent intent/result journal entries, the plan/approval binding must remain unchanged, the final report must match the durable journal, failures must remain fail-closed, the synthetic identity must be restored, and production must remain untouched.
+The durable journal contains exactly ten ordered events: intent/result for each stage. A deliberate out-of-order SNAPSHOT intent was rejected before any action was persisted.
+
+LAB-07 terminal state:
+
+status=validated
+requested_mode=EXECUTE
+workflow_stage=DONE
+workflow_state=complete
+final_validation=true
+inventory_updated=true
+actions=10
+reports=1
+evidence=1
+
+The synthetic device became verified and collected, with last_change_at populated.
+
+LAB-08 validated backup and restore of the isolated operational PostgreSQL laboratory.
+
+Source and restored inventory matched:
+
+schema versions 1..13
+15 ops tables
+3 clients
+3 sites
+3 devices
+3 interventions
+14 actions
+3 reports
+3 evidence records
+temporal guard present
+
+The restored LAB-07 intervention remained validated with ten actions, one report and one evidence.
+
+Backup SHA-256:
+
+5989dd1dcc21e6767563a531d1da6c3424cedfe08b9b7db434e06aecbb6d8273
+
+Production remained unchanged throughout:
+
+schema_version 13 = false
+mimir_ops role = false
+
+## NEXT_ACTION
+
+Define and validate the interrupted-intervention reconciliation procedure before any real equipment homologation.
+
+Use only the isolated PostgreSQL laboratory and synthetic data.
+
+The validation must simulate an EXECUTE intervention interrupted after an EXECUTE intent but before a durable EXECUTE result.
+
+Required properties:
+
+1. a second EXECUTE on the same device remains blocked while the first intervention is running;
+2. history/report expose enough durable state for human reconciliation;
+3. reconciliation must finalize the interrupted intervention as failed without inventing a successful result;
+4. because an EXECUTE intent occurred without confirmed result, the device must remain or become unverified and require manual verification;
+5. the reconciled intervention must preserve the journal and audit history;
+6. production must remain untouched.
+
+Working name:
+
+MIMIR-V1-013-LAB-09
+
+Do not contact real equipment.
 
 ## Planned sequence
 
 1. Create a new synthetic generic-linux device with permission_mode=EXECUTE
-2. Build a valid approved set-hostname plan using only synthetic data
-3. Execute PRECHECK intent/result using doubles
-4. Execute SNAPSHOT intent/result using doubles
-5. Execute BACKUP intent/result using doubles
-6. Execute EXECUTE intent/result using doubles
-7. Execute VALIDATE intent/result using doubles
-8. Confirm DONE/complete
-9. Finish with valid chronology and matching durable journal
-10. Confirm report, evidence and inventory finalization
-11. Restore synthetic identity
-12. Confirm production remains version13=false and mimir_ops=false
-13. Record LAB-07 evidence and update this handoff
+2. Start an approved synthetic EXECUTE intervention
+3. Complete PRECHECK, SNAPSHOT and BACKUP with synthetic doubles
+4. Persist EXECUTE intent only, then simulate interruption
+5. Confirm a second EXECUTE is blocked
+6. Inspect history/report for the running intervention
+7. Reconcile the original intervention to failed using only durable journal facts
+8. Confirm device is unverified and the original journal is preserved
+9. Confirm the intervention is terminal failed with completed_at set
+10. Restore synthetic identity
+11. Confirm production remains version13=false and mimir_ops=false
+12. Record whether the existing API is sufficient or whether additional reconciliation hardening is required
 
 ## Expected next laboratory
 
-MIMIR-V1-013-LAB-07
+MIMIR-V1-013-LAB-09
 
 Purpose:
 
-Validate the complete synthetic EXECUTE state machine without contacting real equipment.
+Validate fail-closed reconciliation of an interrupted synthetic EXECUTE intervention.
 
 ## PostgreSQL laboratory
 
@@ -212,9 +252,15 @@ persistent synthetic READ workflow completed
 MIMIR-V1-013-LAB-06B:
 temporal integrity hardening validated in PostgreSQL laboratory
 
+MIMIR-V1-013-LAB-07:
+full synthetic EXECUTE state machine validated without real equipment
+
+MIMIR-V1-013-LAB-08:
+isolated PostgreSQL laboratory backup and restore validated
+
 ## Do not repeat
 
-Do not repeat LAB-01 through LAB-06B unless a later code change affects their validated assumptions.
+Do not repeat LAB-01 through LAB-08 unless a later code change affects their validated assumptions.
 
 Do not redo historical migration reconstruction 009 through 012.
 
