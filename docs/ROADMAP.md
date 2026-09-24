@@ -59,10 +59,17 @@ documentais de governança. A autorização desta etapa foi restrita ao desenvol
 A sequência canônica de trabalho passou a ser mantida em
 [MIMIR_V1_EXECUTION_PLAN.md](MIMIR_V1_EXECUTION_PLAN.md).
 
-Checkpoint atual: `MIMIR-V1-013-LAB-01` concluído. Runtime de memória está saudável
-e a primeira metade da migration 013 foi validada em cluster PostgreSQL isolado.
-Produção permanece em versões 1–12 e sem `mimir_ops`.
+Checkpoint atual: `MIMIR-V1-013-LAB-09` e
+`MIMIR-V1-OPS-RETENTION-01` concluídos. A migration 013 foi validada em
+laboratório isolado com grants/peer, READ, EXECUTE sintético, hardening temporal,
+backup/restore e reconciliação fail-closed de execução interrompida. A política
+v1 de retenção operacional também foi versionada.
 
-Próxima etapa: validar `013_operational_role.sql`, grants, identidade peer e API
-operacional somente no laboratório temporário. A documentação do Maestro deve ser
-retomada depois da estabilização dos marcos P0/P1 do Mímir.
+Produção permanece em versões 1–12 e sem `mimir_ops`. Nenhum equipamento real
+foi usado nos LABs EXECUTE.
+
+Próxima etapa: fechar as lacunas P0 remanescentes, começando pela ausência
+histórica da migration 001 ou por um bootstrap canônico equivalente sustentado
+por evidência. Depois corrigir metadata drift do plugin e definir
+`plugins.allow` explicitamente. A documentação do Maestro deve ser retomada
+depois da estabilização dos marcos P0/P1 do Mímir.
