@@ -74,9 +74,9 @@ A documentação do Maestro deve ser retomada somente após a estabilização do
 - [x] Confirmar identidade `mimir_ops` criada no schema como desabilitada.
 - [x] Confirmar role cluster-global `mimir_ops` ainda ausente.
 - [x] Confirmar novamente produção intacta: versão 13=false, role `mimir_ops`=false.
-- [ ] Aplicar e validar `013_operational_role.sql` somente no cluster temporário.
-- [ ] Verificar grants mínimos efetivos da role `mimir_ops`.
-- [ ] Verificar ausência de SELECT/INSERT/UPDATE/DELETE direto nas tabelas ops.
+- [x] Aplicar e validar `013_operational_role.sql` somente no cluster temporário.
+- [x] Verificar grants mínimos efetivos da role `mimir_ops`.
+- [x] Verificar ausência de SELECT/INSERT/UPDATE/DELETE direto nas tabelas ops.
 - [ ] Validar autenticação/identidade peer de laboratório sem reutilizar a identidade do OpenClaw.
 - [ ] Testar a API `mimir.ops_api(jsonb)` com dados sintéticos.
 - [ ] Testar constraints e rejeições de segurança com casos negativos.
@@ -139,3 +139,26 @@ Produção continua em versões 1–12, sem `mimir_ops`.
 - `docs/ROADMAP.md`
 - `docs/OPERATIONS.md`
 - `docs/RUNBOOK.md`
+
+
+## Checkpoint MIMIR-V1-013-LAB-02 — concluído
+
+A segunda metade da migration operacional 013 foi validada exclusivamente no cluster PostgreSQL temporário.
+
+Resultados:
+
+- `013_operational_role.sql` aplicada com COMMIT no laboratório;
+- role `mimir_ops` criada no cluster temporário;
+- atributos: LOGIN=true, NOINHERIT, NOSUPERUSER, NOCREATEDB, NOCREATEROLE, NOREPLICATION, NOBYPASSRLS, CONNECTION LIMIT 3;
+- CONNECT no banco de laboratório: true;
+- USAGE no schema `mimir`: true;
+- EXECUTE em `mimir.ops_api(jsonb)`: true;
+- EXECUTE nas funções internas `ops_assert_identity`, `ops_assert_object` e `ops_device_document`: false;
+- tabelas `ops_*` com DML direto efetivo para `mimir_ops`: 0;
+- USAGE nas sequences operacionais: false;
+- identidade registrada como `peer:mimir-ops`, permanecendo `enabled=false`;
+- SELECT direto em `mimir.ops_clients`: bloqueado;
+- chamada da API com identidade ainda não habilitada: bloqueada;
+- produção permaneceu em schema_version 1–12 e sem role `mimir_ops`.
+
+**Próxima atividade:** validar identidade peer dedicada no laboratório e exercitar `mimir.ops_api(jsonb)` com dados sintéticos, incluindo casos negativos, sem reutilizar a identidade `openclaw`.
