@@ -401,6 +401,13 @@ class WorkflowTests(unittest.TestCase):
         stage, state = 'DONE', 'complete'
         self.assertEqual((stage, state), ('DONE', 'complete'))
 
+    def test_read_result_guard_uses_persisted_nested_operation(self):
+        migration = Path(__file__).parents[1] / 'memory' / 'migrations' / '013_operational_inventory.sql'
+        sql = migration.read_text()
+        guard = sql[sql.index("IF method='intervention.event'"):sql.index("IF p->>'stage'='EXECUTE'")]
+        self.assertIn("last_action.payload#>>'{action,operation}' IS DISTINCT FROM p#>>'{action,operation}'", guard)
+        self.assertNotIn("last_action.payload->>'operation'", guard)
+
     def test_schema_migration_keeps_role_and_access_provisioning_separate(self):
         migration_dir = Path(__file__).parents[1] / 'memory' / 'migrations'
         schema = (migration_dir / '013_operational_inventory.sql').read_text()

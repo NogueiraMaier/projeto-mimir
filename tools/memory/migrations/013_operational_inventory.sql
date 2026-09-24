@@ -379,7 +379,7 @@ BEGIN
                OR (p->>'event'='result' AND (intervention.workflow_state IS DISTINCT FROM 'intent'
                    OR last_action.event_type IS DISTINCT FROM 'intent'
                    OR last_action.stage IS DISTINCT FROM p->>'stage'
-                   OR last_action.payload->>'operation' IS DISTINCT FROM p#>>'{action,operation}')) THEN
+                   OR last_action.payload#>>'{action,operation}' IS DISTINCT FROM p#>>'{action,operation}')) THEN
                 RAISE EXCEPTION 'workflow transition out of order';
             END IF;
             IF p->>'stage'='EXECUTE' AND p->>'event'='intent' AND intervention.requested_mode<>'EXECUTE' THEN
