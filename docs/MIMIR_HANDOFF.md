@@ -75,9 +75,9 @@ Milestone:
 MIMIR-V1-013
 
 Last completed laboratory:
-MIMIR-V1-013-LAB-08
+MIMIR-V1-013-LAB-09
 
-LAB-08 status:
+LAB-09 status:
 COMPLETED
 
 The persistent READ workflow was validated end to end in the isolated PostgreSQL laboratory.
@@ -119,99 +119,74 @@ LAB-06 subsequently validated the fix.
 
 ## Current validation state
 
-LAB-07 validated the complete synthetic EXECUTE workflow without contacting real equipment.
-
-Validated state machine:
-
-PRECHECK -> SNAPSHOT -> BACKUP -> EXECUTE -> VALIDATE -> DONE
-
-The durable journal contains exactly ten ordered events: intent/result for each stage. A deliberate out-of-order SNAPSHOT intent was rejected before any action was persisted.
-
-LAB-07 terminal state:
-
-status=validated
-requested_mode=EXECUTE
-workflow_stage=DONE
-workflow_state=complete
-final_validation=true
-inventory_updated=true
-actions=10
-reports=1
-evidence=1
-
-The synthetic device became verified and collected, with last_change_at populated.
+LAB-07 validated the complete synthetic EXECUTE state machine without real equipment.
 
 LAB-08 validated backup and restore of the isolated operational PostgreSQL laboratory.
 
-Source and restored inventory matched:
+LAB-09 validated fail-closed reconciliation for an interrupted EXECUTE workflow using synthetic data only.
 
-schema versions 1..13
-15 ops tables
-3 clients
-3 sites
-3 devices
-3 interventions
-14 actions
-3 reports
-3 evidence records
-temporal guard present
+Hardening code commit:
 
-The restored LAB-07 intervention remained validated with ten actions, one report and one evidence.
+86cf4a96a176c7ac2fdb9decb9c26dc89ecbac38
 
-Backup SHA-256:
+LAB-09 sequence:
 
-5989dd1dcc21e6767563a531d1da6c3424cedfe08b9b7db434e06aecbb6d8273
+- approved EXECUTE intervention started on a synthetic generic-linux device;
+- PRECHECK, SNAPSHOT and BACKUP intent/result pairs completed;
+- EXECUTE intent was persisted without a corresponding result to simulate interruption;
+- a second EXECUTE on the same device was blocked while the original intervention remained running;
+- history/report exposed the durable running state and seven persisted journal actions;
+- the interrupted intervention was reconciled to status=failed without inventing a successful EXECUTE result;
+- the device became unverified with observed_state.state=unknown_requires_manual_verification;
+- a new EXECUTE remained blocked by the new database guard;
+- a successful READ reverification restored the device to verified;
+- only after reverification was a new EXECUTE accepted;
+- the synthetic identity was restored to peer:mimir-ops with enabled=false.
 
-Production remained unchanged throughout:
+LAB-09 final production safety check:
 
 schema_version 13 = false
 mimir_ops role = false
 
+No real equipment was contacted.
+
 ## NEXT_ACTION
 
-Define and validate the interrupted-intervention reconciliation procedure before any real equipment homologation.
+Define the v1 retention policy for operational reports, evidence, journals and audit records before any real-equipment homologation.
 
-Use only the isolated PostgreSQL laboratory and synthetic data.
+The policy must be explicit about:
 
-The validation must simulate an EXECUTE intervention interrupted after an EXECUTE intent but before a durable EXECUTE result.
+1. which operational records are append-only/immutable in v1;
+2. whether automatic deletion is allowed;
+3. how backup copies interact with retention;
+4. how interrupted/failed interventions are preserved;
+5. how future administrative purge must be authorized and audited;
+6. how sensitive operational data is handled;
+7. which items may be retained indefinitely during v1 versus requiring a later lifecycle policy.
 
-Required properties:
+Do not add automatic purge code in this step.
 
-1. a second EXECUTE on the same device remains blocked while the first intervention is running;
-2. history/report expose enough durable state for human reconciliation;
-3. reconciliation must finalize the interrupted intervention as failed without inventing a successful result;
-4. because an EXECUTE intent occurred without confirmed result, the device must remain or become unverified and require manual verification;
-5. the reconciled intervention must preserve the journal and audit history;
-6. production must remain untouched.
+After the retention policy is versioned, return to the remaining P0 items before authorizing real equipment:
 
-Working name:
-
-MIMIR-V1-013-LAB-09
-
-Do not contact real equipment.
+- historical migration 001/bootstrap canonicalization;
+- plugin metadata drift 0.2.6 versus recorded 0.1.0;
+- explicit plugins.allow policy.
 
 ## Planned sequence
 
-1. Create a new synthetic generic-linux device with permission_mode=EXECUTE
-2. Start an approved synthetic EXECUTE intervention
-3. Complete PRECHECK, SNAPSHOT and BACKUP with synthetic doubles
-4. Persist EXECUTE intent only, then simulate interruption
-5. Confirm a second EXECUTE is blocked
-6. Inspect history/report for the running intervention
-7. Reconcile the original intervention to failed using only durable journal facts
-8. Confirm device is unverified and the original journal is preserved
-9. Confirm the intervention is terminal failed with completed_at set
-10. Restore synthetic identity
-11. Confirm production remains version13=false and mimir_ops=false
-12. Record whether the existing API is sufficient or whether additional reconciliation hardening is required
+1. Version the v1 operational retention policy
+2. Update OPERATIONS/RUNBOOK with the policy and administrative constraints
+3. Mark interrupted-intervention reconciliation complete in the master plan
+4. Reconcile STATUS/ROADMAP with LAB-07 through LAB-09
+5. Then resolve the remaining P0 historical/runtime gaps before first real equipment READ
 
-## Expected next laboratory
+## Expected next checkpoint
 
-MIMIR-V1-013-LAB-09
+MIMIR-V1-OPS-RETENTION-01
 
 Purpose:
 
-Validate fail-closed reconciliation of an interrupted synthetic EXECUTE intervention.
+Freeze a conservative, auditable v1 retention policy before production or real-equipment homologation.
 
 ## PostgreSQL laboratory
 
@@ -258,9 +233,12 @@ full synthetic EXECUTE state machine validated without real equipment
 MIMIR-V1-013-LAB-08:
 isolated PostgreSQL laboratory backup and restore validated
 
+MIMIR-V1-013-LAB-09:
+interrupted EXECUTE reconciliation and mandatory reverification validated
+
 ## Do not repeat
 
-Do not repeat LAB-01 through LAB-08 unless a later code change affects their validated assumptions.
+Do not repeat LAB-01 through LAB-09 unless a later code change affects their validated assumptions.
 
 Do not redo historical migration reconstruction 009 through 012.
 
