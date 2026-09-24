@@ -79,7 +79,7 @@ A documentação do Maestro deve ser retomada somente após a estabilização do
 - [x] Verificar ausência de SELECT/INSERT/UPDATE/DELETE direto nas tabelas ops.
 - [x] Validar autenticação/identidade peer de laboratório sem reutilizar a identidade do OpenClaw.
 - [x] Testar a API `mimir.ops_api(jsonb)` com dados sintéticos.
-- [ ] Testar constraints e rejeições de segurança com casos negativos.
+- [x] Testar constraints e rejeições de segurança com casos negativos.
 - [ ] Testar fluxo READ sintético completo.
 - [ ] Testar fluxo EXECUTE somente com dublês/simulação, sem equipamento real.
 - [ ] Testar backup/restauração do laboratório.
@@ -232,3 +232,24 @@ Primeira bateria de casos negativos da API operacional concluída no laboratóri
 Resultado: rejeição de conteúdo sensível, rejeição de campos inesperados e ausência de persistência parcial foram confirmadas.
 
 **Próxima atividade:** concluir LAB-05 com inconsistência rede/IP, dependência entre clientes, plano adulterado e tentativa de EXECUTE sem autorização.
+
+
+## Checkpoint MIMIR-V1-013-LAB-05 — concluído
+
+A bateria completa de casos negativos da API operacional foi concluída no laboratório.
+
+Validações aprovadas:
+
+- payload sensível rejeitado;
+- campo desconhecido rejeitado;
+- IP fora da rede rejeitado;
+- rollback confirmou ausência de device/interface/access inválidos;
+- dependência atravessando clientes rejeitada;
+- rollback confirmou ausência de device/access inválidos;
+- plano adulterado rejeitado;
+- tentativa de EXECUTE em equipamento com `permission_mode=READ` rejeitada;
+- nenhuma intervenção inválida foi persistida;
+- identidade operacional restaurada para `peer:mimir-ops`, `enabled=false`;
+- produção permaneceu com `schema_version=1..12` e sem role `mimir_ops`.
+
+**Próxima atividade:** validar o fluxo READ sintético completo, incluindo abertura de intervenção, journal de intent/result, finalização, atualização do inventário e relatório, ainda sem acessar equipamento real.
