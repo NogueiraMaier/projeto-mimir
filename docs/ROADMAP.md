@@ -52,3 +52,17 @@ Próximos marcos, cada um com autorização própria:
 
 Esses marcos não encerram os riscos históricos PRIO-P0 nem alteram as decisões
 documentais de governança. A autorização desta etapa foi restrita ao desenvolvimento local.
+
+
+## Controle mestre da conclusão v1 — 2026-09-24
+
+A sequência canônica de trabalho passou a ser mantida em
+[MIMIR_V1_EXECUTION_PLAN.md](MIMIR_V1_EXECUTION_PLAN.md).
+
+Checkpoint atual: `MIMIR-V1-013-LAB-01` concluído. Runtime de memória está saudável
+e a primeira metade da migration 013 foi validada em cluster PostgreSQL isolado.
+Produção permanece em versões 1–12 e sem `mimir_ops`.
+
+Próxima etapa: validar `013_operational_role.sql`, grants, identidade peer e API
+operacional somente no laboratório temporário. A documentação do Maestro deve ser
+retomada depois da estabilização dos marcos P0/P1 do Mímir.
