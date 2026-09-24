@@ -82,7 +82,7 @@ A documentação do Maestro deve ser retomada somente após a estabilização do
 - [x] Testar constraints e rejeições de segurança com casos negativos.
 - [x] Testar fluxo READ sintético completo.
 - [x] Implementar hardening temporal de `completed_at >= started_at`.
-- [ ] Validar hardening temporal no `MIMIR-V1-013-LAB-06B`.
+- [x] Validar hardening temporal no `MIMIR-V1-013-LAB-06B`.
 - [ ] Testar fluxo EXECUTE somente com dublês/simulação, sem equipamento real.
 - [ ] Testar backup/restauração do laboratório.
 - [ ] Desligar e remover o cluster temporário somente após coleta de evidências.
@@ -124,15 +124,19 @@ A documentação do Maestro deve ser retomada somente após a estabilização do
 
 ## Checkpoint atual
 
-**Checkpoint MIMIR-V1-013-LAB-06 — concluído.**
+**Checkpoint MIMIR-V1-013-LAB-06B — concluído.**
 
-O fluxo READ sintético persistido foi validado de ponta a ponta no laboratório PostgreSQL isolado. A correção do guard de transição para `payload.action.operation` foi validada, o workflow chegou a `DONE/complete`, e journal, evidence, report, history e atualização do inventário funcionaram como esperado.
+O hardening temporal de `intervention.finish` foi validado no PostgreSQL temporário real do laboratório, usando o checkout `4ef8362c51666124c4c4b39ce181f2b1e9df3e8d` e o fix `bbe6c2a90bd7e3f237c6f02b97bc93d11db6fd13`.
 
-Produção continua em versões 1–12, sem `mimir_ops`.
+No caso negativo, `completed_at < started_at` foi rejeitado e a intervenção permaneceu `running`, em `DONE/complete`, com `completed_at` nulo, 2 ações, 0 relatórios, 0 evidências e dispositivo ainda não verificado.
 
-Foi identificado um hardening temporal obrigatório antes do EXECUTE sintético: `intervention.finish` deve rejeitar `completed_at < started_at`.
+No caso positivo, cronologia válida foi aceita com `status=collected`, `final_validation=true`, `inventory_updated=true`, 1 relatório, 1 evidência e dispositivo em `verification_state=verified`.
 
-**Próxima atividade autorizável:** validar no PostgreSQL temporário, através do `MIMIR-V1-013-LAB-06B`, a rejeição de `completed_at < started_at` e o caminho positivo com cronologia válida. Somente depois iniciar o fluxo EXECUTE sintético.
+A identidade sintética foi restaurada para `peer:mimir-ops`, `enabled=false`. Produção permaneceu sem schema_version 13 e sem role `mimir_ops`.
+
+Uma segunda tentativa acidental de finalizar a mesma intervenção depois da conclusão foi rejeitada com `intervention unavailable or already finalized`, comportamento terminal esperado.
+
+**Próxima atividade autorizável:** executar o `MIMIR-V1-013-LAB-07`, validando o fluxo EXECUTE completo apenas com dublês/simulação e sem contato com equipamento real.
 
 ## Protocolo de continuidade entre sessões
 
