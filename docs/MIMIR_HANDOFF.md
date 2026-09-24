@@ -41,8 +41,8 @@ Draft
 Open
 Not merged
 
-State verified from source commit:
-a4943eaf8ae5e00eed859509d01e259750af6972
+LAB-06B validation checkout:
+4ef8362c51666124c4c4b39ce181f2b1e9df3e8d
 
 Development host:
 gentoo-Dragon_IA
@@ -75,9 +75,9 @@ Milestone:
 MIMIR-V1-013
 
 Last completed laboratory:
-MIMIR-V1-013-LAB-06
+MIMIR-V1-013-LAB-06B
 
-LAB-06 status:
+LAB-06B status:
 COMPLETED
 
 The persistent READ workflow was validated end to end in the isolated PostgreSQL laboratory.
@@ -119,62 +119,59 @@ LAB-06 subsequently validated the fix.
 
 ## Current hardening state
 
-The temporal integrity hardening has been implemented in the development branch and covered by the local operational regression suite.
+Temporal integrity hardening is implemented and validated.
 
 Code commit:
 
 bbe6c2a90bd7e3f237c6f02b97bc93d11db6fd13
 
-The PostgreSQL runtime behavior has not yet been revalidated by LAB-06B.
+LAB-06B validated that completed_at earlier than intervention.started_at is rejected before finalization side effects.
 
-Synthetic EXECUTE remains blocked until LAB-06B passes.
+Negative path remained running at DONE/complete with completed_at NULL, two journal actions, zero reports, zero evidence, and the device still unverified.
+
+Positive path completed with status collected, final_validation=true, inventory_updated=true, one report, one evidence, verification_state=verified and verification_scope=diagnostic_observation.
+
+Synthetic identity was restored to peer:mimir-ops with enabled=false.
+
+Production remained unchanged: schema_version 13 absent and mimir_ops role absent.
+
+A second accidental attempt to finish the already completed intervention was rejected as already finalized. This is expected terminal behavior and does not invalidate LAB-06B.
 
 ## NEXT_ACTION
 
-Validate the temporal hardening in the isolated PostgreSQL laboratory on gentoo-Dragon_vm.
+Run MIMIR-V1-013-LAB-07: synthetic EXECUTE only with doubles/simulation in the isolated PostgreSQL laboratory.
 
-The negative case must prove that:
+No real equipment may be contacted.
 
-completed_at < intervention.started_at
+Validate the full state machine:
 
-is rejected by intervention.finish.
+PRECHECK -> SNAPSHOT -> BACKUP -> EXECUTE -> VALIDATE -> DONE
 
-The rejection must not persist a report or evidence and must not mark the inventory as successfully verified by that invalid finish.
-
-Then run a valid completion with:
-
-completed_at >= intervention.started_at
-
-Only after both cases pass may the project advance to synthetic EXECUTE.
+Each stage must persist coherent intent/result journal entries, the plan/approval binding must remain unchanged, the final report must match the durable journal, failures must remain fail-closed, the synthetic identity must be restored, and production must remain untouched.
 
 ## Planned sequence
 
-1. Update the isolated VPS validation checkout to the temporal hardening commit
-2. Recreate or reset the disposable PostgreSQL laboratory as required
-3. Run MIMIR-V1-013-LAB-06B negative temporal case
-4. Confirm invalid completion creates no report, evidence or successful inventory verification update
-5. Run the valid completion case with correct chronology
-6. Record LAB-06B evidence
-7. Update this handoff
-8. Only then proceed to synthetic EXECUTE
+1. Create a new synthetic generic-linux device with permission_mode=EXECUTE
+2. Build a valid approved set-hostname plan using only synthetic data
+3. Execute PRECHECK intent/result using doubles
+4. Execute SNAPSHOT intent/result using doubles
+5. Execute BACKUP intent/result using doubles
+6. Execute EXECUTE intent/result using doubles
+7. Execute VALIDATE intent/result using doubles
+8. Confirm DONE/complete
+9. Finish with valid chronology and matching durable journal
+10. Confirm report, evidence and inventory finalization
+11. Restore synthetic identity
+12. Confirm production remains version13=false and mimir_ops=false
+13. Record LAB-07 evidence and update this handoff
 
 ## Expected next laboratory
 
-Working name:
-
-MIMIR-V1-013-LAB-06B
+MIMIR-V1-013-LAB-07
 
 Purpose:
 
-Validate temporal integrity of intervention.finish.
-
-Negative case:
-
-completed_at earlier than started_at must fail closed.
-
-Positive case:
-
-completed_at equal to or later than started_at must proceed according to the workflow rules.
+Validate the complete synthetic EXECUTE state machine without contacting real equipment.
 
 ## PostgreSQL laboratory
 
@@ -212,9 +209,12 @@ negative API and authorization tests completed
 MIMIR-V1-013-LAB-06:
 persistent synthetic READ workflow completed
 
+MIMIR-V1-013-LAB-06B:
+temporal integrity hardening validated in PostgreSQL laboratory
+
 ## Do not repeat
 
-Do not repeat LAB-01 through LAB-06 unless a later code change affects their validated assumptions.
+Do not repeat LAB-01 through LAB-06B unless a later code change affects their validated assumptions.
 
 Do not redo historical migration reconstruction 009 through 012.
 
