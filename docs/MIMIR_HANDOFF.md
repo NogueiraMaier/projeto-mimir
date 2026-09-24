@@ -75,7 +75,7 @@ Milestone:
 MIMIR-V1-013
 
 Last completed checkpoint:
-MIMIR-V1-OPS-RETENTION-01
+MIMIR-V1-MEMORY-BOOTSTRAP-01
 
 Checkpoint status:
 COMPLETED
@@ -148,35 +148,32 @@ No real equipment has been contacted.
 
 ## NEXT_ACTION
 
-Validate the new canonical memory-v1 bootstrap reconstruction in an isolated PostgreSQL database.
+Retire the temporary PostgreSQL validation cluster now that its required evidence,
+backup/restore test and bootstrap replay have been completed and versioned.
 
-Versioned artifacts:
+Before deletion:
 
-- tools/memory/bootstrap/memory_v1_canonical.sql
-- tools/memory/test_memory_bootstrap.py
-- tools/memory/validate-memory-bootstrap-lab.sh
+1. confirm production is still schema versions 1..12;
+2. confirm production has no schema version 13;
+3. confirm production has no mimir_ops role;
+4. identify the temporary cluster data directory from its running postmaster;
+5. stop only the cluster listening on port 55432;
+6. confirm production PostgreSQL on port 5432 remains running;
+7. remove only the temporary cluster tree after shutdown;
+8. retain no requirement to preserve synthetic database contents after the
+   checkpoint evidence is versioned.
 
-Historical conclusion:
+After the temporary cluster is removed, proceed to the remaining runtime P0 items:
 
-The original migration 001 was not recovered from Git or the local recovery directory. The canonical bootstrap is a reconstruction and must not be described as the historical migration.
-
-Validation requirements:
-
-1. use only the temporary PostgreSQL cluster;
-2. create an empty database named mimir_memory inside that temporary cluster;
-3. apply the canonical v1 bootstrap;
-4. confirm schema version 1;
-5. apply migrations 002 through 012 unchanged and in order;
-6. confirm schema versions 1..12;
-7. confirm key objects and privileges match the observed production state;
-8. run the static bootstrap regression test;
-9. confirm real production remains untouched.
+- resolve plugin metadata drift: runtime/package/manifest 0.2.6 versus OpenClaw
+  recorded version 0.1.0;
+- define plugins.allow explicitly for trusted external plugins.
 
 Working checkpoint:
 
-MIMIR-V1-MEMORY-BOOTSTRAP-01
+MIMIR-V1-LAB-CLEANUP-01
 
-Do not apply the canonical bootstrap to production.
+Do not alter production PostgreSQL.
 
 ## PostgreSQL laboratory
 
@@ -244,7 +241,7 @@ Do not provision the final Linux mimir-ops identity in production yet.
 
 ## Remaining major work after migration 013 validation
 
-Historical migration 001 resolution or canonical bootstrap documentation
+Canonical memory-v1 bootstrap validation completed
 
 Permanent PostgreSQL memory workflow
 
