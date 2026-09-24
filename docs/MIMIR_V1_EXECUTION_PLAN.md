@@ -122,13 +122,29 @@ A documentação do Maestro deve ser retomada somente após a estabilização do
 
 ## Checkpoint atual
 
-**Checkpoint MIMIR-V1-013-LAB-01 — concluído.**
+**Checkpoint MIMIR-V1-013-LAB-06 — concluído.**
 
-A migration `013_operational_inventory.sql` foi aplicada com sucesso apenas em cluster PostgreSQL temporário. O laboratório ficou em versões 1–13, com 15 tabelas operacionais e `mimir.ops_api(jsonb)` presente. A identidade lógica `mimir_ops` permanece desabilitada e a role cluster-global ainda não foi criada.
+O fluxo READ sintético persistido foi validado de ponta a ponta no laboratório PostgreSQL isolado. A correção do guard de transição para `payload.action.operation` foi validada, o workflow chegou a `DONE/complete`, e journal, evidence, report, history e atualização do inventário funcionaram como esperado.
 
 Produção continua em versões 1–12, sem `mimir_ops`.
 
-**Próxima atividade autorizável:** validar `013_operational_role.sql` e os grants no mesmo cluster temporário, mantendo produção intocada.
+Foi identificado um hardening temporal obrigatório antes do EXECUTE sintético: `intervention.finish` deve rejeitar `completed_at < started_at`.
+
+**Próxima atividade autorizável:** implementar o invariant temporal, adicionar teste de regressão e executar o `MIMIR-V1-013-LAB-06B`. Somente depois iniciar o fluxo EXECUTE sintético.
+
+## Protocolo de continuidade entre sessões
+
+O arquivo `docs/MIMIR_HANDOFF.md` é o ponto operacional corrente para retomada entre chats, sessões do Codex e outros agentes.
+
+Regras:
+
+1. Toda nova sessão deve ler primeiro `docs/MIMIR_HANDOFF.md` e depois este plano mestre.
+2. Git, branch e HEAD devem ser conferidos antes de qualquer alteração.
+3. O campo `NEXT_ACTION` do handoff define o ponto exato de retomada.
+4. LAB concluído, bug bloqueante, fix relevante, mudança de máquina ou mudança do próximo passo exigem atualização do handoff.
+5. Sessões longas devem atualizar e versionar o handoff antes de encerrar.
+6. Checkpoints históricos relevantes devem ser preservados em `docs/handoff/archive/`.
+7. Se conversa, memória do modelo e Git divergirem, o repositório e o handoff versionado prevalecem após conferência.
 
 ## Evidências relacionadas
 
