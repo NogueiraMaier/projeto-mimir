@@ -78,7 +78,7 @@ A documentação do Maestro deve ser retomada somente após a estabilização do
 - [x] Verificar grants mínimos efetivos da role `mimir_ops`.
 - [x] Verificar ausência de SELECT/INSERT/UPDATE/DELETE direto nas tabelas ops.
 - [x] Validar autenticação/identidade peer de laboratório sem reutilizar a identidade do OpenClaw.
-- [ ] Testar a API `mimir.ops_api(jsonb)` com dados sintéticos.
+- [x] Testar a API `mimir.ops_api(jsonb)` com dados sintéticos.
 - [ ] Testar constraints e rejeições de segurança com casos negativos.
 - [ ] Testar fluxo READ sintético completo.
 - [ ] Testar fluxo EXECUTE somente com dublês/simulação, sem equipamento real.
@@ -195,3 +195,26 @@ Configuração sintética de laboratório:
 Conclusão: peer authentication + pg_ident + least privilege funcionam no desenho esperado. A identidade definitiva `peer:mimir-ops` ainda não foi provisionada no host real.
 
 **Próxima atividade:** habilitar temporariamente `peer:jarvisdev` somente no laboratório, exercitar `mimir.ops_api(jsonb)` com dados totalmente sintéticos e depois executar casos negativos.
+
+
+## Checkpoint MIMIR-V1-013-LAB-04 — concluído
+
+A API operacional foi exercitada com identidade peer sintética habilitada somente no laboratório e com dados totalmente sintéticos.
+
+Fluxo executado sob `set -euo pipefail`:
+
+- identidade temporária do laboratório alterada para `peer:jarvisdev` e habilitada;
+- conexão como `mimir_ops` via peer confirmada;
+- `inventory.add` de cliente sintético concluído;
+- `inventory.add` de site sintético concluído;
+- `inventory.add` de dispositivo `generic-linux` em modo READ concluído;
+- acesso SSH sintético associado ao dispositivo;
+- `inventory.list` de clientes concluído;
+- `inventory.show` do dispositivo concluído;
+- SELECT direto nas tabelas ops continuou bloqueado;
+- `trap` restaurou a identidade lógica para `peer:mimir-ops`, `enabled=false`;
+- produção permaneceu com `schema_version=1..12` e sem role `mimir_ops`.
+
+O fato de o script ter alcançado as verificações finais sob `set -e` confirma que as chamadas anteriores da API não retornaram erro SQL.
+
+**Próxima atividade:** executar casos negativos da API no mesmo laboratório: campos desconhecidos/segredos, inconsistência rede/IP, dependência entre clientes, plano adulterado e tentativa de EXECUTE sem autorização.
