@@ -1,7 +1,7 @@
 # Estado técnico do Projeto Mimir
 
 Data da consolidação original: 2026-07-30
-Última atualização documental: 2026-09-22
+Última atualização documental: 2026-09-24
 
 ## Declarações históricas de 2026-07-30
 
@@ -77,3 +77,17 @@ identidade peer existente e autorizada. Testar SQL em banco descartável antes
 de qualquer implantação, revisar backup/restauração e provisionamento da role,
 e somente então autorizar equipamento de laboratório em READ. As lacunas
 históricas da memória e de governança não foram encerradas por esta revisão.
+
+
+## Atualização operacional — 2026-09-24
+
+- **VALIDADO EM RUNTIME:** OpenClaw 2026.9.5 ativo, configuração válida e plugin `mimir-memory` carregado em versão 0.2.6.
+- **CORRIGIDO:** provider local de embeddings migrado para o `llama-cpp` Managed local server, sem alterar o modelo de chat atual.
+- **VALIDADO:** memória nativa reindexada; 9/9 arquivos, 77 chunks, `dirty=false`, índice vetorial complete, `semanticAvailable=true`, 768 dimensões e `embeddingProbe.ok=true`.
+- **VALIDADO EM LAB ISOLADO:** `013_operational_inventory.sql` aplicada em cluster PostgreSQL temporário, com versões 1–13, 15 tabelas ops e `mimir.ops_api(jsonb)`.
+- **PRODUÇÃO INTACTA:** `mimir_memory` permanece em versões 1–12 e a role `mimir_ops` continua ausente.
+- **PENDENTE:** validar `013_operational_role.sql`, grants mínimos, peer dedicado e API funcional apenas no laboratório.
+- **PENDENTE:** corrigir metadata drift do plugin (runtime 0.2.6 versus Recorded version 0.1.0) e definir `plugins.allow` explícito.
+
+Lista mestre de execução: [MIMIR_V1_EXECUTION_PLAN.md](MIMIR_V1_EXECUTION_PLAN.md).
+Evidência da rodada: [review/operations/2026-09-24.md](review/operations/2026-09-24.md).
