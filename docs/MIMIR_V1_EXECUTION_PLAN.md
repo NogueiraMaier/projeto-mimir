@@ -33,7 +33,7 @@ A documentação do Maestro deve ser retomada somente após a estabilização do
 - [x] Renumerar a migration operacional conflitante de 009 para 013.
 - [x] Fazer a 013 exigir versão 12 e recusar reaplicação silenciosa.
 - [x] Registrar regra: nenhuma migration em ambiente persistente antes de existir no Git.
-- [ ] Resolver a ausência histórica da migration 001 no Git ou documentar bootstrap canônico equivalente.
+- [x] Resolver a ausência histórica da migration 001 no Git ou documentar bootstrap canônico equivalente.
 
 ### P0 — Validador e segurança da branch operacional
 
@@ -124,29 +124,32 @@ A documentação do Maestro deve ser retomada somente após a estabilização do
 
 ## Checkpoint atual
 
-**Checkpoint MIMIR-V1-OPS-RETENTION-01 — concluído.**
+**Checkpoint MIMIR-V1-MEMORY-BOOTSTRAP-01 — concluído.**
 
-Após a validação do LAB-09, foi definida a política operacional v1 em
-`docs/OPERATIONS_RETENTION.md`.
+A migration histórica 001 não foi recuperada. Em seu lugar foi versionado um
+bootstrap canônico explicitamente identificado como reconstrução:
 
-Decisão v1:
+- `tools/memory/bootstrap/memory_v1_canonical.sql`;
+- `tools/memory/test_memory_bootstrap.py`;
+- `tools/memory/validate-memory-bootstrap-lab.sh`;
+- `docs/recovery/MEMORY_V1_CANONICAL_BOOTSTRAP.md`.
 
-- registros operacionais persistidos não expiram automaticamente;
-- purge automático é proibido;
-- purge administrativo não é implementado na v1;
-- intervenções failed/interrupted e seus journals devem ser preservados;
-- relatórios/evidências reais são confidenciais e não entram no Git;
-- backups seguem ciclo de vida separado e não autorizam exclusão silenciosa;
-- laboratórios totalmente sintéticos podem ser removidos somente depois que as
-  evidências necessárias estiverem versionadas e os checkpoints de recuperação
-  tiverem sido concluídos.
+Validação executada:
 
-`OPERATIONS.md` e `RUNBOOK.md` foram alinhados com essa política.
+- 9 testes estáticos aprovados;
+- bootstrap aplicado em banco vazio do cluster temporário;
+- estado após bootstrap: versão 1;
+- migrations 002–012 aplicadas sem edição e em ordem;
+- estado final: versões 1–12;
+- objetos, colunas geradas e least privilege esperados confirmados;
+- produção permaneceu em versões 1–12, sem versão 13 e sem `mimir_ops`.
 
-**Próxima atividade:** retornar às lacunas P0 antes da primeira homologação em
-equipamento real. O próximo item é resolver a ausência histórica da migration
-001 no Git ou documentar um bootstrap canônico equivalente, sem inventar SQL que
-não possa ser sustentado por evidência histórica.
+Com isso, o P0 de bootstrap/versionamento da memória fica fechado sem inventar
+uma migration histórica inexistente.
+
+**Próxima atividade:** coletar evidência final do cluster temporário e removê-lo
+de forma controlada. Em seguida, tratar os dois P0 restantes do runtime:
+metadata drift do plugin e `plugins.allow` explícito.
 
 ## Protocolo de continuidade entre sessões
 
