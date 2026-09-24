@@ -74,10 +74,10 @@ Do not use real equipment for EXECUTE until the synthetic EXECUTE workflow and t
 Milestone:
 MIMIR-V1-013
 
-Last completed laboratory:
-MIMIR-V1-013-LAB-09
+Last completed checkpoint:
+MIMIR-V1-OPS-RETENTION-01
 
-LAB-09 status:
+Checkpoint status:
 COMPLETED
 
 The persistent READ workflow was validated end to end in the isolated PostgreSQL laboratory.
@@ -123,70 +123,68 @@ LAB-07 validated the complete synthetic EXECUTE state machine without real equip
 
 LAB-08 validated backup and restore of the isolated operational PostgreSQL laboratory.
 
-LAB-09 validated fail-closed reconciliation for an interrupted EXECUTE workflow using synthetic data only.
+LAB-09 validated fail-closed reconciliation of an interrupted EXECUTE workflow, including mandatory READ reverification before another EXECUTE is accepted.
 
 Hardening code commit:
 
 86cf4a96a176c7ac2fdb9decb9c26dc89ecbac38
 
-LAB-09 sequence:
+The v1 operational retention policy is now versioned in:
 
-- approved EXECUTE intervention started on a synthetic generic-linux device;
-- PRECHECK, SNAPSHOT and BACKUP intent/result pairs completed;
-- EXECUTE intent was persisted without a corresponding result to simulate interruption;
-- a second EXECUTE on the same device was blocked while the original intervention remained running;
-- history/report exposed the durable running state and seven persisted journal actions;
-- the interrupted intervention was reconciled to status=failed without inventing a successful EXECUTE result;
-- the device became unverified with observed_state.state=unknown_requires_manual_verification;
-- a new EXECUTE remained blocked by the new database guard;
-- a successful READ reverification restored the device to verified;
-- only after reverification was a new EXECUTE accepted;
-- the synthetic identity was restored to peer:mimir-ops with enabled=false.
+docs/OPERATIONS_RETENTION.md
 
-LAB-09 final production safety check:
+Policy checkpoint:
+
+MIMIR-V1-OPS-RETENTION-01
+
+The v1 policy prohibits automatic purge, preserves failed/interrupted operational history, keeps real evidence/reports out of Git, and allows fully synthetic laboratories to be removed only after required evidence and recovery checkpoints are recorded.
+
+Production remains unchanged:
 
 schema_version 13 = false
 mimir_ops role = false
 
-No real equipment was contacted.
+No real equipment has been contacted.
 
 ## NEXT_ACTION
 
-Define the v1 retention policy for operational reports, evidence, journals and audit records before any real-equipment homologation.
+Resolve the historical absence of migration 001 from Git, or document a canonical bootstrap equivalent supported by repository/history evidence.
 
-The policy must be explicit about:
+Do not invent a migration 001 from assumptions.
 
-1. which operational records are append-only/immutable in v1;
-2. whether automatic deletion is allowed;
-3. how backup copies interact with retention;
-4. how interrupted/failed interventions are preserved;
-5. how future administrative purge must be authorized and audited;
-6. how sensitive operational data is handled;
-7. which items may be retained indefinitely during v1 versus requiring a later lifecycle policy.
+The next investigation must:
 
-Do not add automatic purge code in this step.
+1. inspect the current migrations 002 through 013 and determine the objects that migration 002 assumes already exist;
+2. inspect Git history, recovery documentation and bootstrap/install scripts for evidence of how schema version 1 was originally created;
+3. inspect the production schema only read-only if necessary and only to describe current version-1 objects, not to infer unsupported historical SQL;
+4. distinguish historical evidence from a new canonical bootstrap design;
+5. choose one of two outcomes:
+   - recover and version an evidence-backed migration 001; or
+   - document a canonical bootstrap procedure that reproduces the required pre-002 schema without pretending it is the historical migration;
+6. add tests/validation for a fresh bootstrap path before considering the P0 item closed.
 
-After the retention policy is versioned, return to the remaining P0 items before authorizing real equipment:
+Working checkpoint:
 
-- historical migration 001/bootstrap canonicalization;
-- plugin metadata drift 0.2.6 versus recorded 0.1.0;
-- explicit plugins.allow policy.
+MIMIR-V1-MEMORY-BOOTSTRAP-01
 
 ## Planned sequence
 
-1. Version the v1 operational retention policy
-2. Update OPERATIONS/RUNBOOK with the policy and administrative constraints
-3. Mark interrupted-intervention reconciliation complete in the master plan
-4. Reconcile STATUS/ROADMAP with LAB-07 through LAB-09
-5. Then resolve the remaining P0 historical/runtime gaps before first real equipment READ
+1. Inspect migration 002 preconditions and schema dependencies
+2. Search Git history and repository artifacts for version-1/bootstrap evidence
+3. Compare with current production schema read-only only if repository evidence is insufficient
+4. Write a recovery/design note separating historical facts from canonical reconstruction
+5. Implement the smallest evidence-backed bootstrap artifact
+6. Validate a clean bootstrap through current migrations in an isolated PostgreSQL database
+7. Update the master plan and handoff
+8. Then address plugin metadata drift and explicit plugins.allow
 
 ## Expected next checkpoint
 
-MIMIR-V1-OPS-RETENTION-01
+MIMIR-V1-MEMORY-BOOTSTRAP-01
 
 Purpose:
 
-Freeze a conservative, auditable v1 retention policy before production or real-equipment homologation.
+Close the P0 bootstrap/versioning gap without fabricating historical migration content.
 
 ## PostgreSQL laboratory
 
