@@ -154,6 +154,7 @@ Versioned artifacts:
 
 - tools/memory/bootstrap/memory_v1_canonical.sql
 - tools/memory/test_memory_bootstrap.py
+- tools/memory/validate-memory-bootstrap-lab.sh
 
 Historical conclusion:
 
