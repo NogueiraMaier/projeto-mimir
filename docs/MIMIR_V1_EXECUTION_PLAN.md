@@ -81,6 +81,8 @@ A documentação do Maestro deve ser retomada somente após a estabilização do
 - [x] Testar a API `mimir.ops_api(jsonb)` com dados sintéticos.
 - [x] Testar constraints e rejeições de segurança com casos negativos.
 - [x] Testar fluxo READ sintético completo.
+- [x] Implementar hardening temporal de `completed_at >= started_at`.
+- [ ] Validar hardening temporal no `MIMIR-V1-013-LAB-06B`.
 - [ ] Testar fluxo EXECUTE somente com dublês/simulação, sem equipamento real.
 - [ ] Testar backup/restauração do laboratório.
 - [ ] Desligar e remover o cluster temporário somente após coleta de evidências.
@@ -130,7 +132,7 @@ Produção continua em versões 1–12, sem `mimir_ops`.
 
 Foi identificado um hardening temporal obrigatório antes do EXECUTE sintético: `intervention.finish` deve rejeitar `completed_at < started_at`.
 
-**Próxima atividade autorizável:** implementar o invariant temporal, adicionar teste de regressão e executar o `MIMIR-V1-013-LAB-06B`. Somente depois iniciar o fluxo EXECUTE sintético.
+**Próxima atividade autorizável:** validar no PostgreSQL temporário, através do `MIMIR-V1-013-LAB-06B`, a rejeição de `completed_at < started_at` e o caminho positivo com cronologia válida. Somente depois iniciar o fluxo EXECUTE sintético.
 
 ## Protocolo de continuidade entre sessões
 

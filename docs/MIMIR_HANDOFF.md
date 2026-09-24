@@ -117,58 +117,46 @@ Regression fix commit:
 
 LAB-06 subsequently validated the fix.
 
-## Current open issue
+## Current hardening state
 
-LAB-06 exposed a temporal integrity weakness.
+The temporal integrity hardening has been implemented in the development branch and covered by the local operational regression suite.
 
-The generated report contained completed_at earlier than the database intervention started_at.
+Code commit:
 
-Observed example:
+bbe6c2a90bd7e3f237c6f02b97bc93d11db6fd13
 
-started_at:
-2026-09-24T18:08:13.768898-03:00
+The PostgreSQL runtime behavior has not yet been revalidated by LAB-06B.
 
-completed_at:
-2026-09-24T18:08:13.728459-03:00
-
-The API accepted this impossible chronology because intervention.finish currently validates that completed_at exists but does not enforce:
-
-completed_at >= started_at
-
-This hardening must be completed before synthetic EXECUTE testing.
+Synthetic EXECUTE remains blocked until LAB-06B passes.
 
 ## NEXT_ACTION
 
-Implement temporal validation for intervention.finish.
+Validate the temporal hardening in the isolated PostgreSQL laboratory on gentoo-Dragon_vm.
 
-The persisted PostgreSQL intervention.started_at is authoritative.
-
-A report with:
+The negative case must prove that:
 
 completed_at < intervention.started_at
 
-must be rejected before report persistence, evidence persistence, inventory verification changes or successful intervention finalization.
+is rejected by intervention.finish.
 
-Add regression coverage.
+The rejection must not persist a report or evidence and must not mark the inventory as successfully verified by that invalid finish.
 
-Do not start synthetic EXECUTE before this passes.
+Then run a valid completion with:
+
+completed_at >= intervention.started_at
+
+Only after both cases pass may the project advance to synthetic EXECUTE.
 
 ## Planned sequence
 
-1. Add temporal validation to tools/memory/migrations/013_operational_inventory.sql
-2. Add regression test to tools/ops/test_mimir_ops.py
-3. Run the relevant local test suite
-4. Run git diff --check
-5. Review the diff
-6. Commit the restricted fix
-7. Update the isolated VPS validation checkout
-8. Recreate or reset the disposable PostgreSQL laboratory as required
-9. Run a dedicated temporal negative test
-10. Confirm invalid completion creates no report, evidence or inventory verification update
-11. Run valid completion with correct chronology
-12. Record evidence
-13. Update this handoff
-14. Only then proceed to synthetic EXECUTE
+1. Update the isolated VPS validation checkout to the temporal hardening commit
+2. Recreate or reset the disposable PostgreSQL laboratory as required
+3. Run MIMIR-V1-013-LAB-06B negative temporal case
+4. Confirm invalid completion creates no report, evidence or successful inventory verification update
+5. Run the valid completion case with correct chronology
+6. Record LAB-06B evidence
+7. Update this handoff
+8. Only then proceed to synthetic EXECUTE
 
 ## Expected next laboratory
 
