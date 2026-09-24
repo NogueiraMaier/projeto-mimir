@@ -218,3 +218,17 @@ Fluxo executado sob `set -euo pipefail`:
 O fato de o script ter alcançado as verificações finais sob `set -e` confirma que as chamadas anteriores da API não retornaram erro SQL.
 
 **Próxima atividade:** executar casos negativos da API no mesmo laboratório: campos desconhecidos/segredos, inconsistência rede/IP, dependência entre clientes, plano adulterado e tentativa de EXECUTE sem autorização.
+
+
+## Checkpoint MIMIR-V1-013-LAB-05A — concluído
+
+Primeira bateria de casos negativos da API operacional concluída no laboratório:
+
+- payload com campo sensível foi rejeitado;
+- payload com campo desconhecido foi rejeitado;
+- nenhum objeto residual foi criado após as rejeições;
+- identidade sintética foi restaurada para `peer:mimir-ops`, `enabled=false`.
+
+Resultado: rejeição de conteúdo sensível, rejeição de campos inesperados e ausência de persistência parcial foram confirmadas.
+
+**Próxima atividade:** concluir LAB-05 com inconsistência rede/IP, dependência entre clientes, plano adulterado e tentativa de EXECUTE sem autorização.
