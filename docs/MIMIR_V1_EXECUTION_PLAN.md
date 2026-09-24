@@ -80,7 +80,7 @@ A documentação do Maestro deve ser retomada somente após a estabilização do
 - [x] Validar autenticação/identidade peer de laboratório sem reutilizar a identidade do OpenClaw.
 - [x] Testar a API `mimir.ops_api(jsonb)` com dados sintéticos.
 - [x] Testar constraints e rejeições de segurança com casos negativos.
-- [ ] Testar fluxo READ sintético completo.
+- [x] Testar fluxo READ sintético completo.
 - [ ] Testar fluxo EXECUTE somente com dublês/simulação, sem equipamento real.
 - [ ] Testar backup/restauração do laboratório.
 - [ ] Desligar e remover o cluster temporário somente após coleta de evidências.
@@ -277,3 +277,36 @@ Estado do teste:
 - o item “Testar fluxo READ sintético completo” permanece pendente.
 
 **Próxima atividade:** corrigir a migration 013 no desenvolvimento local, adicionar teste de regressão para a transição intent → result e somente depois recriar/revalidar o laboratório a partir de um estado limpo.
+
+
+## Checkpoint MIMIR-V1-013-LAB-06 — concluído
+
+O fluxo READ sintético persistido foi reexecutado do zero após a correção do guard de transição e concluiu com sucesso.
+
+Resultados:
+
+- `intervention.begin`: aceito;
+- `READ intent`: aceito;
+- após intent: `stage=READ,state=intent`;
+- `READ result`: aceito;
+- após result: `stage=DONE,state=complete`;
+- journal persistiu exatamente dois eventos: intent e result;
+- `intervention.finish`: aceito com status `collected`;
+- `final_validation=true`;
+- `inventory_updated=true`;
+- 1 evidência persistida;
+- 1 relatório persistido;
+- dispositivo passou para `verification_state=verified`;
+- `verified_at` e `last_collected_at` preenchidos;
+- `verification_scope=diagnostic_observation`;
+- APIs `history` e `report` retornaram o registro esperado;
+- identidade restaurada para `peer:mimir-ops`, `enabled=false`;
+- produção permaneceu sem schema_version 13 e sem role `mimir_ops`.
+
+A correção validada foi `last_action.payload#>>'{action,operation}'`, commit `148044569dab79a2faa902e1a7b51c691bb43353`.
+
+### Hardening temporal identificado
+
+O teste gerou `completed_at` no arquivo de request antes de executar `intervention.begin`, e por isso o valor persistido ficou alguns milissegundos anterior ao `started_at` registrado pelo banco. A API aceitou essa cronologia impossível porque hoje valida apenas a presença de `completed_at`, não `completed_at >= started_at`.
+
+Esse ponto deve ser corrigido e coberto por teste antes de avançar para o fluxo EXECUTE sintético.
