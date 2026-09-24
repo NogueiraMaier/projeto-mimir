@@ -408,6 +408,25 @@ class WorkflowTests(unittest.TestCase):
         self.assertIn("last_action.payload#>>'{action,operation}' IS DISTINCT FROM p#>>'{action,operation}'", guard)
         self.assertNotIn("last_action.payload->>'operation'", guard)
 
+    def test_finish_rejects_completed_at_before_started_at(self):
+        migration = Path(__file__).parents[1] / 'memory' / 'migrations' / '013_operational_inventory.sql'
+        sql = migration.read_text()
+        finish = sql[
+            sql.index("report := p->'report'"):
+            sql.index("ELSIF method='history'")
+        ]
+        check = "(report->>'completed_at')::timestamptz < intervention.started_at"
+        self.assertIn(check, finish)
+        self.assertIn("RAISE EXCEPTION 'completed_at precedes started_at'", finish)
+        self.assertLess(
+            finish.index(check),
+            finish.index("IF success AND intervention.workflow_state")
+        )
+        self.assertLess(
+            finish.index(check),
+            finish.index("INSERT INTO mimir.ops_reports")
+        )
+
     def test_schema_migration_keeps_role_and_access_provisioning_separate(self):
         migration_dir = Path(__file__).parents[1] / 'memory' / 'migrations'
         schema = (migration_dir / '013_operational_inventory.sql').read_text()

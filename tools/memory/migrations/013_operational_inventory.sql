@@ -423,6 +423,9 @@ BEGIN
         IF report->>'status' NOT IN ('collected','validated','failed') OR report->>'completed_at' IS NULL THEN
             RAISE EXCEPTION 'invalid final state';
         END IF;
+        IF (report->>'completed_at')::timestamptz < intervention.started_at THEN
+            RAISE EXCEPTION 'completed_at precedes started_at';
+        END IF;
         IF success AND intervention.workflow_state IS DISTINCT FROM 'complete' THEN
             RAISE EXCEPTION 'workflow not complete';
         END IF;
