@@ -102,7 +102,7 @@ A documentação do Maestro deve ser retomada somente após a estabilização do
 ### P1 — Camada operacional
 
 - [ ] Demonstrar backup/restauração real por adapter.
-- [ ] Definir reconciliação de intervenção interrompida.
+- [x] Definir reconciliação de intervenção interrompida.
 - [ ] Definir política de retenção de evidências/relatórios.
 - [ ] Homologar primeiro equipamento de laboratório em READ.
 - [ ] Homologar `set-hostname` transitório no adapter generic-linux em laboratório.
@@ -124,36 +124,28 @@ A documentação do Maestro deve ser retomada somente após a estabilização do
 
 ## Checkpoint atual
 
-**Checkpoints MIMIR-V1-013-LAB-07 e LAB-08 — concluídos.**
+**Checkpoint MIMIR-V1-013-LAB-09 — concluído.**
 
-LAB-07 validou o fluxo EXECUTE sintético completo, sem contato com equipamento real:
+Foi validada a reconciliação fail-closed de uma intervenção EXECUTE interrompida, somente com dados sintéticos e sem contato com equipamento real.
 
-`PRECHECK -> SNAPSHOT -> BACKUP -> EXECUTE -> VALIDATE -> DONE`.
+Sequência comprovada:
 
-O journal persistiu exatamente 10 eventos em ordem, com `intent/result` para cada estágio. Uma tentativa deliberada de iniciar em `SNAPSHOT` fora de ordem foi rejeitada com zero ações persistidas.
+- intervenção EXECUTE aprovada iniciada;
+- PRECHECK, SNAPSHOT e BACKUP concluídos;
+- `EXECUTE intent` persistido sem `result`, simulando perda de confirmação;
+- segunda intervenção EXECUTE no mesmo equipamento bloqueada enquanto a primeira permaneceu `running`;
+- APIs de history/report expuseram o estado durável da intervenção e as 7 ações persistidas;
+- intervenção interrompida reconciliada como `failed`, sem inventar um resultado de EXECUTE;
+- dispositivo passou para `verification_state=unverified` e `observed_state.state=unknown_requires_manual_verification`;
+- novo EXECUTE permaneceu bloqueado pelo hardening adicionado no commit `86cf4a96a176c7ac2fdb9decb9c26dc89ecbac38`;
+- uma intervenção READ de reverificação restaurou o dispositivo para `verified`;
+- somente depois da reverificação um novo EXECUTE foi aceito;
+- identidade sintética restaurada para `peer:mimir-ops`, `enabled=false`;
+- produção permaneceu sem schema_version 13 e sem role `mimir_ops`.
 
-Estado final do LAB-07:
+O LAB-09 confirma que uma alteração externa de resultado incerto não pode ser seguida por nova alteração até que o estado do equipamento seja novamente observado.
 
-- `status=validated`;
-- `requested_mode=EXECUTE`;
-- `workflow_stage=DONE`;
-- `workflow_state=complete`;
-- `final_validation=true`;
-- `inventory_updated=true`;
-- 10 ações;
-- 1 relatório;
-- 1 evidência;
-- dispositivo marcado como verificado/coletado e com `last_change_at` preenchido.
-
-LAB-08 validou backup/restauração do PostgreSQL temporário. O inventário antes e depois do restore foi idêntico: versões 1–13, 15 tabelas ops, 3 clientes, 3 sites, 3 devices, 3 intervenções, 14 ações, 3 relatórios e 3 evidências, com o guard temporal presente. O LAB-07 restaurado permaneceu íntegro.
-
-SHA-256 do dump de validação:
-
-`5989dd1dcc21e6767563a531d1da6c3424cedfe08b9b7db434e06aecbb6d8273`
-
-Produção permaneceu sem schema_version 13 e sem role `mimir_ops`.
-
-**Próxima atividade autorizável:** definir e validar a reconciliação de intervenção interrompida no `MIMIR-V1-013-LAB-09`, ainda somente com dados sintéticos e sem contato com equipamento real.
+**Próxima atividade:** definir e versionar a política v1 de retenção de evidências, relatórios, journals e auditoria. Depois disso, retornar às lacunas P0 históricas/runtime antes da primeira homologação em equipamento real.
 
 ## Protocolo de continuidade entre sessões
 
