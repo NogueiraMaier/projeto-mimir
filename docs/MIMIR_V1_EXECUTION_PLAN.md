@@ -83,8 +83,8 @@ A documentação do Maestro deve ser retomada somente após a estabilização do
 - [x] Testar fluxo READ sintético completo.
 - [x] Implementar hardening temporal de `completed_at >= started_at`.
 - [x] Validar hardening temporal no `MIMIR-V1-013-LAB-06B`.
-- [ ] Testar fluxo EXECUTE somente com dublês/simulação, sem equipamento real.
-- [ ] Testar backup/restauração do laboratório.
+- [x] Testar fluxo EXECUTE somente com dublês/simulação, sem equipamento real.
+- [x] Testar backup/restauração do laboratório.
 - [ ] Desligar e remover o cluster temporário somente após coleta de evidências.
 
 ### P1 — Memória permanente PostgreSQL
@@ -124,19 +124,36 @@ A documentação do Maestro deve ser retomada somente após a estabilização do
 
 ## Checkpoint atual
 
-**Checkpoint MIMIR-V1-013-LAB-06B — concluído.**
+**Checkpoints MIMIR-V1-013-LAB-07 e LAB-08 — concluídos.**
 
-O hardening temporal de `intervention.finish` foi validado no PostgreSQL temporário real do laboratório, usando o checkout `4ef8362c51666124c4c4b39ce181f2b1e9df3e8d` e o fix `bbe6c2a90bd7e3f237c6f02b97bc93d11db6fd13`.
+LAB-07 validou o fluxo EXECUTE sintético completo, sem contato com equipamento real:
 
-No caso negativo, `completed_at < started_at` foi rejeitado e a intervenção permaneceu `running`, em `DONE/complete`, com `completed_at` nulo, 2 ações, 0 relatórios, 0 evidências e dispositivo ainda não verificado.
+`PRECHECK -> SNAPSHOT -> BACKUP -> EXECUTE -> VALIDATE -> DONE`.
 
-No caso positivo, cronologia válida foi aceita com `status=collected`, `final_validation=true`, `inventory_updated=true`, 1 relatório, 1 evidência e dispositivo em `verification_state=verified`.
+O journal persistiu exatamente 10 eventos em ordem, com `intent/result` para cada estágio. Uma tentativa deliberada de iniciar em `SNAPSHOT` fora de ordem foi rejeitada com zero ações persistidas.
 
-A identidade sintética foi restaurada para `peer:mimir-ops`, `enabled=false`. Produção permaneceu sem schema_version 13 e sem role `mimir_ops`.
+Estado final do LAB-07:
 
-Uma segunda tentativa acidental de finalizar a mesma intervenção depois da conclusão foi rejeitada com `intervention unavailable or already finalized`, comportamento terminal esperado.
+- `status=validated`;
+- `requested_mode=EXECUTE`;
+- `workflow_stage=DONE`;
+- `workflow_state=complete`;
+- `final_validation=true`;
+- `inventory_updated=true`;
+- 10 ações;
+- 1 relatório;
+- 1 evidência;
+- dispositivo marcado como verificado/coletado e com `last_change_at` preenchido.
 
-**Próxima atividade autorizável:** executar o `MIMIR-V1-013-LAB-07`, validando o fluxo EXECUTE completo apenas com dublês/simulação e sem contato com equipamento real.
+LAB-08 validou backup/restauração do PostgreSQL temporário. O inventário antes e depois do restore foi idêntico: versões 1–13, 15 tabelas ops, 3 clientes, 3 sites, 3 devices, 3 intervenções, 14 ações, 3 relatórios e 3 evidências, com o guard temporal presente. O LAB-07 restaurado permaneceu íntegro.
+
+SHA-256 do dump de validação:
+
+`5989dd1dcc21e6767563a531d1da6c3424cedfe08b9b7db434e06aecbb6d8273`
+
+Produção permaneceu sem schema_version 13 e sem role `mimir_ops`.
+
+**Próxima atividade autorizável:** definir e validar a reconciliação de intervenção interrompida no `MIMIR-V1-013-LAB-09`, ainda somente com dados sintéticos e sem contato com equipamento real.
 
 ## Protocolo de continuidade entre sessões
 
