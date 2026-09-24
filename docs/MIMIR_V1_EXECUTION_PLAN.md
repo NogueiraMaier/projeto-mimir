@@ -162,3 +162,16 @@ Resultados:
 - produção permaneceu em schema_version 1–12 e sem role `mimir_ops`.
 
 **Próxima atividade:** validar identidade peer dedicada no laboratório e exercitar `mimir.ops_api(jsonb)` com dados sintéticos, incluindo casos negativos, sem reutilizar a identidade `openclaw`.
+
+
+## Checkpoint MIMIR-V1-013-LAB-03-PREFLIGHT — concluído
+
+Preflight de autenticação peer no laboratório concluído sem alterações no host de produção:
+
+- usuário Linux `mimir-ops`: ausente;
+- HBA do cluster temporário ainda usa `trust` para conexões locais;
+- `pg_ident.conf` do laboratório: vazio;
+- conexão administrativa atual: `current_user=postgres`, `session_user=postgres`, `system_user=NULL`, conforme esperado sob `trust`;
+- identidade operacional cadastrada no schema: `db_role=mimir_ops`, `authentication_identity=peer:mimir-ops`, `enabled=false`.
+
+Decisão de segurança: não criar ainda o usuário Linux persistente `mimir-ops` no VPS apenas para o laboratório. O próximo teste deve validar o mecanismo peer usando uma identidade sintética restrita ao cluster temporário; a identidade definitiva `peer:mimir-ops` só será provisionada no host durante a implantação autorizada.
