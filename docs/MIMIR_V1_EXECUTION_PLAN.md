@@ -103,7 +103,7 @@ A documentação do Maestro deve ser retomada somente após a estabilização do
 
 - [ ] Demonstrar backup/restauração real por adapter.
 - [x] Definir reconciliação de intervenção interrompida.
-- [ ] Definir política de retenção de evidências/relatórios.
+- [x] Definir política de retenção de evidências/relatórios.
 - [ ] Homologar primeiro equipamento de laboratório em READ.
 - [ ] Homologar `set-hostname` transitório no adapter generic-linux em laboratório.
 - [ ] Manter MikroTik inicialmente em diagnóstico/READ.
@@ -124,28 +124,29 @@ A documentação do Maestro deve ser retomada somente após a estabilização do
 
 ## Checkpoint atual
 
-**Checkpoint MIMIR-V1-013-LAB-09 — concluído.**
+**Checkpoint MIMIR-V1-OPS-RETENTION-01 — concluído.**
 
-Foi validada a reconciliação fail-closed de uma intervenção EXECUTE interrompida, somente com dados sintéticos e sem contato com equipamento real.
+Após a validação do LAB-09, foi definida a política operacional v1 em
+`docs/OPERATIONS_RETENTION.md`.
 
-Sequência comprovada:
+Decisão v1:
 
-- intervenção EXECUTE aprovada iniciada;
-- PRECHECK, SNAPSHOT e BACKUP concluídos;
-- `EXECUTE intent` persistido sem `result`, simulando perda de confirmação;
-- segunda intervenção EXECUTE no mesmo equipamento bloqueada enquanto a primeira permaneceu `running`;
-- APIs de history/report expuseram o estado durável da intervenção e as 7 ações persistidas;
-- intervenção interrompida reconciliada como `failed`, sem inventar um resultado de EXECUTE;
-- dispositivo passou para `verification_state=unverified` e `observed_state.state=unknown_requires_manual_verification`;
-- novo EXECUTE permaneceu bloqueado pelo hardening adicionado no commit `86cf4a96a176c7ac2fdb9decb9c26dc89ecbac38`;
-- uma intervenção READ de reverificação restaurou o dispositivo para `verified`;
-- somente depois da reverificação um novo EXECUTE foi aceito;
-- identidade sintética restaurada para `peer:mimir-ops`, `enabled=false`;
-- produção permaneceu sem schema_version 13 e sem role `mimir_ops`.
+- registros operacionais persistidos não expiram automaticamente;
+- purge automático é proibido;
+- purge administrativo não é implementado na v1;
+- intervenções failed/interrupted e seus journals devem ser preservados;
+- relatórios/evidências reais são confidenciais e não entram no Git;
+- backups seguem ciclo de vida separado e não autorizam exclusão silenciosa;
+- laboratórios totalmente sintéticos podem ser removidos somente depois que as
+  evidências necessárias estiverem versionadas e os checkpoints de recuperação
+  tiverem sido concluídos.
 
-O LAB-09 confirma que uma alteração externa de resultado incerto não pode ser seguida por nova alteração até que o estado do equipamento seja novamente observado.
+`OPERATIONS.md` e `RUNBOOK.md` foram alinhados com essa política.
 
-**Próxima atividade:** definir e versionar a política v1 de retenção de evidências, relatórios, journals e auditoria. Depois disso, retornar às lacunas P0 históricas/runtime antes da primeira homologação em equipamento real.
+**Próxima atividade:** retornar às lacunas P0 antes da primeira homologação em
+equipamento real. O próximo item é resolver a ausência histórica da migration
+001 no Git ou documentar um bootstrap canônico equivalente, sem inventar SQL que
+não possa ser sustentado por evidência histórica.
 
 ## Protocolo de continuidade entre sessões
 
