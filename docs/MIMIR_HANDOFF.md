@@ -325,18 +325,38 @@ Recorded production SHA-256 baseline:
 - semantic helper:
   `e9b54ccedbdf4926fc1cc635c40146561bb384cd4620f6e8eb5cf74614c530ae`.
 
+Production backup/rollback checkpoint completed on 2026-09-25.
+
+Backup:
+
+`/var/backups/mimir-memory-0.2.6-20260925T203923`
+
+Validated:
+
+- all six production baseline SHA-256 guards matched before backup;
+- full production `mimir-memory 0.2.6` directory archived;
+- semantic-search helper copied separately;
+- runtime registration snapshot captured;
+- checksum manifest written;
+- archive extracted to a temporary restore-check directory;
+- source/build/package/manifest/helper comparisons passed;
+- explicit rollback instructions written to `ROLLBACK.txt`;
+- no production runtime file was replaced and the Gateway remained loaded with
+  0.2.6 during this checkpoint.
+
 Next executable action:
 
-1. create a versioned backup of the production 0.2.6 plugin directory plus the
-   semantic-search helper, runtime-inspection JSON and checksum manifest;
-2. verify the backup and prepare explicit rollback commands without changing the
-   loaded plugin;
-3. after explicit production-change authorization, deploy only the 0.2.7 files
-   already validated in the isolated checkout, rebuild with existing shared VPS
-   dependencies, and verify runtime metadata;
-4. run direct `tools.invoke` for `mimir_memory_search`;
-5. only after direct invocation passes, repeat the Telegram memory request;
-6. keep migration 013, `mimir_ops`, tool permissions and Telegram policy
+1. wait for explicit authorization to perform the production runtime change;
+2. after authorization, stop the OpenClaw Gateway before replacing either the
+   plugin or semantic helper, preventing an old 0.2.6 process from invoking a
+   new 0.2.7 helper contract;
+3. deploy only the whitelisted 0.2.7 files already validated in the isolated
+   checkout, preserving the production `node_modules` directory;
+4. rebuild with `--noEmitOnError`, verify runtime registration reports 0.2.7,
+   then start the Gateway;
+5. run direct `tools.invoke` for `mimir_memory_search`;
+6. only after direct invocation passes, repeat the Telegram memory request;
+7. keep migration 013, `mimir_ops`, tool permissions and Telegram policy
    unchanged.
 
 ## PostgreSQL laboratory
