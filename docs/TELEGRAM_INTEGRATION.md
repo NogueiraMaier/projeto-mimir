@@ -16,6 +16,13 @@ Adicionar Telegram como segundo canal operacional do Mímir para:
 Telegram é um canal secundário. Ele não substitui o canal principal nem deve
 receber segredos, dumps completos ou evidências operacionais sensíveis.
 
+## Identidade do bot
+
+- Nome/username criado no BotFather: `MimirAssistenteBot`;
+- link público: `t.me/MimirAssistenteBot`;
+- nenhum token deve ser versionado, documentado ou compartilhado em chat;
+- o primeiro token emitido em 2026-09-25 foi exposto durante o setup e deve ser revogado/rotacionado antes de uso.
+
 ## Estado atual
 
 O Projeto Mímir não possui configuração Telegram versionada.
