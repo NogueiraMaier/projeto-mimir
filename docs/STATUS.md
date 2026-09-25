@@ -106,3 +106,19 @@ históricas da memória e de governança não foram encerradas por esta revisão
 
 Lista mestre de execução: [MIMIR_V1_EXECUTION_PLAN.md](MIMIR_V1_EXECUTION_PLAN.md).
 Evidência da rodada: [review/operations/2026-09-24.md](review/operations/2026-09-24.md).
+
+
+## Atualização documental — arquitetura futura, 2026-09-25
+
+Foram registrados dois planos futuros, sem alteração de runtime:
+
+- [GATEWAY_PCIA_MIGRATION_PLAN.md](GATEWAY_PCIA_MIGRATION_PLAN.md) — migração controlada do plano de controle/Gateway para o PcIA, mantendo a VPS como nó de persistência/infraestrutura;
+- [MODEL_ROUTING_AND_INFERENCE_ROADMAP.md](MODEL_ROUTING_AND_INFERENCE_ROADMAP.md) — evolução pós-v1 para Capability Router, Engine Registry, policy-aware routing, benchmark e engines/providers substituíveis.
+
+Estado: **PLANEJADO / NÃO IMPLEMENTADO**.
+
+A documentação estabelece que a migração física deve ocorrer separadamente da introdução de model routing. Nenhuma mudança de produção, provider, modelo, migration, tool permission ou EXECUTE foi autorizada por essa atualização.
+
+Revisão associada:
+
+- [review/architecture/2026-09-25-gateway-model-routing.md](review/architecture/2026-09-25-gateway-model-routing.md).
