@@ -327,6 +327,10 @@ Recorded production SHA-256 baseline:
 
 Production backup/rollback checkpoint completed on 2026-09-25.
 
+Explicit production deployment authorization received on 2026-09-25 for
+`mimir-memory 0.2.7` only. This authorization does not widen migration 013,
+`mimir_ops`, tool policy, Telegram policy, or PostgreSQL schema boundaries.
+
 Backup:
 
 `/var/backups/mimir-memory-0.2.6-20260925T203923`
@@ -346,17 +350,19 @@ Validated:
 
 Next executable action:
 
-1. wait for explicit authorization to perform the production runtime change;
-2. after authorization, stop the OpenClaw Gateway before replacing either the
-   plugin or semantic helper, preventing an old 0.2.6 process from invoking a
-   new 0.2.7 helper contract;
-3. deploy only the whitelisted 0.2.7 files already validated in the isolated
-   checkout, preserving the production `node_modules` directory;
-4. rebuild with `--noEmitOnError`, verify runtime registration reports 0.2.7,
-   then start the Gateway;
-5. run direct `tools.invoke` for `mimir_memory_search`;
-6. only after direct invocation passes, repeat the Telegram memory request;
-7. keep migration 013, `mimir_ops`, tool permissions and Telegram policy
+1. execute the authorized controlled production deployment of
+   `mimir-memory 0.2.7` using the validated isolated checkout and the verified
+   0.2.6 backup/rollback checkpoint;
+2. stop the OpenClaw Gateway before replacing either the plugin or semantic
+   helper, preventing an old 0.2.6 process from invoking a new 0.2.7 helper
+   contract;
+3. deploy only the whitelisted 0.2.7 files, preserve the production
+   `node_modules` directory, rebuild with `--noEmitOnError`, and verify
+   runtime registration reports 0.2.7;
+4. run direct `tools.invoke` for `mimir_memory_search`; automatically roll
+   back to 0.2.6 if deployment/build/start/runtime validation fails;
+5. only after direct invocation passes, repeat the Telegram memory request;
+6. keep migration 013, `mimir_ops`, tool permissions and Telegram policy
    unchanged.
 
 ## PostgreSQL laboratory
