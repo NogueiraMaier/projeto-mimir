@@ -219,17 +219,29 @@ Follow-up fix versioned on 2026-09-25:
 - the development tool resolver now also checks `/opt/openclaw-release` and
   `~/.local/share/openclaw-client/node_modules` without downloading anything.
 
+Development validation result on PcIA:
+
+- development HEAD: `408533480103ba6208308f8867ff26b777ca31d9`;
+- helper syntax check: PASS;
+- TypeScript build: PASS;
+- structural import: PASS;
+- 768-dimension embedding contract smoke test: PASS;
+- invalid embedding rejection: PASS;
+- dedicated PostgreSQL transport environment isolation: PASS;
+- Vitest remains unavailable on PcIA and was not installed;
+- no production runtime change occurred.
+
 Next executable action:
 
-1. fast-forward the development checkout to
-   `d474eb36464c9b2232ba90584b04a016b4e79714`;
-2. rerun TypeScript build plus structural/runtime smoke tests on PcIA;
-3. record Vitest as unavailable unless an existing trusted copy is found; do
-   not install dependencies merely to satisfy this checkpoint;
-4. only after build/smoke validation passes, prepare a controlled VPS
-   deployment/rollback of `mimir-memory 0.2.7`;
-5. re-run direct `tools.invoke` for `mimir_memory_search`, then repeat the
-   Telegram memory request;
+1. validate the same `mimir-memory 0.2.7` commit in the isolated VPS checkout
+   using the VPS OpenClaw 2026.9.5 / Node 24 runtime and existing shared test
+   dependencies;
+2. only after VPS isolated validation passes, back up the current production
+   plugin source/build and prepare an explicit rollback;
+3. deploy only the validated plugin/helper files to the production workspace,
+   build there with existing dependencies, and verify plugin runtime metadata;
+4. re-run direct `tools.invoke` for `mimir_memory_search`;
+5. only after direct invocation passes, repeat the Telegram memory request;
 6. keep tool permissions, Telegram policy, production PostgreSQL schema and
    migration 013 unchanged throughout this validation.
 
