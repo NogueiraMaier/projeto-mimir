@@ -100,7 +100,8 @@ históricas da memória e de governança não foram encerradas por esta revisão
 - **VALIDADO P0:** bootstrap canônico da memória v1 reproduziu versões 1–12 em banco descartável; o SQL histórico original da migration 001 continua não recuperado e é tratado como lacuna histórica documentada.
 - **LAB TEMPORÁRIO REMOVIDO:** `/var/tmp/mimir-pg13-lab` foi parado e removido após evidências, backup/restore e bootstrap; produção permaneceu operacional em 1–12.
 - **VALIDADO P0 RUNTIME:** `mimir-memory` runtime/package/recorded em 0.2.6, registry `fresh`, `plugins.allow` explícito e conjunto de 41 plugins habilitados preservado; config/doctor/health aprovados.
-- **PRÓXIMO:** canal secundário Telegram para conversa remota e notificações controladas, conforme `docs/TELEGRAM_INTEGRATION.md`.
+- **VALIDADO:** canal Telegram `@MimirAssistenteBot` operacional; entrada, resposta e envio proativo confirmados; DM restrita por allowlist; token fora do Git.
+- **PRÓXIMO:** validar pelo Telegram consultas somente leitura e acesso às ferramentas já autorizadas ao agente `main`, mantendo os limites atuais.
 - **NÃO AUTORIZADO AINDA:** equipamento real em EXECUTE.
 
 Lista mestre de execução: [MIMIR_V1_EXECUTION_PLAN.md](MIMIR_V1_EXECUTION_PLAN.md).
