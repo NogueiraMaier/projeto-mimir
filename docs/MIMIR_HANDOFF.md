@@ -162,6 +162,19 @@ Working checkpoint:
 
 MIMIR-V1-TELEGRAM-02
 
+Checkpoint status: BLOCKED — tool surface diagnosis required.
+
+Observed from the Telegram direct session on 2026-09-25:
+
+- explicit `session_status` request returned `TOOL_UNAVAILABLE: session_status`;
+- explicit `mimir_memory_search` request returned
+  `TOOL_UNAVAILABLE: mimir_memory_search`;
+- Telegram transport itself remains healthy and bidirectional;
+- no production authorization boundary has been widened.
+
+Next executable action: inspect the session-scoped effective tool inventory and
+the global/per-agent tool policy before changing any configuration.
+
 ## PostgreSQL laboratory
 
 Host:
