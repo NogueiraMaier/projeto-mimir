@@ -182,11 +182,34 @@ Observed from the Telegram direct session on 2026-09-25:
 - Telegram transport remains healthy and bidirectional;
 - no production authorization boundary has been widened.
 
-Next executable action: refactor the custom `mimir_memory_search` embedding path
-to use the OpenClaw 2026.9.5 managed llama.cpp service lifecycle instead of
-`node-llama-cpp`, then validate the custom tool again without changing tool
-permissions or Telegram policy. The PostgreSQL helper must also stop hardcoding
-the local Unix socket before Gateway migration to PcIA.
+Code fix versioned on 2026-09-25:
+
+- commit `eff3f90f46f9dd54c8c27210ca3051a932d13cd2`;
+- plugin version advanced to `mimir-memory 0.2.7`;
+- explicit `mimir_memory_search` now resolves the OpenClaw registered local
+  embedding provider and supplies `api.runtime.llm.acquireLocalService()`, so
+  OpenClaw owns the managed `llama-server` lifecycle;
+- the PostgreSQL helper no longer loads `node-llama-cpp`; it receives a
+  validated 768-dimensional vector over stdin and performs only the controlled
+  `mimir.search_active_memory(...)` lookup;
+- PostgreSQL transport defaults remain local but can be overridden only through
+  dedicated `MIMIR_MEMORY_PG*` service environment variables, preparing a
+  future PcIA -> VPS path without inheriting arbitrary Gateway PG variables;
+- the evidence-shadow path is separate and was intentionally not declared fixed
+  by this patch.
+
+Runtime status of this fix: VERSIONED, NOT YET DEPLOYED OR VALIDATED.
+
+Next executable action:
+
+1. validate commit `eff3f90f46f9dd54c8c27210ca3051a932d13cd2` on the
+   development checkout with plugin tests, TypeScript build and helper syntax;
+2. only after those pass, prepare a controlled VPS deployment/rollback of
+   `mimir-memory 0.2.7`;
+3. re-run direct `tools.invoke` for `mimir_memory_search`;
+4. only after direct invocation passes, repeat the Telegram memory request;
+5. keep tool permissions, Telegram policy, production PostgreSQL schema and
+   migration 013 unchanged throughout this validation.
 
 ## PostgreSQL laboratory
 
