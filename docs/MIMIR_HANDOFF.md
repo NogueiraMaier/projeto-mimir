@@ -200,15 +200,37 @@ Code fix versioned on 2026-09-25:
 
 Runtime status of this fix: VERSIONED, NOT YET DEPLOYED OR VALIDATED.
 
+Development validation on PcIA found one compile-time packaging mismatch:
+
+- OpenClaw 2026.9.5 runtime exports
+  `openclaw/plugin-sdk/embedding-providers`, but its package export omits a
+  TypeScript `types` mapping for that subpath;
+- TypeScript therefore failed with TS7016 before any runtime smoke test;
+- no runtime or production change occurred.
+
+Follow-up fix versioned on 2026-09-25:
+
+- commit `d474eb36464c9b2232ba90584b04a016b4e79714`;
+- added a narrow local declaration shim matching the OpenClaw 2026.9.5
+  embedding-provider structural contract;
+- no OpenClaw implementation code was copied or vendored;
+- the plugin still resolves the actual embedding provider from the installed
+  OpenClaw runtime;
+- the development tool resolver now also checks `/opt/openclaw-release` and
+  `~/.local/share/openclaw-client/node_modules` without downloading anything.
+
 Next executable action:
 
-1. validate commit `eff3f90f46f9dd54c8c27210ca3051a932d13cd2` on the
-   development checkout with plugin tests, TypeScript build and helper syntax;
-2. only after those pass, prepare a controlled VPS deployment/rollback of
-   `mimir-memory 0.2.7`;
-3. re-run direct `tools.invoke` for `mimir_memory_search`;
-4. only after direct invocation passes, repeat the Telegram memory request;
-5. keep tool permissions, Telegram policy, production PostgreSQL schema and
+1. fast-forward the development checkout to
+   `d474eb36464c9b2232ba90584b04a016b4e79714`;
+2. rerun TypeScript build plus structural/runtime smoke tests on PcIA;
+3. record Vitest as unavailable unless an existing trusted copy is found; do
+   not install dependencies merely to satisfy this checkpoint;
+4. only after build/smoke validation passes, prepare a controlled VPS
+   deployment/rollback of `mimir-memory 0.2.7`;
+5. re-run direct `tools.invoke` for `mimir_memory_search`, then repeat the
+   Telegram memory request;
+6. keep tool permissions, Telegram policy, production PostgreSQL schema and
    migration 013 unchanged throughout this validation.
 
 ## PostgreSQL laboratory
