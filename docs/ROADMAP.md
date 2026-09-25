@@ -73,3 +73,54 @@ histórica da migration 001 ou por um bootstrap canônico equivalente sustentado
 por evidência. Depois corrigir metadata drift do plugin e definir
 `plugins.allow` explicitamente. A documentação do Maestro deve ser retomada
 depois da estabilização dos marcos P0/P1 do Mímir.
+
+
+## Evolução arquitetural documentada — pós-v1
+
+Foram adicionados documentos específicos para separar duas evoluções que não devem ser misturadas com o fechamento da v1.
+
+### Migração do plano de controle para o PcIA
+
+Documento:
+
+- [GATEWAY_PCIA_MIGRATION_PLAN.md](GATEWAY_PCIA_MIGRATION_PLAN.md)
+
+Escopo:
+
+- estudar e preparar a migração do OpenClaw Gateway, agente `main`, Telegram e integração do HUD para o nó local com GPU;
+- manter PostgreSQL/pgvector e infraestrutura auxiliar na VPS;
+- exigir preflight, backup, rollback e cutover controlado;
+- não executar dois consumidores Telegram em polling simultâneo;
+- tratar disponibilidade do PcIA como novo risco arquitetural;
+- validar novamente tools e memória após a migração.
+
+A migração está **PLANEJADA**. Este registro não autoriza alteração de produção.
+
+### Capability Routing, Model Routing e inferência
+
+Documento:
+
+- [MODEL_ROUTING_AND_INFERENCE_ROADMAP.md](MODEL_ROUTING_AND_INFERENCE_ROADMAP.md)
+
+Escopo:
+
+- desacoplar Mímir de modelo específico;
+- introduzir futuramente Capability Router, Engine Registry e policy-aware routing;
+- distinguir engine, provider, harness, agente, memória e ferramenta;
+- permitir avaliação controlada de Qwen local, providers autorizados, NVIDIA, Codex, Claude Code, OpenCode e outras engines futuras;
+- separar routing por capacidade de fallback por falha;
+- exigir benchmark e auditoria antes de seleção automática.
+
+Regra de ordem:
+
+**não introduzir a nova lógica de model routing durante a migração física do Gateway.**
+
+Primeiro preservar o comportamento e validar a nova topologia. Depois capturar baseline e evoluir o roteamento.
+
+### Relação com Memory v2 e agentes especialistas
+
+A evolução da memória continua em branch/documento próprio e não é substituída por este trabalho.
+
+O model routing consome contexto e evidência fornecidos pela memória, mas não redefine sua governança.
+
+Agentes especialistas continuam sendo separados de engines: um agente de Redes, SOC ou Desenvolvimento poderá usar capacidades diferentes conforme a tarefa, desde que a política autorize.
