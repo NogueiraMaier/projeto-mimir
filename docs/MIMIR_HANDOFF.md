@@ -75,7 +75,7 @@ Milestone:
 MIMIR-V1-013
 
 Last completed checkpoint:
-MIMIR-V1-RUNTIME-PLUGIN-P0-01
+MIMIR-V1-TELEGRAM-01
 
 Checkpoint status:
 COMPLETED
@@ -148,40 +148,19 @@ No real equipment has been contacted.
 
 ## NEXT_ACTION
 
-Implement the Telegram secondary channel for Mímir according to
-docs/TELEGRAM_INTEGRATION.md.
+Validate the Telegram channel as an operational surface for the Mímir main
+agent using read-only requests first.
 
-Current runtime preconditions are now satisfied:
+Sequence:
 
-- mimir-memory runtime/package/recorded version = 0.2.6;
-- plugin registry state = fresh;
-- plugins.allow is explicit;
-- 41 enabled plugins preserved;
-- config validate passed;
-- plugins doctor passed;
-- Gateway health passed;
-- OpenRC service is started.
-
-Telegram must be configured as a bundled channel, not as a third-party plugin.
-
-Required sequence:
-
-1. create the bot with BotFather;
-2. store the bot token outside Git;
-3. configure channels.telegram with enabled=true and dmPolicy=pairing;
-4. validate channel status/probe;
-5. send the first DM to create pairing;
-6. approve the pairing and capture the operator numeric Telegram user ID;
-7. switch DM access to allowlist with that numeric ID;
-8. test bidirectional conversation;
-9. test one proactive notification;
-10. document the final channel security settings.
-
-Do not paste the Telegram bot token into Git, documentation or chat logs.
+1. test a runtime status query from Telegram;
+2. test a memory lookup from Telegram;
+3. document which automated notification classes will be used;
+4. keep the existing production boundaries unchanged.
 
 Working checkpoint:
 
-MIMIR-V1-TELEGRAM-01
+MIMIR-V1-TELEGRAM-02
 
 ## PostgreSQL laboratory
 
