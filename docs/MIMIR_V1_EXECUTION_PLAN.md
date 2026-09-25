@@ -57,8 +57,8 @@ A documentação do Maestro deve ser retomada somente após a estabilização do
 - [x] Fazer backup consistente do SQLite antes de reconstruir o índice.
 - [x] Reindexar memória nativa com sucesso.
 - [x] Confirmar 9/9 arquivos, 77 chunks, `dirty=false`, índice vetorial complete, `semanticAvailable=true` e `indexIdentity.status=valid`.
-- [ ] Corrigir metadata drift do plugin: runtime 0.2.6 versus Recorded version 0.1.0, sem reinstalação cega.
-- [ ] Definir `plugins.allow` explicitamente para plugins externos confiáveis, eliminando autoload implícito.
+- [x] Corrigir metadata drift do plugin: runtime 0.2.6 versus Recorded version 0.1.0, sem reinstalação cega.
+- [x] Definir `plugins.allow` explicitamente para plugins confiáveis atualmente habilitados, preservando o conjunto runtime.
 
 ### P0 — Migration operacional 013 em laboratório isolado
 
@@ -125,30 +125,36 @@ A documentação do Maestro deve ser retomada somente após a estabilização do
 
 ## Checkpoint atual
 
-**Checkpoint MIMIR-V1-MEMORY-BOOTSTRAP-01 — concluído.**
+**Checkpoint MIMIR-V1-RUNTIME-PLUGIN-P0-01 — concluído.**
 
-A migration histórica 001 não foi recuperada. Em seu lugar foi versionado um
-bootstrap canônico explicitamente identificado como reconstrução:
+O runtime OpenClaw 2026.9.5 foi validado após correção controlada do registro do
+plugin `mimir-memory`.
 
-- `tools/memory/bootstrap/memory_v1_canonical.sql`;
-- `tools/memory/test_memory_bootstrap.py`;
-- `tools/memory/validate-memory-bootstrap-lab.sh`;
-- `docs/recovery/MEMORY_V1_CANONICAL_BOOTSTRAP.md`.
+Resultado final:
 
-Validação executada:
+- `mimir-memory` permanece `loaded`;
+- runtime version: `0.2.6`;
+- package version: `0.2.6`;
+- recorded version: `0.2.6`;
+- registry state: `fresh`;
+- current install record: `0.2.6`;
+- persisted install record: `0.2.6`;
+- conjunto de 41 plugins habilitados preservado sem faltas ou extras;
+- `plugins.allow` passou a ser explícito;
+- `config validate`: aprovado;
+- `plugins doctor`: aprovado;
+- Gateway health: aprovado;
+- serviço OpenRC: started.
 
-- 9 testes estáticos aprovados;
-- bootstrap aplicado em banco vazio do cluster temporário;
-- estado após bootstrap: versão 1;
-- migrations 002–012 aplicadas sem edição e em ordem;
-- estado final: versões 1–12;
-- objetos, colunas geradas e least privilege esperados confirmados;
-- produção permaneceu em versões 1–12, sem versão 13 e sem `mimir_ops`.
+Durante a correção foi removido somente um symlink quebrado de desenvolvimento
+(`node_modules/vitest -> /opt/openclaw/node_modules/vitest`) que impedia o
+security scan da instalação local. Nenhum bypass de segurança foi usado.
 
-Com isso, o P0 de bootstrap/versionamento da memória fica fechado sem inventar
-uma migration histórica inexistente.
+Com isso, os P0 de runtime do plugin ficam encerrados.
 
-**Próxima atividade:** tratar os dois P0 restantes do runtime: metadata drift do plugin e `plugins.allow` explícito. O cluster PostgreSQL temporário já foi desligado e removido após a coleta das evidências exigidas.
+**Próxima atividade:** implementar o canal secundário Telegram conforme
+`docs/TELEGRAM_INTEGRATION.md`, começando por configuração segura do bot,
+pairing do operador e teste bidirecional/notificação.
 
 ## Protocolo de continuidade entre sessões
 
