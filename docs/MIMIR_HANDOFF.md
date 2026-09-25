@@ -254,17 +254,35 @@ Observed:
 - no production plugin deployment or PostgreSQL/tool-policy/Telegram-policy
   change occurred.
 
+VPS shared dependency discovery completed on 2026-09-25:
+
+- `/opt/openclaw` is a symlink to
+  `/opt/openclaw-release/node_modules/openclaw`;
+- shared `typescript`, `@types/node`, `typebox` and `undici-types` exist
+  under `/opt/openclaw-release/node_modules`;
+- `vitest` is not present in the inspected OpenClaw, workspace or backup
+  dependency roots;
+- `createRequire("/opt/openclaw-release/package.json")` resolves TypeScript,
+  `@types/node` and `undici-types`, while the package-local
+  `/opt/openclaw/package.json` resolver does not;
+- the isolated TypeScript failure is therefore a project module-resolution
+  issue, not an absent `@types/node` package.
+
 Next executable action:
 
-1. inspect the VPS shared dependency locations read-only for `@types/node`,
-   `typebox`, `typescript`, `vitest` and the OpenClaw package roots;
-2. rerun isolated validation with fail-fast semantics, a clean `dist/`, and no
-   nested heredoc quoting;
-3. only after a true isolated PASS, back up the current production plugin and
+1. rerun isolated VPS validation with fail-fast semantics, remove the old
+   `dist/`, and temporarily link the isolated plugin's ignored
+   `node_modules` to `/opt/openclaw-release/node_modules` so TypeScript can
+   resolve the existing shared declarations without any download or install;
+2. run structural import and embedding/PG smoke tests without nested
+   shell/heredoc quoting;
+3. record Vitest as unavailable rather than installing it solely for this
+   checkpoint;
+4. only after a true isolated PASS, back up the current production plugin and
    prepare explicit rollback;
-4. then deploy the validated 0.2.7 files, verify runtime metadata, run direct
+5. then deploy the validated 0.2.7 files, verify runtime metadata, run direct
    `tools.invoke`, and only afterward repeat the Telegram memory request;
-5. keep migration 013, `mimir_ops`, tool permissions and Telegram policy
+6. keep migration 013, `mimir_ops`, tool permissions and Telegram policy
    unchanged.
 
 ## PostgreSQL laboratory
