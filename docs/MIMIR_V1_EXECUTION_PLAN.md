@@ -85,7 +85,7 @@ A documentação do Maestro deve ser retomada somente após a estabilização do
 - [x] Validar hardening temporal no `MIMIR-V1-013-LAB-06B`.
 - [x] Testar fluxo EXECUTE somente com dublês/simulação, sem equipamento real.
 - [x] Testar backup/restauração do laboratório.
-- [ ] Desligar e remover o cluster temporário somente após coleta de evidências.
+- [x] Desligar e remover o cluster temporário somente após coleta de evidências.
 
 ### P1 — Memória permanente PostgreSQL
 
@@ -147,9 +147,7 @@ Validação executada:
 Com isso, o P0 de bootstrap/versionamento da memória fica fechado sem inventar
 uma migration histórica inexistente.
 
-**Próxima atividade:** coletar evidência final do cluster temporário e removê-lo
-de forma controlada. Em seguida, tratar os dois P0 restantes do runtime:
-metadata drift do plugin e `plugins.allow` explícito.
+**Próxima atividade:** tratar os dois P0 restantes do runtime: metadata drift do plugin e `plugins.allow` explícito. O cluster PostgreSQL temporário já foi desligado e removido após a coleta das evidências exigidas.
 
 ## Protocolo de continuidade entre sessões
 
