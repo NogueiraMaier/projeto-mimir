@@ -2,6 +2,7 @@
 // No package manager invocation and no automatic download.
 import { createRequire } from 'node:module';
 import { dirname, join } from 'node:path';
+import { homedir } from 'node:os';
 import { pathToFileURL } from 'node:url';
 
 const [tool, ...args] = process.argv.slice(2);
@@ -11,7 +12,17 @@ if (!Object.hasOwn(entries, tool)) {
   process.exit(2);
 }
 let entry;
-for (const source of [import.meta.url, '/opt/openclaw/package.json']) {
+const sharedClientOpenClaw = join(
+  homedir(),
+  '.local/share/openclaw-client/node_modules/openclaw/package.json',
+);
+
+for (const source of [
+  import.meta.url,
+  '/opt/openclaw/package.json',
+  '/opt/openclaw-release/package.json',
+  sharedClientOpenClaw,
+]) {
   try {
     const require = createRequire(source);
     const [name, relative] = entries[tool];

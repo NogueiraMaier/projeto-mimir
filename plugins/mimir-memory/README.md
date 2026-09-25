@@ -80,12 +80,22 @@ compilação, importação estrutural e `plugins inspect --runtime`.
 ## Testes no servidor de desenvolvimento
 
 Os scripts `npm test` e `npm run build` procuram Vitest/TypeScript nas dependências
-locais e depois em `/opt/openclaw`. Não executam instalação nem download.
-Isso permite testar fora do VPS sem alterar a configuração do OpenClaw.
+locais, em `/opt/openclaw`, em `/opt/openclaw-release` e no cliente compartilhado
+`~/.local/share/openclaw-client/node_modules`. Não executam instalação nem
+download. Isso permite compilar no PcIA sem criar `node_modules` no checkout.
+Vitest continua obrigatório para `npm test`; se ele não estiver disponível, o
+script falha sem instalar nada.
 
 A versão 0.2.7 requer OpenClaw 2026.9.5 ou superior porque depende do registry de
 embedding providers e do lifecycle `api.runtime.llm.acquireLocalService()` para
 usar o `llama-server` gerenciado.
+
+O pacote OpenClaw 2026.9.5 exporta
+`openclaw/plugin-sdk/embedding-providers` em runtime, mas não publica um
+`types` mapping para esse subpath. O plugin mantém
+`src/openclaw-embedding-providers.d.ts` como shim mínimo, copiado do contrato
+estrutural da mesma versão do host, somente para compilação TypeScript. O runtime
+continua vindo do OpenClaw instalado; nenhuma implementação é vendorizada.
 
 A revisão offline não comprova carregamento no Gateway nem acesso real ao
 PostgreSQL. A implantação no VPS exige validação separada e não altera por si só
