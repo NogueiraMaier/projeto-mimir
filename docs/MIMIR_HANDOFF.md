@@ -75,7 +75,7 @@ Milestone:
 MIMIR-V1-013
 
 Last completed checkpoint:
-MIMIR-V1-MEMORY-BOOTSTRAP-01
+MIMIR-V1-LAB-CLEANUP-01
 
 Checkpoint status:
 COMPLETED
@@ -148,32 +148,36 @@ No real equipment has been contacted.
 
 ## NEXT_ACTION
 
-Retire the temporary PostgreSQL validation cluster now that its required evidence,
-backup/restore test and bootstrap replay have been completed and versioned.
+Resolve the two remaining runtime P0 items on gentoo-Dragon_vm:
 
-Before deletion:
+1. plugin metadata drift: source/runtime package and manifest are version 0.2.6
+   while OpenClaw previously reported Recorded version 0.1.0;
+2. define plugins.allow explicitly for trusted external plugins.
 
-1. confirm production is still schema versions 1..12;
-2. confirm production has no schema version 13;
-3. confirm production has no mimir_ops role;
-4. identify the temporary cluster data directory from its running postmaster;
-5. stop only the cluster listening on port 55432;
-6. confirm production PostgreSQL on port 5432 remains running;
-7. remove only the temporary cluster tree after shutdown;
-8. retain no requirement to preserve synthetic database contents after the
-   checkpoint evidence is versioned.
+Start with read-only inspection only.
 
-After the temporary cluster is removed, proceed to the remaining runtime P0 items:
+Collect:
 
-- resolve plugin metadata drift: runtime/package/manifest 0.2.6 versus OpenClaw
-  recorded version 0.1.0;
-- define plugins.allow explicitly for trusted external plugins.
+- current OpenClaw service status;
+- config validation result;
+- current plugin runtime inspection for mimir-memory;
+- plugin package.json and openclaw.plugin.json versions from the installed plugin;
+- OpenClaw configuration fields related to plugins, paths, entries, installs and allow;
+- any recorded plugin metadata store or installation registry that explains the
+  recorded 0.1.0 value, without printing secrets.
+
+Do not reinstall the plugin blindly.
+Do not modify openclaw.json until the exact drift source and current trusted
+plugin set are confirmed.
+Do not restart OpenClaw in the inspection step.
 
 Working checkpoint:
 
-MIMIR-V1-LAB-CLEANUP-01
+MIMIR-V1-RUNTIME-PLUGIN-P0-01
 
-Do not alter production PostgreSQL.
+After the read-only inspection, make the smallest controlled configuration or
+metadata correction, validate config, restart through OpenRC only if required,
+and confirm plugin runtime remains 0.2.6.
 
 ## PostgreSQL laboratory
 
@@ -189,7 +193,7 @@ mimir_lab
 Port:
 55432
 
-The temporary laboratory must not be removed until required evidence and backup/restore validation are complete.
+The temporary PostgreSQL laboratory was stopped and removed after the required evidence, backup/restore and bootstrap validation were completed.
 
 ## Completed migration 013 laboratory checkpoints
 
