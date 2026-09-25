@@ -1,6 +1,6 @@
 {
   "name": "openclaw-plugin-mimir-memory",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "type": "module",
   "private": true,
   "scripts": {
@@ -14,7 +14,7 @@
     "tools"
   ],
   "peerDependencies": {
-    "openclaw": ">=2026.5.17"
+    "openclaw": ">=2026.9.5"
   },
   "dependencies": {
     "typebox": "^1.1.38"
@@ -31,5 +31,5 @@
       "./dist/index.js"
     ]
   },
-  "description": "Consulta controlada da mem\u00f3ria permanente e verifica\u00e7\u00e3o em modo sombra."
+  "description": "Consulta controlada da memória permanente e verificação em modo sombra."
 }
