@@ -162,18 +162,31 @@ Working checkpoint:
 
 MIMIR-V1-TELEGRAM-02
 
-Checkpoint status: BLOCKED — tool surface diagnosis required.
+Checkpoint status: BLOCKED — custom memory tool runtime defect identified.
 
 Observed from the Telegram direct session on 2026-09-25:
 
-- explicit `session_status` request returned `TOOL_UNAVAILABLE: session_status`;
-- explicit `mimir_memory_search` request returned
-  `TOOL_UNAVAILABLE: mimir_memory_search`;
-- Telegram transport itself remains healthy and bidirectional;
+- effective tool profile is `minimal`;
+- `session_status` is absent because `tools.deny` includes `group:sessions`;
+- `mimir_memory_search` is present in `tools.effective` for the Telegram session;
+- direct `tools.invoke` reaches `mimir_memory_search` but returns
+  `internal_error: tool execution failed`;
+- the custom semantic-search helper still resolves the removed in-process
+  `node-llama-cpp` package and fails with `MODULE_NOT_FOUND`;
+- OpenClaw 2026.9.5 native memory is using the managed llama.cpp local service
+  at `http://127.0.0.1:8601/v1`;
+- native embedding probe succeeds with 768 dimensions using
+  EmbeddingGemma through managed `llama-server`;
+- the native memory status observed during this diagnosis reports `dirty=true`
+  and must be reconciled separately before declaring a clean memory baseline;
+- Telegram transport remains healthy and bidirectional;
 - no production authorization boundary has been widened.
 
-Next executable action: inspect the session-scoped effective tool inventory and
-the global/per-agent tool policy before changing any configuration.
+Next executable action: refactor the custom `mimir_memory_search` embedding path
+to use the OpenClaw 2026.9.5 managed llama.cpp service lifecycle instead of
+`node-llama-cpp`, then validate the custom tool again without changing tool
+permissions or Telegram policy. The PostgreSQL helper must also stop hardcoding
+the local Unix socket before Gateway migration to PcIA.
 
 ## PostgreSQL laboratory
 
