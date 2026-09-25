@@ -96,3 +96,25 @@ spam nem transformar cada evento técnico em mensagem.
 - testar mensagens;
 - integrar notificações do Mímir com tarefas/automação;
 - registrar política final de severidade e rate limit.
+
+
+## Atualização documental — 2026-09-25
+
+O bloco inicial deste documento preserva o estado histórico anterior da implantação.
+
+O estado consolidado mais recente registrado em `MIMIR_V1_EXECUTION_PLAN.md` e `STATUS.md` informa que o canal Telegram foi posteriormente validado com:
+
+- bot operacional;
+- transporte bidirecional;
+- envio proativo;
+- DM por allowlist;
+- grupos desabilitados;
+- token fora do Git.
+
+Portanto, os itens anteriores marcados como pendentes não devem ser interpretados isoladamente como estado atual do runtime.
+
+Para uma futura migração do Gateway para o PcIA, consultar também:
+
+- [GATEWAY_PCIA_MIGRATION_PLAN.md](GATEWAY_PCIA_MIGRATION_PLAN.md).
+
+A migração deve preservar a política de segurança vigente e realizar o cutover do poller de forma exclusiva, sem manter simultaneamente VPS e PcIA consumindo o mesmo bot.
