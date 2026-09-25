@@ -98,6 +98,7 @@ históricas da memória e de governança não foram encerradas por esta revisão
 - **POLÍTICA v1 DEFINIDA:** retenção operacional sem expurgo automático; failed/interrupted preservados; dados reais confidenciais e fora do Git.
 - **PRODUÇÃO INTACTA:** `mimir_memory` segue em versões 1–12 e sem role `mimir_ops`.
 - **VALIDADO P0:** bootstrap canônico da memória v1 reproduziu versões 1–12 em banco descartável; o SQL histórico original da migration 001 continua não recuperado e é tratado como lacuna histórica documentada.
+- **LAB TEMPORÁRIO REMOVIDO:** `/var/tmp/mimir-pg13-lab` foi parado e removido após evidências, backup/restore e bootstrap; produção permaneceu operacional em 1–12.
 - **PENDENTE P0:** corrigir metadata drift do plugin e definir `plugins.allow` explícito.
 - **NÃO AUTORIZADO AINDA:** equipamento real em EXECUTE.
 
