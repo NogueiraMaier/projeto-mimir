@@ -101,7 +101,7 @@ A documentação do Maestro deve ser retomada somente após a estabilização do
 
 ### P1 — Camada operacional
 
-- [ ] Canal secundário Telegram: conversa remota e notificações controladas do Mímir, conforme `docs/TELEGRAM_INTEGRATION.md`.
+- [x] Canal secundário Telegram: conversa remota e notificações controladas do Mímir, conforme `docs/TELEGRAM_INTEGRATION.md`.
 - [ ] Demonstrar backup/restauração real por adapter.
 - [x] Definir reconciliação de intervenção interrompida.
 - [x] Definir política de retenção de evidências/relatórios.
@@ -125,36 +125,23 @@ A documentação do Maestro deve ser retomada somente após a estabilização do
 
 ## Checkpoint atual
 
-**Checkpoint MIMIR-V1-RUNTIME-PLUGIN-P0-01 — concluído.**
+**Checkpoint MIMIR-V1-TELEGRAM-01 — concluído.**
 
-O runtime OpenClaw 2026.9.5 foi validado após correção controlada do registro do
-plugin `mimir-memory`.
+O canal Telegram do Mímir foi validado no OpenClaw 2026.9.5:
 
-Resultado final:
+- bot operacional: `@MimirAssistenteBot`;
+- canal enabled/configured/running/connected;
+- transporte polling;
+- conversa bidirecional validada;
+- envio proativo validado;
+- `dmPolicy=allowlist`;
+- grupos desabilitados;
+- token mantido fora do Git por arquivo protegido;
+- somente o operador autorizado permanece na allowlist.
 
-- `mimir-memory` permanece `loaded`;
-- runtime version: `0.2.6`;
-- package version: `0.2.6`;
-- recorded version: `0.2.6`;
-- registry state: `fresh`;
-- current install record: `0.2.6`;
-- persisted install record: `0.2.6`;
-- conjunto de 41 plugins habilitados preservado sem faltas ou extras;
-- `plugins.allow` passou a ser explícito;
-- `config validate`: aprovado;
-- `plugins doctor`: aprovado;
-- Gateway health: aprovado;
-- serviço OpenRC: started.
-
-Durante a correção foi removido somente um symlink quebrado de desenvolvimento
-(`node_modules/vitest -> /opt/openclaw/node_modules/vitest`) que impedia o
-security scan da instalação local. Nenhum bypass de segurança foi usado.
-
-Com isso, os P0 de runtime do plugin ficam encerrados.
-
-**Próxima atividade:** implementar o canal secundário Telegram conforme
-`docs/TELEGRAM_INTEGRATION.md`, começando por configuração segura do bot,
-pairing do operador e teste bidirecional/notificação.
+**Próxima atividade:** validar pelo Telegram o uso controlado das ferramentas do
+agente `main` e definir a política de notificações automáticas, sem ampliar
+permissões operacionais nem autorizar EXECUTE em equipamento real.
 
 ## Protocolo de continuidade entre sessões
 
