@@ -268,20 +268,39 @@ VPS shared dependency discovery completed on 2026-09-25:
 - the isolated TypeScript failure is therefore a project module-resolution
   issue, not an absent `@types/node` package.
 
+VPS isolated validation V2 completed successfully on 2026-09-25 at
+detached HEAD `a7153997a32ab70ee29b035d2ff66ba15d071cdf`, using
+Node 24.16.0 and OpenClaw 2026.9.5.
+
+Validated:
+
+- helper syntax: PASS;
+- legacy `node-llama-cpp` guard: PASS (absent from explicit tool path);
+- managed `acquireLocalService` integration marker: PASS;
+- TypeScript build with `--noEmitOnError`: PASS;
+- fresh `dist/index.js` generated under the isolated checkout: PASS;
+- structural import: PASS;
+- plugin id/register/testing exports: PASS;
+- 768-dimension embedding contract: PASS;
+- invalid vector rejection: PASS;
+- dedicated PostgreSQL environment isolation: PASS;
+- Vitest remains unavailable and was not installed.
+
+Production remained unchanged.
+
 Next executable action:
 
-1. rerun isolated VPS validation with fail-fast semantics, remove the old
-   `dist/`, and temporarily link the isolated plugin's ignored
-   `node_modules` to `/opt/openclaw-release/node_modules` so TypeScript can
-   resolve the existing shared declarations without any download or install;
-2. run structural import and embedding/PG smoke tests without nested
-   shell/heredoc quoting;
-3. record Vitest as unavailable rather than installing it solely for this
-   checkpoint;
-4. only after a true isolated PASS, back up the current production plugin and
-   prepare explicit rollback;
-5. then deploy the validated 0.2.7 files, verify runtime metadata, run direct
-   `tools.invoke`, and only afterward repeat the Telegram memory request;
+1. inspect and back up the current production `mimir-memory 0.2.6` source,
+   build artifact, manifest/package metadata and helper, recording checksums and
+   the exact OpenClaw runtime registration;
+2. prepare an explicit rollback command set before replacing any production
+   file;
+3. after explicit production-change authorization, deploy only the files already
+   validated at commit `a7153997a32ab70ee29b035d2ff66ba15d071cdf`,
+   rebuild with the existing shared VPS dependencies, and verify plugin runtime
+   metadata;
+4. run direct `tools.invoke` for `mimir_memory_search`;
+5. only after direct invocation passes, repeat the Telegram memory request;
 6. keep migration 013, `mimir_ops`, tool permissions and Telegram policy
    unchanged.
 
