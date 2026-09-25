@@ -340,3 +340,54 @@ A long development or ChatGPT session is about to end
 The handoff must describe the next executable action, not only historical progress.
 
 Before starting a new major phase, commit the updated handoff.
+
+
+## Architectural documentation prepared but not active
+
+The following architectural documentation has been prepared on a separate documentation branch:
+
+Branch:
+
+`docs/mimir-gateway-model-routing`
+
+Documents:
+
+- `docs/GATEWAY_PCIA_MIGRATION_PLAN.md`
+- `docs/MODEL_ROUTING_AND_INFERENCE_ROADMAP.md`
+- `docs/review/architecture/2026-09-25-gateway-model-routing.md`
+
+Status:
+
+**DOCUMENTED / NOT IMPLEMENTED**
+
+These documents record future architecture and migration planning only.
+
+They do **not** replace the current operational continuation point, do not change the current milestone and do not supersede the existing `NEXT_ACTION`.
+
+The current `NEXT_ACTION` in this handoff remains authoritative until the Telegram/tool-surface work is concluded and the handoff is explicitly advanced through the normal project process.
+
+Do not start the Gateway migration or model-routing implementation merely because these documents exist.
+
+When the project reaches the appropriate future phase, inspect the dedicated documentation branch and reconcile it with the then-current operational branch before execution.
+
+### Branch roles recorded for continuity
+
+At the time of this note:
+
+- `feat/mimir-operational-foundation` — current operational/v1 development line;
+- `docs/mimir-gateway-model-routing` — future Gateway migration and model-routing documentation;
+- `docs/mimir-memory-v2-roadmap` — future Memory v2 documentation.
+
+A file not present on the current branch must not automatically be interpreted as deleted or abandoned. Check the documented branch ownership before drawing that conclusion.
+
+### Current versus target architecture
+
+The target architecture described in the new documents is **not evidence of current implementation**.
+
+Future agents must distinguish:
+
+- **CURRENT** — runtime and checkpoints actually validated;
+- **TARGET** — planned Gateway placement, Capability Router, Policy Engine and Engine Registry;
+- **WATCHLIST** — techniques/components requiring later benchmark or evidence.
+
+No future agent should mark a TARGET component as implemented without runtime evidence and an explicit project checkpoint.
