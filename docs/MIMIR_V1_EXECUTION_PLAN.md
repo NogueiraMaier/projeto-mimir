@@ -337,3 +337,54 @@ A correção validada foi `last_action.payload#>>'{action,operation}'`, commit `
 O teste gerou `completed_at` no arquivo de request antes de executar `intervention.begin`, e por isso o valor persistido ficou alguns milissegundos anterior ao `started_at` registrado pelo banco. A API aceitou essa cronologia impossível porque hoje valida apenas a presença de `completed_at`, não `completed_at >= started_at`.
 
 Esse ponto deve ser corrigido e coberto por teste antes de avançar para o fluxo EXECUTE sintético.
+
+
+## Observação arquitetural futura — não altera o escopo corrente da v1
+
+Foram documentadas duas evoluções futuras relacionadas ao runtime do Mímir:
+
+- [GATEWAY_PCIA_MIGRATION_PLAN.md](GATEWAY_PCIA_MIGRATION_PLAN.md);
+- [MODEL_ROUTING_AND_INFERENCE_ROADMAP.md](MODEL_ROUTING_AND_INFERENCE_ROADMAP.md).
+
+Esses documentos **não substituem esta lista mestre**, não encerram itens pendentes e não autorizam mudança de produção.
+
+### Regra de isolamento de mudanças
+
+Não executar na mesma etapa:
+
+1. migração física do OpenClaw Gateway/VPS para o PcIA;
+2. alteração de modelo principal;
+3. introdução de Capability Router/Engine Registry;
+4. mudança de política de fallback;
+5. ampliação de tools;
+6. mudança na governança de memória.
+
+A ordem futura deve preservar capacidade de diagnóstico:
+
+`baseline -> migração física -> validação -> novo baseline -> evolução de model routing`.
+
+### Observação sobre tool-calling
+
+Problemas de disponibilidade ou chamada de tools não devem ser atribuídos automaticamente à localização do Gateway.
+
+A migração de host não comprova nem corrige, por si só:
+
+- surface/policy de tools;
+- compatibilidade de tool schema;
+- comportamento do modelo;
+- integração llama.cpp/OpenAI-style;
+- uso de `mimir_memory_search`.
+
+Tool-calling deve possuir validação específica antes e depois da migração.
+
+### Observação sobre disponibilidade
+
+Se o PcIA se tornar o Primary Mímir Node, sua indisponibilidade passa a afetar diretamente Gateway, Telegram, HUD e inferência local.
+
+Esse trade-off deve ser aceito explicitamente antes do cutover.
+
+### Observação sobre nomenclatura do host
+
+A documentação atual utiliza `gentoo-Dragon_IA` em pontos do fluxo de desenvolvimento, enquanto o plano de migração refere-se a `gentoo-Dragon_PcIA`.
+
+Não reconciliar os nomes por suposição. Confirmar o hostname canônico em preflight e atualizar a documentação apenas com evidência.
