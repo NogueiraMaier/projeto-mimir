@@ -108,3 +108,115 @@ A consulta ocorre por função controlada do banco.
 13. Geração local do embedding.
 14. Teste de recuperação semântica.
 15. Auditoria.
+
+
+## Arquitetura atual versus arquitetura alvo
+
+Esta seção foi acrescentada para evitar que documentação futura seja interpretada como estado já implantado.
+
+Nada nesta seção substitui o conteúdo anterior deste arquivo.
+
+### CURRENT — arquitetura efetivamente validada/documentada
+
+O estado CURRENT deve ser inferido somente a partir de:
+
+- `MIMIR_HANDOFF.md`;
+- `MIMIR_V1_EXECUTION_PLAN.md`;
+- `STATUS.md`;
+- evidências de revisão e validação;
+- runtime efetivamente inspecionado.
+
+Componentes futuros não devem ser promovidos para CURRENT apenas porque aparecem em roadmap ou diagrama.
+
+### TARGET — arquitetura futura planejada
+
+A direção arquitetural planejada é:
+
+```text
+CANAIS
+Telegram / HUD / outros
+        |
+        v
+      MÍMIR
+identidade / policy / memória
+planejamento / auditoria
+        |
+        v
+ Capability Router
+        |
+        v
+   Policy Engine
+        |
+        v
+   Engine Registry
+   /      |       \
+  v       v        v
+local   provider   coding harness
+engine  autorizado Codex/Claude/etc.
+  |        |         |
+  +--------+---------+
+           |
+ ferramentas / evidências
+           |
+ PostgreSQL / pgvector / CMDB
+```
+
+Esse desenho representa responsabilidades conceituais, não implantação confirmada.
+
+### Separação de responsabilidades
+
+O Mímir continua sendo o núcleo de:
+
+- identidade;
+- contexto;
+- memória;
+- policy;
+- planejamento;
+- auditoria;
+- coordenação de agentes e ferramentas.
+
+O Capability Router decide **qual capacidade** é necessária.
+
+O Policy Engine decide **quais opções são permitidas**.
+
+O Engine Registry descreve **quais engines/providers/harnesses estão disponíveis e elegíveis**.
+
+Modelos/providers/harnesses continuam substituíveis.
+
+Ferramentas e evidências pertencem ao plano de orquestração do Mímir e não a uma única engine.
+
+Portanto, a arquitetura não deve ser interpretada como:
+
+`Qwen -> ferramentas -> memória`
+
+mas como:
+
+`Mímir -> evidências/ferramentas + seleção de capacidade -> engine autorizada`
+
+### Documentos de evolução relacionados
+
+- [GATEWAY_PCIA_MIGRATION_PLAN.md](GATEWAY_PCIA_MIGRATION_PLAN.md)
+- [MODEL_ROUTING_AND_INFERENCE_ROADMAP.md](MODEL_ROUTING_AND_INFERENCE_ROADMAP.md)
+- [review/architecture/2026-09-25-gateway-model-routing.md](review/architecture/2026-09-25-gateway-model-routing.md)
+
+A Memory v2 permanece em linha documental própria e não é substituída por esta arquitetura.
+
+### Regra de transição
+
+A existência da arquitetura TARGET não autoriza implementação.
+
+A sequência documentada permanece:
+
+```text
+estado atual validado
+        ->
+concluir checkpoint operacional corrente
+        ->
+migração física quando autorizada
+        ->
+validação e novo baseline
+        ->
+evolução de model routing
+```
+
+Não misturar mudança de host, mudança de modelo, mudança de provider, mudança de tool policy e mudança de governança de memória na mesma etapa sem decisão explícita.
