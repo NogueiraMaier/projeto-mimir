@@ -75,7 +75,7 @@ Milestone:
 MIMIR-V1-013
 
 Last completed checkpoint:
-MIMIR-V1-LAB-CLEANUP-01
+MIMIR-V1-RUNTIME-PLUGIN-P0-01
 
 Checkpoint status:
 COMPLETED
@@ -148,36 +148,40 @@ No real equipment has been contacted.
 
 ## NEXT_ACTION
 
-Resolve the two remaining runtime P0 items on gentoo-Dragon_vm:
+Implement the Telegram secondary channel for Mímir according to
+docs/TELEGRAM_INTEGRATION.md.
 
-1. plugin metadata drift: source/runtime package and manifest are version 0.2.6
-   while OpenClaw previously reported Recorded version 0.1.0;
-2. define plugins.allow explicitly for trusted external plugins.
+Current runtime preconditions are now satisfied:
 
-Start with read-only inspection only.
+- mimir-memory runtime/package/recorded version = 0.2.6;
+- plugin registry state = fresh;
+- plugins.allow is explicit;
+- 41 enabled plugins preserved;
+- config validate passed;
+- plugins doctor passed;
+- Gateway health passed;
+- OpenRC service is started.
 
-Collect:
+Telegram must be configured as a bundled channel, not as a third-party plugin.
 
-- current OpenClaw service status;
-- config validation result;
-- current plugin runtime inspection for mimir-memory;
-- plugin package.json and openclaw.plugin.json versions from the installed plugin;
-- OpenClaw configuration fields related to plugins, paths, entries, installs and allow;
-- any recorded plugin metadata store or installation registry that explains the
-  recorded 0.1.0 value, without printing secrets.
+Required sequence:
 
-Do not reinstall the plugin blindly.
-Do not modify openclaw.json until the exact drift source and current trusted
-plugin set are confirmed.
-Do not restart OpenClaw in the inspection step.
+1. create the bot with BotFather;
+2. store the bot token outside Git;
+3. configure channels.telegram with enabled=true and dmPolicy=pairing;
+4. validate channel status/probe;
+5. send the first DM to create pairing;
+6. approve the pairing and capture the operator numeric Telegram user ID;
+7. switch DM access to allowlist with that numeric ID;
+8. test bidirectional conversation;
+9. test one proactive notification;
+10. document the final channel security settings.
+
+Do not paste the Telegram bot token into Git, documentation or chat logs.
 
 Working checkpoint:
 
-MIMIR-V1-RUNTIME-PLUGIN-P0-01
-
-After the read-only inspection, make the smallest controlled configuration or
-metadata correction, validate config, restart through OpenRC only if required,
-and confirm plugin runtime remains 0.2.6.
+MIMIR-V1-TELEGRAM-01
 
 ## PostgreSQL laboratory
 
