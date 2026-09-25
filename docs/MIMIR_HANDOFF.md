@@ -288,17 +288,52 @@ Validated:
 
 Production remained unchanged.
 
+Production pre-deploy inventory completed on 2026-09-25.
+
+Observed production baseline:
+
+- host `gentoo-Dragon_vm`, Node 24.16.0, OpenClaw 2026.9.5;
+- OpenRC `openclaw` service healthy and running;
+- production plugin root:
+  `/var/lib/openclaw/workspace/plugins/mimir-memory`;
+- on-disk and runtime plugin version: `0.2.6`;
+- runtime registration is loaded, enabled, explicit, install source `path`,
+  accepted tool surface only `mimir_memory_search`, typed hooks
+  `gateway_stop` and `message_received`;
+- production helper still contains the obsolete in-process
+  `node-llama-cpp` path and is therefore the known failing implementation;
+- production plugin `node_modules` is a real directory with no broken
+  symlinks reported;
+- `tools/run-tool.mjs` is absent from the production 0.2.6 plugin;
+- shared VPS build dependencies exist in
+  `/opt/openclaw-release/node_modules`:
+  TypeScript 6.0.3, @types/node 26.6.2, typebox 1.3.30 and
+  undici-types 8.9.0.
+
+Recorded production SHA-256 baseline:
+
+- `src/index.ts`:
+  `384c37b9243025f25b0f0c07859186c54014e8b54a4991ff52343988d711d399`;
+- `dist/index.js`:
+  `00e4a9a207ff495695f4ebba269f9afa297005d097b28fe093666bf87fb0bb0e`;
+- `package.json`:
+  `25a19c5a0d77e5821122526842f8bf7277a64de197bf50aa1e50cff038aea22f`;
+- `openclaw.plugin.json`:
+  `783e8bf6e521d44930a035cc2aecbc5be2ec9398e126c73b4bdfa944d0f6eaa3`;
+- `tsconfig.json`:
+  `cbc659156f2bc5c4976619a11c9119dab7e4a6d888c92417fa570ea24d208200`;
+- semantic helper:
+  `e9b54ccedbdf4926fc1cc635c40146561bb384cd4620f6e8eb5cf74614c530ae`.
+
 Next executable action:
 
-1. inspect and back up the current production `mimir-memory 0.2.6` source,
-   build artifact, manifest/package metadata and helper, recording checksums and
-   the exact OpenClaw runtime registration;
-2. prepare an explicit rollback command set before replacing any production
-   file;
-3. after explicit production-change authorization, deploy only the files already
-   validated at commit `a7153997a32ab70ee29b035d2ff66ba15d071cdf`,
-   rebuild with the existing shared VPS dependencies, and verify plugin runtime
-   metadata;
+1. create a versioned backup of the production 0.2.6 plugin directory plus the
+   semantic-search helper, runtime-inspection JSON and checksum manifest;
+2. verify the backup and prepare explicit rollback commands without changing the
+   loaded plugin;
+3. after explicit production-change authorization, deploy only the 0.2.7 files
+   already validated in the isolated checkout, rebuild with existing shared VPS
+   dependencies, and verify runtime metadata;
 4. run direct `tools.invoke` for `mimir_memory_search`;
 5. only after direct invocation passes, repeat the Telegram memory request;
 6. keep migration 013, `mimir_ops`, tool permissions and Telegram policy
