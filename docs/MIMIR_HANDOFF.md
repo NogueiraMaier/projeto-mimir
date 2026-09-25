@@ -231,19 +231,41 @@ Development validation result on PcIA:
 - Vitest remains unavailable on PcIA and was not installed;
 - no production runtime change occurred.
 
+VPS isolated validation attempted on 2026-09-25 at detached HEAD
+`fb0dcdfbe39e2cbbaadd58579dae96d9526b0cac` with Node 24.16.0 and
+OpenClaw 2026.9.5.
+
+Result: FAILED / NOT VALIDATED.
+
+Observed:
+
+- helper syntax check passed;
+- Vitest was unavailable through the existing resolver, so plugin tests did not
+  execute;
+- TypeScript was found, but the build failed with TS2688 because the isolated
+  checkout could not resolve the `node` type definition library;
+- `dist/index.js` must not be treated as proof of a successful build because
+  TypeScript may emit output despite diagnostics and the checkout already had a
+  prior artifact;
+- the structural import command then failed because nested shell/heredoc quoting
+  removed the quotes around `./dist/index.js`;
+- the final printed `VPS ISOLATED VALIDATION: PASS` was unconditional and is
+  therefore a false positive;
+- no production plugin deployment or PostgreSQL/tool-policy/Telegram-policy
+  change occurred.
+
 Next executable action:
 
-1. validate the same `mimir-memory 0.2.7` commit in the isolated VPS checkout
-   using the VPS OpenClaw 2026.9.5 / Node 24 runtime and existing shared test
-   dependencies;
-2. only after VPS isolated validation passes, back up the current production
-   plugin source/build and prepare an explicit rollback;
-3. deploy only the validated plugin/helper files to the production workspace,
-   build there with existing dependencies, and verify plugin runtime metadata;
-4. re-run direct `tools.invoke` for `mimir_memory_search`;
-5. only after direct invocation passes, repeat the Telegram memory request;
-6. keep tool permissions, Telegram policy, production PostgreSQL schema and
-   migration 013 unchanged throughout this validation.
+1. inspect the VPS shared dependency locations read-only for `@types/node`,
+   `typebox`, `typescript`, `vitest` and the OpenClaw package roots;
+2. rerun isolated validation with fail-fast semantics, a clean `dist/`, and no
+   nested heredoc quoting;
+3. only after a true isolated PASS, back up the current production plugin and
+   prepare explicit rollback;
+4. then deploy the validated 0.2.7 files, verify runtime metadata, run direct
+   `tools.invoke`, and only afterward repeat the Telegram memory request;
+5. keep migration 013, `mimir_ops`, tool permissions and Telegram policy
+   unchanged.
 
 ## PostgreSQL laboratory
 
