@@ -558,14 +558,22 @@ Fresh-session Telegram validation on 2026-09-26:
 
 Next executable action:
 
-1. document the notification classes that Telegram may emit automatically,
-   keeping them informational/read-only and within the existing operator
-   allowlist;
-2. separately inspect permanent-memory corpus coverage/retrieval relevance for
-   operational facts such as migration 013 and LAB-01..LAB-09 before claiming
-   semantic recall quality;
-3. keep the evidence-shadow path separate and not yet declared healthy;
-4. keep migration 013, `mimir_ops`, PostgreSQL schema, Telegram DM policy and
+1. prioritize the permanent-memory quality defect exposed by the successful
+   Telegram-02 tool call: perform a read-only production corpus inventory before
+   changing any memory record;
+2. verify whether active embedded memories contain the requested operational
+   facts for migration 013 and LAB-01..LAB-09, and distinguish corpus coverage
+   failure from semantic-ranking failure;
+3. note that repository `MEMORY.md` is itself stale relative to the validated
+   project state (it still describes PostgreSQL as future work and does not
+   contain the LAB-01..LAB-09 results), so it must not be treated as evidence
+   that production permanent memory is current;
+4. after corpus diagnosis, define the smallest reviewed memory update and only
+   then generate/store embeddings through the controlled workflow;
+5. document Telegram automatic-notification classes after the memory-quality
+   checkpoint;
+6. keep the evidence-shadow path separate and not yet declared healthy;
+7. keep migration 013, `mimir_ops`, PostgreSQL schema, Telegram DM policy and
    real-equipment EXECUTE boundaries unchanged.
 
 ## PostgreSQL laboratory
