@@ -484,9 +484,7 @@ server-derived session inventory projection. It is useful evidence, but the
 remaining discrepancy is now between that projection and the concrete
 model-facing tool set of the actual Telegram run.
 
-Active-run diagnostic completed for the failed Telegram memory turn.
-
-Evidence:
+Active-run and trajectory diagnostics for the failed Telegram memory turn:
 
 - the 23:02:24-23:02:44 -03 Telegram turn maps to the trajectory run beginning
   at 02:02:25 in the session tail;
@@ -504,28 +502,32 @@ Evidence:
   `mimir_memory_search` and `web_search`;
 - immediately before provider submission OpenClaw logged
   `route=compact_only`, `estimatedPromptTokens=15955` and
-  `promptBudgetBeforeReserve=12288`, so context pressure is a new relevant
-  observation. Do not yet conclude that compaction removed tools; the concrete
-  model-facing tool definitions must be inspected first;
-- an older trajectory entry does contain a historical
-  `mimir_memory_search` tool call followed by an error, but it is not the
-  current 23:02 post-deploy failure and must not be conflated with it.
+  `promptBudgetBeforeReserve=12288`;
+- trajectory export under
+  `/var/tmp/mimir-telegram02-trajectory.ejS31N` produced 84 runtime events and
+  31 transcript events, but the 02:02:25 `context.compiled` event exposed no
+  `tools` or `providerVisibleTools`, and no `tools.json` was exported;
+- that absence is not yet proof that the provider received zero tools:
+  OpenClaw 2026.9.5 can truncate oversized trajectory events and explicitly
+  drop `tools`, recording `truncated=true`,
+  `reason=trajectory-event-size-limit` and `droppedFields`; this must be
+  checked before interpreting the missing fields as an actual provider
+  boundary condition.
 
 Next executable action:
 
-1. export the current session trajectory to a temporary workspace under
-   `/var/tmp` only, leaving `/var/lib/openclaw/workspace` untouched;
-2. parse only trajectory metadata/tool definitions for the latest failed turn,
-   especially `context.compiled.data.tools` /
-   `providerVisibleTools`, without printing prompt/history content;
-3. determine whether `mimir_memory_search` was actually included in the tool
-   schema sent to the local Qwen provider for the 23:02 turn;
-4. if it was included, investigate local Qwen/OpenAI-compatible tool-call
-   generation behavior and context-pressure effects; if it was absent, trace
-   the prompt-build/tool-projection layer that removed it;
-5. do not change tool policy, Telegram policy, plugin registration or model
+1. inspect only the 02:02:25 `context.compiled` event metadata for
+   `truncated`, `reason`, `originalBytes`, `limitBytes`,
+   `droppedFields` and the remaining data keys;
+2. if `tools` appears in `droppedFields`, treat the current trajectory as
+   inconclusive about provider-facing tool availability and use a fresh,
+   low-context reproduction to capture an untruncated `context.compiled`
+   event;
+3. if the event is not truncated and `tools` is genuinely absent, trace the
+   prompt-build/provider-visible tool projection layer;
+4. do not change tool policy, Telegram policy, plugin registration or model
    routing until this boundary is proven;
-6. keep migration 013, `mimir_ops`, PostgreSQL schema and shadow
+5. keep migration 013, `mimir_ops`, PostgreSQL schema and shadow
    evaluator/generator unchanged.
 
 ## PostgreSQL laboratory
