@@ -556,9 +556,9 @@ Fresh-session Telegram validation on 2026-09-26:
   / memory-corpus freshness remains a separate P1 memory-quality issue and must
   not be conflated with Telegram tool availability.
 
-Permanent-memory production corpus diagnosis completed.
+Permanent-memory production corpus and pipeline diagnosis completed.
 
-Evidence:
+Corpus evidence:
 
 - production schema remains versions 1..12 only;
 - exactly five active memory records exist and all five have embeddings;
@@ -568,28 +568,47 @@ Evidence:
   principal model and critical-security principle;
 - none of the five active memories contains migration 013, LAB-01..LAB-09,
   `mimir_ops` or `schema_version`;
-- no active record matching any requested operational term exists;
 - therefore the Telegram semantic miss is a corpus-coverage failure, not an
-  embedding-generation or ranking failure;
-- repository `MEMORY.md` is stale relative to the validated project state and
-  the current markdown importer only imports `MEMORY.md` plus top-level
-  `memory/*.md`; it does not automatically import the operational handoff or
-  review documents under `docs/`.
+  embedding-generation or ranking failure.
+
+Pipeline evidence from the read-only production inventory:
+
+- `memory_events` contains only three source events total: two
+  `workspace-markdown` document imports and one protected OpenClaw session
+  import;
+- the only Markdown sources ever ingested are `MEMORY.md` and
+  `memory/2026-07-30.md`, both from 2026-07-30;
+- `session_sources` contains exactly one captured session, also from
+  2026-07-30, with 13 user and 29 assistant messages;
+- that protected session contains none of the migration-013/LAB/`mimir_ops`/
+  `schema_version` terms;
+- there are zero candidate memories, zero pending-review records and zero
+  pending embeddings;
+- the only five reviews are the original 2026-07-30 approvals of the five
+  currently active memories;
+- recent operational knowledge therefore never reached the ingestion layer at
+  all. The current blocker precedes consolidation/review/promotion/embedding;
+- repository `MEMORY.md` is stale relative to the validated project state;
+- the current Markdown importer intentionally reads only `MEMORY.md` plus
+  top-level `memory/*.md`; operational truth under `docs/` is outside that
+  source set;
+- the runbook explicitly states that no session should be imported without an
+  explicit ingestion-client execution, so absence of recent sessions may be an
+  unimplemented/unscheduled workflow rather than a failed daemon. This must be
+  confirmed before adding automation.
 
 Next executable action:
 
-1. perform a read-only ingestion/promotion pipeline inventory: document/session
-   events, protected session sources, candidate memories, reviews and pending
-   embeddings;
-2. determine whether recent operational facts already exist as ingested source
-   evidence but have never been consolidated/reviewed/promoted, or whether the
-   ingestion source set itself is missing them;
-3. do not insert, approve, supersede or re-embed any production memory until
-   that pipeline location is proven and a human-reviewed candidate set is
-   prepared;
-4. after diagnosis, define the smallest durable operational-memory records for
-   migration-013 production boundaries and LAB-01..LAB-09 status, with explicit
-   source provenance;
+1. perform a read-only runtime/scheduling inventory for memory ingestion:
+   crontabs, OpenRC services, running processes, script timestamps and the
+   current OpenClaw session index/capture dry-run summary;
+2. determine whether any automatic ingestion mechanism exists today or whether
+   ingestion has only ever been manual/experimental;
+3. do not run a writing ingestion client, import docs, create candidates,
+   approve memories or generate new embeddings during this diagnostic;
+4. after the ingestion mechanism is proven, design the smallest safe production
+   path for keeping durable operational facts current with explicit provenance
+   and human review;
 5. keep the evidence-shadow path separate and not yet declared healthy;
 6. keep migration 013, `mimir_ops`, PostgreSQL schema, Telegram DM policy and
    real-equipment EXECUTE boundaries unchanged.
