@@ -874,3 +874,41 @@ O objetivo é fazer com que decisões, controles, acessos, detecções e recuper
 - rastreáveis;
 - recuperáveis;
 - sustentados por evidência.
+
+
+---
+
+# Projeto consumidor futuro — Mímir Field Assessment / SOC-OSINT
+
+Queue ID:
+
+`MIMIR-FIELD-ASSESSMENT-01`
+
+Documento:
+
+- [FIELD_ASSESSMENT_SOC_OSINT_ROADMAP.md](FIELD_ASSESSMENT_SOC_OSINT_ROADMAP.md)
+
+Status:
+
+**FILA / NÃO IMPLEMENTADO**
+
+O Field Assessment é um consumidor futuro das capacidades definidas neste roadmap, especialmente:
+
+- Risk Engine;
+- Zero-Trust Authorization Context;
+- Attack Surface & Drift;
+- Security Control Assurance;
+- Evidence-Grade Audit;
+- Vulnerability Management;
+- Detection Engineering;
+- Incident Response;
+- RPO/RTO;
+- NIST CSF 2.0 coverage.
+
+A primeira fase deverá ser READ-ONLY e baseada em evidência.
+
+Intervenções futuras deverão ocorrer exclusivamente por catálogo fechado, com PLAN, PREPARE, APPROVAL, EXECUTE e VALIDATE.
+
+O projeto inclui diagnóstico técnico de host e rede, inclusive Windows Event Logs, integridade, saúde de hardware e análise TCP/NIC.
+
+Controle gráfico genérico de desktop continua fora do escopo inicial.
