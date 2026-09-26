@@ -420,18 +420,30 @@ Evidence:
   Gateway policy, managed local embedding lifecycle and semantic-search
   execution. The shadow path remains a separate validation item.
 
+Telegram-02 evidence capture attempted after the 0.2.7 direct-invoke PASS,
+but the captured grep output did not include a new post-deploy Telegram inbound
+turn or a current `mimir_memory_search` execution. It only showed historical
+Telegram activity from earlier on 2026-09-25, the old pre-0.2.7
+`node-llama-cpp` failure, the 21:52 Gateway/Telegram restart, and the 22:33
+managed embedding service start associated with the already-validated direct
+invocation.
+
+Therefore `MIMIR-V1-TELEGRAM-02` remains OPEN; do not infer success from that
+capture.
+
 Next executable action:
 
-1. repeat a memory-recall request through the existing Telegram direct session
+1. send a new uniquely marked Telegram memory-recall request through
    `agent:main:telegram:direct:242921698`;
-2. verify from Gateway logs/session output that Telegram can actually select and
-   execute `mimir_memory_search`, rather than merely answering from model
+2. immediately capture only fresh Gateway log lines from the test start time,
+   including Telegram inbound/outbound, tool-execution milestones and any
+   `mimir_memory_search`/provider-local-service events;
+3. verify the bot response plus logs prove the Telegram turn actually selected
+   and executed `mimir_memory_search`, rather than merely answering from model
    context;
-3. if successful, close `MIMIR-V1-TELEGRAM-02` and record the runtime memory
-   0.2.7 explicit-tool path as production-validated;
-4. keep migration 013, `mimir_ops`, tool permissions and Telegram policy
-   unchanged;
-5. do not mark the shadow evaluator/generator path healthy; it remains separate.
+4. only then close `MIMIR-V1-TELEGRAM-02`;
+5. keep migration 013, `mimir_ops`, tool permissions and Telegram policy
+   unchanged, and keep the shadow evaluator/generator path separate.
 
 ## PostgreSQL laboratory
 
