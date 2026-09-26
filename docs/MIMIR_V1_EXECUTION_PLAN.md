@@ -139,9 +139,26 @@ O canal Telegram do Mímir foi validado no OpenClaw 2026.9.5:
 - token mantido fora do Git por arquivo protegido;
 - somente o operador autorizado permanece na allowlist.
 
-**Próxima atividade:** validar pelo Telegram o uso controlado das ferramentas do
-agente `main` e definir a política de notificações automáticas, sem ampliar
-permissões operacionais nem autorizar EXECUTE em equipamento real.
+**Checkpoint MIMIR-V1-TELEGRAM-02 — concluído.**
+
+Validação em sessão Telegram nova confirmou o caminho explícito de memória:
+
+- `context.compiled (2 tools)`;
+- `tool.call mimir_memory_search`;
+- `tool.result mimir_memory_search ok`;
+- execução final no modelo local Qwen3-4B;
+- `session.ended success`;
+- plugin `mimir-memory 0.2.7`, embedding local gerenciado pelo OpenClaw e
+  consulta PostgreSQL foram validados no caminho ponta a ponta;
+- a resposta semântica obtida no teste não cobriu corretamente os fatos
+  solicitados de migration/LAB, portanto qualidade de recuperação/cobertura do
+  corpus permanece pendência P1 separada;
+- o caminho shadow continua separado e não foi declarado saudável.
+
+**Próxima atividade:** definir e documentar as classes de notificações
+automáticas permitidas no Telegram e, em trilha separada, validar cobertura e
+relevância da memória permanente para fatos operacionais, sem ampliar
+permissões nem autorizar EXECUTE em equipamento real.
 
 ## Protocolo de continuidade entre sessões
 
