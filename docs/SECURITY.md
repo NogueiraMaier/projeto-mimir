@@ -125,3 +125,34 @@ Não cadastrar segredos em campos livres e não ampliar coleta para backups ou
 configurações completas. Relatórios são confidenciais, com diretório local
 0700 e arquivos 0600. `memory_handoff` é PARCIAL e exige revisão antes de
 qualquer promoção; nenhum dado é enviado a API externa por esta camada.
+
+
+## Evolução futura — Security Governance e Control Assurance
+
+A evolução futura de segurança está documentada em:
+
+- [SECURITY_GOVERNANCE_AND_ASSURANCE_ROADMAP.md](SECURITY_GOVERNANCE_AND_ASSURANCE_ROADMAP.md)
+
+Estado: **PLANEJADO / NÃO IMPLEMENTADO**.
+
+O roadmap complementa os controles existentes com planejamento para:
+
+- inventário de ativos de IA e fluxos de dados;
+- autorização contextual/temporal;
+- avaliação de risco;
+- superfície de ataque;
+- assurance de controles;
+- auditoria baseada em evidência;
+- gestão de vulnerabilidades;
+- detecção e MITRE ATT&CK;
+- resposta a incidentes;
+- recuperação com RPO/RTO;
+- métricas de maturidade.
+
+Princípio adicional:
+
+`CONFIGURED != EFFECTIVE`
+
+Um controle futuro só deve ser tratado como efetivo quando configuração, cobertura, operação, teste e resultado possuírem evidência compatível.
+
+Esta seção não amplia permissões, não modifica as restrições do agente `main` e não autoriza acesso ao desktop/endpoint.
