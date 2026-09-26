@@ -626,20 +626,48 @@ current canonical sessions.
 This is now the primary P1 ingestion blocker. Do not work around it by recreating
 legacy `sessions.json` files or reading SQLite internals ad hoc.
 
+SQLite session inventory completed on 2026-09-26.
+
+Evidence:
+
+- canonical main-agent session store:
+  `/var/lib/openclaw/.openclaw/agents/main/agent/openclaw-agent.sqlite`,
+  owner `openclaw:openclaw`, mode 0600;
+- OpenClaw CLI reports 18 canonical session rows, with 12 currently
+  `status=done`;
+- current store contains direct, HUD, ACP bridge, Maestro, Telegram and cron
+  session keys; the latest Telegram direct session is visible through the
+  canonical store;
+- the only root-crontab line matching the earlier broad search is
+  `mimir-security-audit --scheduled` every six hours; it is unrelated to
+  memory ingestion, so no scheduled memory-ingestion job has been identified;
+- no ingestion-related process was running;
+- legacy collector compatibility check is explicit:
+  `references_sessions_json=true`,
+  `references_jsonl=true`,
+  `references_openclaw_agent_sqlite=false`;
+- conclusion:
+  `RESULT=LEGACY_SESSION_COLLECTOR_INCOMPATIBLE`;
+- therefore current session knowledge is available in OpenClaw 2026.9.5, but
+  the Mímir capture client cannot reach it because it targets the retired
+  file-backed session layout.
+
 Next executable action:
 
-1. inspect the exact matching root crontab command with secrets redacted;
-2. use read-only OpenClaw 2026.9.5 APIs/CLI
-   (`openclaw sessions --agent main --limit all --json` and optionally
-   `doctor --session-sqlite inspect`) to inventory the live SQLite session
-   store;
-3. compare the current capture/ingest scripts against the supported SQLite
-   session access paths and design a replacement capture interface rather than
-   patching the legacy filename;
-4. do not write/import production sessions or mutate OpenClaw SQLite during this
+1. perform a read-only structural probe of the supported Gateway
+   `chat.history` API for one canonical completed session, storing output only
+   in a protected temporary file and printing no message content;
+2. verify whether the response preserves the metadata needed by Mímir capture:
+   session id/key, role, message id/sequence, owner marker
+   `__openclaw.senderIsOwner`, pagination and truncation/redaction signals;
+3. if owner and pagination metadata are sufficient, design the replacement
+   collector around `openclaw sessions --json` + `chat.history` rather than
+   direct SQLite access;
+4. if owner identity is not available at that boundary, identify the supported
+   session/channel provenance needed to retain the existing owner-only rule
+   before implementation;
+5. do not write/import production sessions or mutate OpenClaw SQLite during this
    diagnostic;
-5. after the compatible capture path is designed and tested in isolation,
-   request separate authorization before enabling production ingestion;
 6. keep the evidence-shadow path separate and not yet declared healthy;
 7. keep migration 013, `mimir_ops`, PostgreSQL schema, Telegram DM policy and
    real-equipment EXECUTE boundaries unchanged.
