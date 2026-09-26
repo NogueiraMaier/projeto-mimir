@@ -681,20 +681,46 @@ implementation, the same structural rules must be surveyed across the other
 completed main-agent session classes (HUD, ACP bridge, Maestro/main) so the
 owner-only policy can fail closed where provenance differs.
 
+Batch structural survey over all canonical `status=done` main-agent
+sessions completed successfully on 2026-09-26.
+
+Evidence:
+
+- canonical store reported 18 total rows and 12 `status=done` sessions;
+- all 12 completed sessions were readable through the supported
+  `chat.history` boundary;
+- all 12 returned positive owner provenance for every user message:
+  `senderIsOwner=true`, with zero false and zero missing owner markers;
+- covered session classes were Telegram, HUD, ACP bridge, Maestro and
+  `agent:main:main`;
+- every surveyed message had stable id/seq/timestamp metadata;
+- pagination metadata was present for every surveyed session;
+- no truncation/omission signal was observed;
+- Telegram additionally demonstrated system/toolResult roles and
+  thinking/toolCall blocks, which must remain excluded from memory capture;
+- result summary:
+  `OWNER_PROVENANCE_PASS=12`, `sessions_read=12`.
+
+The supported API boundary is therefore suitable for a fail-closed v2
+collector across the currently observed completed session classes. This does
+not authorize production ingestion or memory writes.
+
 Next executable action:
 
-1. run a read-only batch structural survey over all canonical
-   `status=done` main-agent sessions via `sessions --json` +
-   `chat.history`, printing counts/metadata only and no message content;
-2. classify each session by key/kind, user owner-marker coverage, message roles,
-   tool/thinking blocks, pagination and truncation/omission signals;
-3. use the survey to define the exact eligible session classes for the v2
-   collector; sessions lacking positive owner provenance must be skipped or
-   blocked, never silently trusted;
-4. only after that survey, implement and test a new API-based dry-run collector
-   in the repository; do not replace/deploy the production script yet;
-5. keep the evidence-shadow path separate and not yet declared healthy;
-6. keep migration 013, `mimir_ops`, PostgreSQL schema, Telegram DM policy and
+1. implement a new repository-only API-based dry-run collector using
+   `openclaw sessions --json` + `gateway call chat.history`;
+2. keep the legacy July collector unchanged for forensic/reference purposes;
+3. enforce explicit eligible classes (Telegram, HUD, ACP bridge, Maestro,
+   main), positive owner provenance for every user message, supported
+   pagination, UUID/session consistency, secret scanning and truncation guards;
+4. include only user/assistant text; exclude system, toolResult, thinking and
+   toolCall material;
+5. add synthetic tests for owner-pass, foreign-owner block, missing-owner
+   block, secret block, unsupported-class skip, pagination and truncation;
+6. validate the new collector in isolation before any VPS deployment or
+   PostgreSQL write;
+7. keep the evidence-shadow path separate and not yet declared healthy;
+8. keep migration 013, `mimir_ops`, PostgreSQL schema, Telegram DM policy and
    real-equipment EXECUTE boundaries unchanged.
 
 ## PostgreSQL laboratory
