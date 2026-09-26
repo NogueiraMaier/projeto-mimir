@@ -391,3 +391,22 @@ Future agents must distinguish:
 - **WATCHLIST** — techniques/components requiring later benchmark or evidence.
 
 No future agent should mark a TARGET component as implemented without runtime evidence and an explicit project checkpoint.
+
+
+## Additional future security roadmap — informational only
+
+A further future roadmap has been documented on the documentation branch:
+
+- `docs/SECURITY_GOVERNANCE_AND_ASSURANCE_ROADMAP.md`
+
+Status:
+
+**DOCUMENTED / NOT IMPLEMENTED / DOES NOT CHANGE NEXT_ACTION**
+
+It covers future security governance, risk, control assurance, attack-surface management, evidence-grade audit, vulnerability validation, incident response, recovery assurance and ATT&CK-oriented detection planning.
+
+This note is informational only.
+
+It does not modify the current Telegram/tool-surface checkpoint, does not replace any existing v1 task and does not authorize implementation.
+
+Desktop/endpoint access or inspection is intentionally excluded from this roadmap pending separate architectural discussion.
