@@ -141,3 +141,43 @@ Nenhuma permissão foi ampliada.
 O `NEXT_ACTION` operacional atual permanece inalterado.
 
 Acesso/análise de desktop ou endpoint foi deliberadamente excluído desta rodada documental.
+
+
+## Atualização documental — Field Assessment / SOC-OSINT, 2026-09-26
+
+Foi criado:
+
+- [FIELD_ASSESSMENT_SOC_OSINT_ROADMAP.md](FIELD_ASSESSMENT_SOC_OSINT_ROADMAP.md)
+
+Queue ID:
+
+`MIMIR-FIELD-ASSESSMENT-01`
+
+Estado:
+
+**FILA / PLANEJADO / NÃO IMPLEMENTADO**.
+
+O projeto futuro registra:
+
+- Field Probe via pendrive;
+- WireGuard efêmero;
+- HUD;
+- coleta READ-first;
+- saúde de hardware;
+- diagnóstico Windows/logs;
+- avaliação de rede/TCP;
+- OSINT/SOC;
+- Risk Engine;
+- NIST CSF 2.0;
+- checklist de enquadramento;
+- persistência estruturada;
+- relatório;
+- remediação futura por catálogo controlado.
+
+Nenhuma ferramenta foi criada em runtime.
+
+Nenhuma permissão foi ampliada.
+
+Nenhum EXECUTE foi autorizado.
+
+O `NEXT_ACTION` atual permanece inalterado.
