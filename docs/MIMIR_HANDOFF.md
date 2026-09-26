@@ -556,24 +556,42 @@ Fresh-session Telegram validation on 2026-09-26:
   / memory-corpus freshness remains a separate P1 memory-quality issue and must
   not be conflated with Telegram tool availability.
 
+Permanent-memory production corpus diagnosis completed.
+
+Evidence:
+
+- production schema remains versions 1..12 only;
+- exactly five active memory records exist and all five have embeddings;
+- all five active records were created on 2026-07-30 and all derive from
+  `MEMORY.md`;
+- the active keys are limited to project identity/title, execution platform,
+  principal model and critical-security principle;
+- none of the five active memories contains migration 013, LAB-01..LAB-09,
+  `mimir_ops` or `schema_version`;
+- no active record matching any requested operational term exists;
+- therefore the Telegram semantic miss is a corpus-coverage failure, not an
+  embedding-generation or ranking failure;
+- repository `MEMORY.md` is stale relative to the validated project state and
+  the current markdown importer only imports `MEMORY.md` plus top-level
+  `memory/*.md`; it does not automatically import the operational handoff or
+  review documents under `docs/`.
+
 Next executable action:
 
-1. prioritize the permanent-memory quality defect exposed by the successful
-   Telegram-02 tool call: perform a read-only production corpus inventory before
-   changing any memory record;
-2. verify whether active embedded memories contain the requested operational
-   facts for migration 013 and LAB-01..LAB-09, and distinguish corpus coverage
-   failure from semantic-ranking failure;
-3. note that repository `MEMORY.md` is itself stale relative to the validated
-   project state (it still describes PostgreSQL as future work and does not
-   contain the LAB-01..LAB-09 results), so it must not be treated as evidence
-   that production permanent memory is current;
-4. after corpus diagnosis, define the smallest reviewed memory update and only
-   then generate/store embeddings through the controlled workflow;
-5. document Telegram automatic-notification classes after the memory-quality
-   checkpoint;
-6. keep the evidence-shadow path separate and not yet declared healthy;
-7. keep migration 013, `mimir_ops`, PostgreSQL schema, Telegram DM policy and
+1. perform a read-only ingestion/promotion pipeline inventory: document/session
+   events, protected session sources, candidate memories, reviews and pending
+   embeddings;
+2. determine whether recent operational facts already exist as ingested source
+   evidence but have never been consolidated/reviewed/promoted, or whether the
+   ingestion source set itself is missing them;
+3. do not insert, approve, supersede or re-embed any production memory until
+   that pipeline location is proven and a human-reviewed candidate set is
+   prepared;
+4. after diagnosis, define the smallest durable operational-memory records for
+   migration-013 production boundaries and LAB-01..LAB-09 status, with explicit
+   source provenance;
+5. keep the evidence-shadow path separate and not yet declared healthy;
+6. keep migration 013, `mimir_ops`, PostgreSQL schema, Telegram DM policy and
    real-equipment EXECUTE boundaries unchanged.
 
 ## PostgreSQL laboratory
