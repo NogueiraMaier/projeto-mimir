@@ -156,16 +156,16 @@ Validação em sessão Telegram nova confirmou o caminho explícito de memória:
 - o caminho shadow continua separado e não foi declarado saudável.
 
 **Próxima atividade:** fechar primeiro o bloqueador P1 da memória permanente.
-O store canônico SQLite foi confirmado com 18 sessões, 12 concluídas, e não há
-agendamento de ingestão de memória identificado; a linha de cron encontrada é
-somente `mimir-security-audit`. O coletor atual é definitivamente legado
-(`sessions.json`/JSONL e sem suporte ao SQLite). Validar agora, somente leitura
-e sem expor conteúdo, se `chat.history` fornece owner marker, IDs/seq,
-paginação e sinais de truncamento/redaction suficientes para um novo coletor
-baseado nas APIs suportadas do OpenClaw 2026.9.5. Só depois implementar/testar em
-isolamento e pedir autorização separada para escrita em produção. Em seguida
-retomar candidate → revisão humana → active → embedding. Não ampliar permissões
-nem autorizar EXECUTE em equipamento real.
+A fronteira suportada `chat.history` já foi validada na sessão Telegram:
+`senderIsOwner=true`, IDs/seq, timestamp, paginação e deltaCursor estão
+disponíveis sem acesso direto ao SQLite. Antes de implementar, executar survey
+estrutural read-only das demais sessões concluídas (HUD/ACP/Maestro/main) para
+definir fail-closed quais classes preservam proveniência owner positiva e quais
+devem ser excluídas. Depois implementar/testar em isolamento o coletor API-based
+v2, mantendo o script legado e sem deploy em produção. Só após validação pedir
+autorização separada para escrita/ativação e então retomar candidate → revisão
+humana → active → embedding. Não ampliar permissões nem autorizar EXECUTE em
+equipamento real.
 
 ## Protocolo de continuidade entre sessões
 
