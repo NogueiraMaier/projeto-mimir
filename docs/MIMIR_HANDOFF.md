@@ -652,24 +652,49 @@ Evidence:
   the Mímir capture client cannot reach it because it targets the retired
   file-backed session layout.
 
+Read-only structural probe of the supported OpenClaw 2026.9.5
+`chat.history` boundary completed successfully for the canonical Telegram
+owner-DM session.
+
+Evidence:
+
+- `chat.history` returned the expected canonical `sessionKey` and
+  `sessionId`;
+- response exposed pagination/state metadata including `hasMore`,
+  `totalMessages` and `deltaCursor`;
+- all five returned messages had stable `__openclaw.id` and `seq`, and all
+  five had timestamp information;
+- the single user message carried
+  `__openclaw.senderIsOwner=true` with no missing owner marker;
+- user metadata also exposed sender/transport identity fields without requiring
+  direct SQLite access;
+- roles observed were system, user, assistant and toolResult; assistant content
+  also contained thinking/toolCall blocks, confirming the replacement collector
+  must explicitly keep only user/assistant text and exclude system, toolResult,
+  thinking and toolCall material;
+- result:
+  `CHAT_HISTORY_SUITABLE_FOR_COLLECTOR_DESIGN`.
+
+This validates the supported API boundary for the Telegram session and removes
+the need for direct reads of OpenClaw's private SQLite schema. Before
+implementation, the same structural rules must be surveyed across the other
+completed main-agent session classes (HUD, ACP bridge, Maestro/main) so the
+owner-only policy can fail closed where provenance differs.
+
 Next executable action:
 
-1. perform a read-only structural probe of the supported Gateway
-   `chat.history` API for one canonical completed session, storing output only
-   in a protected temporary file and printing no message content;
-2. verify whether the response preserves the metadata needed by Mímir capture:
-   session id/key, role, message id/sequence, owner marker
-   `__openclaw.senderIsOwner`, pagination and truncation/redaction signals;
-3. if owner and pagination metadata are sufficient, design the replacement
-   collector around `openclaw sessions --json` + `chat.history` rather than
-   direct SQLite access;
-4. if owner identity is not available at that boundary, identify the supported
-   session/channel provenance needed to retain the existing owner-only rule
-   before implementation;
-5. do not write/import production sessions or mutate OpenClaw SQLite during this
-   diagnostic;
-6. keep the evidence-shadow path separate and not yet declared healthy;
-7. keep migration 013, `mimir_ops`, PostgreSQL schema, Telegram DM policy and
+1. run a read-only batch structural survey over all canonical
+   `status=done` main-agent sessions via `sessions --json` +
+   `chat.history`, printing counts/metadata only and no message content;
+2. classify each session by key/kind, user owner-marker coverage, message roles,
+   tool/thinking blocks, pagination and truncation/omission signals;
+3. use the survey to define the exact eligible session classes for the v2
+   collector; sessions lacking positive owner provenance must be skipped or
+   blocked, never silently trusted;
+4. only after that survey, implement and test a new API-based dry-run collector
+   in the repository; do not replace/deploy the production script yet;
+5. keep the evidence-shadow path separate and not yet declared healthy;
+6. keep migration 013, `mimir_ops`, PostgreSQL schema, Telegram DM policy and
    real-equipment EXECUTE boundaries unchanged.
 
 ## PostgreSQL laboratory
