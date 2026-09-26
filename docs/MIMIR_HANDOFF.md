@@ -391,17 +391,30 @@ Production 0.2.7 SHA-256 baseline:
 - semantic helper:
   `d586ee22a44f53fc08d439c601071db6106efb1671fe851a82ca2ef84a375d79`.
 
+Production runtime deployment checkpoint:
+
+- `mimir-memory 0.2.7` is loaded and activated in production;
+- `mimir_memory_search` is registered after Gateway restart;
+- runtime deployment itself is complete and must not be rolled back merely
+  because the next functional invocation exposes a separate embedding,
+  PostgreSQL, policy or session-path defect;
+- persisted install-record metadata still reports 0.2.6 while the loaded
+  package/runtime reports 0.2.7; this is recorded metadata drift, not a runtime
+  version mismatch.
+
 Next executable action:
 
-1. invoke `mimir_memory_search` directly through Gateway `tools.invoke`
-   against the existing Telegram direct session, verifying the complete path
-   from tool policy through managed local embedding lifecycle to PostgreSQL;
-2. on failure, capture the structured RPC error plus Gateway logs before making
-   any further runtime change; do not automatically reinterpret a tool failure
-   as a deploy failure because runtime 0.2.7 is already loaded and healthy;
-3. only after direct invocation succeeds, repeat the equivalent memory request
+1. query `tools.effective` for the existing Telegram direct session to confirm
+   `mimir_memory_search` remains policy-visible after restart;
+2. invoke `mimir_memory_search` directly through Gateway `tools.invoke`
+   against that session, using a low-risk read-only semantic query and checking
+   for `ok=true`, a 768-dimensional embedding payload and PostgreSQL-backed
+   results (zero results is still a valid transport-path success);
+3. on failure, capture the structured RPC error plus Gateway logs before making
+   any further runtime change;
+4. only after direct invocation succeeds, repeat the equivalent memory request
    from Telegram;
-4. keep migration 013, `mimir_ops`, tool permissions and Telegram policy
+5. keep migration 013, `mimir_ops`, tool permissions and Telegram policy
    unchanged.
 
 ## PostgreSQL laboratory
