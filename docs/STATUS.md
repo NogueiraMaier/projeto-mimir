@@ -108,7 +108,8 @@ históricas da memória e de governança não foram encerradas por esta revisão
 - **STORE ATUAL VALIDADO:** CLI canônica enxerga 18 sessões no SQLite principal, 12 com `status=done`; a única linha de cron encontrada é `mimir-security-audit --scheduled` e não existe evidência de agendamento de ingestão de memória. Compatibilidade do coletor: `sessions.json=true`, JSONL=true, SQLite=false.
 - **CHAT.HISTORY VALIDADO:** probe read-only da sessão Telegram confirmou `senderIsOwner=true`, IDs/seq, timestamp, paginação e deltaCursor; a fronteira suportada é suficiente para projetar o coletor sem SQL direto. O payload também contém system/toolResult/thinking/toolCall, que deverão ser excluídos explicitamente.
 - **SURVEY DE SESSÕES CONCLUÍDO:** 12/12 sessões `done` (Telegram, HUD, ACP bridge, Maestro e main) passaram com `senderIsOwner=true` para todas as mensagens user, IDs/seq/timestamp presentes, paginação disponível e nenhum sinal de truncamento.
-- **PRÓXIMO:** implementar/testar no repositório um coletor v2 dry-run baseado em `sessions --json` + `chat.history`, mantendo o coletor legado intacto e sem deploy/escrita em produção.
+- **COLETOR V2 CRIADO NO REPOSITÓRIO:** `mimir-capture-sessions-v2.py` usa somente `sessions --json` + `chat.history`, sem SQL direto, e aplica allowlist de classes, owner-only fail-closed, exclusão de system/toolResult/thinking/toolCall, secret scan, paginação e truncation guards. Testes sintéticos também foram adicionados. Coletor legado permanece intacto.
+- **PRÓXIMO:** validar sintaxe/testes em checkout isolado e depois executar uma única leitura dry-run contra o Gateway da VPS sem copiar para o workspace de produção nem escrever no PostgreSQL.
 - **NÃO AUTORIZADO AINDA:** equipamento real em EXECUTE.
 
 Lista mestre de execução: [MIMIR_V1_EXECUTION_PLAN.md](MIMIR_V1_EXECUTION_PLAN.md).
