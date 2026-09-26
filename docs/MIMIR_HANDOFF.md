@@ -464,33 +464,45 @@ Additional Telegram-02 policy evidence:
 - no `toolsAllow` field was found anywhere in the inspected configuration;
 - around the failed 22:41 Telegram turn, Gateway repeatedly reported that agent
   `main` uses tool profile `minimal`;
-- those diagnostics also state that configured `tools.exec` / `tools.fs`
-  sections no longer widen the selected profile and that explicit
-  `alsoAllow` entries are required for additional tools;
-- OpenClaw 2026.9.5 policy documentation/source confirms that
-  `tools.profile` is the base allowlist and that optional plugin tools are not
-  selected by a minimal/unset profile unless explicitly granted; direct
-  `tools.invoke` can still succeed because it explicitly requests the named
-  plugin tool through `gatewayRequestedTools`.
+- global tools already include `alsoAllow` for
+  `exec, process, read, write, edit`;
+- `agents.entries.main.tools.alsoAllow` already contains exactly
+  `mimir_memory_search` and `web_search`;
+- current `tools.effective` for
+  `agent:main:telegram:direct:242921698` lists both `web_search` and
+  `mimir_memory_search`, with the latter sourced from plugin
+  `mimir-memory`;
+- nevertheless a real Telegram agent turn still returned
+  `TOOL_UNAVAILABLE: mimir_memory_search` and did not emit a tool-execution
+  event.
 
-Current root-cause hypothesis is therefore high confidence:
-`mimir_memory_search` is healthy but hidden from the ordinary Telegram agent
-turn because it is registered as `optional: true` while agent `main` runs
-with profile `minimal` and lacks an explicit model-facing grant.
+This disproves the earlier hypothesis that the blocker was a missing
+`alsoAllow` grant. Do not add or widen tool permissions as a fix.
+
+OpenClaw 2026.9.5 documentation describes `tools.effective` as a
+server-derived session inventory projection. It is useful evidence, but the
+remaining discrepancy is now between that projection and the concrete
+model-facing tool set of the actual Telegram run.
 
 Next executable action:
 
-1. read only the effective `tools` objects for global config and agent
-   `main`, plus current `tools.effective` for the Telegram session, to
-   confirm the exact config location for `alsoAllow`;
-2. if confirmed, request explicit production authorization for the smallest
-   policy mutation: add only `mimir_memory_search` to agent `main`'s
-   `tools.alsoAllow`, preserving profile `minimal` and every existing deny;
-3. restart/reload only as required by OpenClaw, then repeat the uniquely marked
-   Telegram test;
-4. do not grant exec/fs/session groups as part of this fix;
-5. keep migration 013, `mimir_ops`, PostgreSQL schema, Telegram DM policy and
-   shadow evaluator/generator unchanged.
+1. inspect the runtime trajectory for
+   `agent:main:telegram:direct:242921698` using read-only
+   `openclaw sessions tail --session-key ...` to determine the provider/model,
+   whether any tool call was emitted, and the terminal status of the 23:03
+   Telegram turn;
+2. inspect the main agent/provider-specific tool policy and active model
+   selection without mutating config, especially any provider/model/runtime
+   restriction applied after the session-level tool projection;
+3. if needed, inspect the stored transcript/trajectory for the failed turn to
+   distinguish (a) the model merely generating the literal
+   `TOOL_UNAVAILABLE` text from (b) the runtime rejecting an attempted tool
+   call;
+4. do not change `tools.profile`, `alsoAllow`, deny lists, Telegram policy,
+   plugin registration, or model routing until the exact active-run layer is
+   identified;
+5. keep migration 013, `mimir_ops`, PostgreSQL schema and shadow
+   evaluator/generator unchanged.
 
 ## PostgreSQL laboratory
 
