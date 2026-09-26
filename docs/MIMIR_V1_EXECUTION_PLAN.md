@@ -155,9 +155,14 @@ Validação em sessão Telegram nova confirmou o caminho explícito de memória:
   corpus permanece pendência P1 separada;
 - o caminho shadow continua separado e não foi declarado saudável.
 
-**Próxima atividade:** definir e documentar as classes de notificações
-automáticas permitidas no Telegram e, em trilha separada, validar cobertura e
-relevância da memória permanente para fatos operacionais, sem ampliar
+**Próxima atividade:** fechar primeiro o diagnóstico P1 da memória permanente:
+a produção possui somente os 5 registros ativos de 2026-07-30, e o inventário
+mostrou que os fatos operacionais atuais nem sequer chegaram à camada de
+ingestão. Inventariar em modo somente leitura cron/OpenRC/processos/scripts e a
+fila real de sessões capturáveis para confirmar se existe automação de ingestão
+ou se o fluxo permanece manual/dry-run. Só depois definir a atualização
+controlada do corpus com revisão humana e proveniência. A definição das classes
+de notificações automáticas Telegram fica no checkpoint seguinte. Não ampliar
 permissões nem autorizar EXECUTE em equipamento real.
 
 ## Protocolo de continuidade entre sessões
