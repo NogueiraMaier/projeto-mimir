@@ -410,3 +410,22 @@ This note is informational only.
 It does not modify the current Telegram/tool-surface checkpoint, does not replace any existing v1 task and does not authorize implementation.
 
 Desktop/endpoint access or inspection is intentionally excluded from this roadmap pending separate architectural discussion.
+
+
+## Future queue note — Field Assessment / SOC-OSINT
+
+A new future project has been documented:
+
+- Queue ID: `MIMIR-FIELD-ASSESSMENT-01`
+- Document: `docs/FIELD_ASSESSMENT_SOC_OSINT_ROADMAP.md`
+- Status: **QUEUED / NOT IMPLEMENTED / DOES NOT CHANGE NEXT_ACTION**
+
+The project describes a future USB/Field Probe assessment workflow with ephemeral WireGuard, HUD access, READ-first host/network diagnostics, OSINT, SOC analysis, NIST CSF 2.0 assessment/checklist, structured evidence, reporting and controlled remediation.
+
+This queue entry is informational only.
+
+It does not modify the current Telegram/tool-surface checkpoint.
+
+When resumed in the future, start with `FA-0 — specification`; do not begin by implementing the USB launcher or enabling EXECUTE.
+
+Generic graphical desktop control remains outside the initial scope.
