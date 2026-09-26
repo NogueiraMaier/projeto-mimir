@@ -431,19 +431,47 @@ invocation.
 Therefore `MIMIR-V1-TELEGRAM-02` remains OPEN; do not infer success from that
 capture.
 
+Telegram-02 fresh post-deploy test failed on 2026-09-25.
+
+Observed:
+
+- Telegram ingress is healthy: the new 173-character direct message from
+  Telegram user 242921698 reached `@MimirAssistenteBot` at 22:41:46;
+- Telegram egress is healthy: the bot sent one text reply at 22:41:59;
+- the visible bot reply was exactly
+  `TOOL_UNAVAILABLE: mimir_memory_search`;
+- no `tool_execution_started`, current `mimir_memory_search` execution, or
+  new managed-embedding event appeared for that turn;
+- therefore the 0.2.7 explicit tool implementation itself remains validated by
+  direct Gateway `tools.invoke`, but the normal Telegram agent-turn tool
+  projection/selection path still does not expose the optional plugin tool to
+  the model;
+- `MIMIR-V1-TELEGRAM-02` remains BLOCKED and must not be closed.
+
+OpenClaw 2026.9.5 source inspection relevant to this blocker:
+
+- `mimir_memory_search` is registered by the plugin as an optional tool;
+- restricted profiles do not automatically select optional plugin tools;
+- direct Gateway `tools.invoke` explicitly injects the requested non-core
+  tool into `gatewayRequestedTools`, which explains why direct invocation can
+  succeed even when a normal Telegram agent turn does not receive that tool;
+- the next diagnostic must compare the saved/current `tools.effective`
+  projection with the actual configured profile/allow/alsoAllow/runtime
+  restrictions for the Telegram turn before changing policy.
+
 Next executable action:
 
-1. send a new uniquely marked Telegram memory-recall request through
-   `agent:main:telegram:direct:242921698`;
-2. immediately capture only fresh Gateway log lines from the test start time,
-   including Telegram inbound/outbound, tool-execution milestones and any
-   `mimir_memory_search`/provider-local-service events;
-3. verify the bot response plus logs prove the Telegram turn actually selected
-   and executed `mimir_memory_search`, rather than merely answering from model
-   context;
-4. only then close `MIMIR-V1-TELEGRAM-02`;
-5. keep migration 013, `mimir_ops`, tool permissions and Telegram policy
-   unchanged, and keep the shadow evaluator/generator path separate.
+1. perform a read-only policy diagnostic: inspect the saved direct-test
+   `tools-effective.json`, query current `tools.effective` for the Telegram
+   session, and print only tool-policy-related config fields;
+2. capture all Gateway lines around the 22:41 Telegram turn, not only the prior
+   narrow grep, to look for runtime `toolsAllow` or tool-construction
+   diagnostics;
+3. determine the narrowest policy correction that makes only
+   `mimir_memory_search` available to the Telegram main-agent turn;
+4. do not change tool policy until that diagnostic is reviewed;
+5. keep migration 013, `mimir_ops`, PostgreSQL schema and shadow
+   evaluator/generator unchanged.
 
 ## PostgreSQL laboratory
 
