@@ -155,15 +155,17 @@ Validação em sessão Telegram nova confirmou o caminho explícito de memória:
   corpus permanece pendência P1 separada;
 - o caminho shadow continua separado e não foi declarado saudável.
 
-**Próxima atividade:** fechar primeiro o diagnóstico P1 da memória permanente:
-a produção possui somente os 5 registros ativos de 2026-07-30, e o inventário
-mostrou que os fatos operacionais atuais nem sequer chegaram à camada de
-ingestão. Inventariar em modo somente leitura cron/OpenRC/processos/scripts e a
-fila real de sessões capturáveis para confirmar se existe automação de ingestão
-ou se o fluxo permanece manual/dry-run. Só depois definir a atualização
-controlada do corpus com revisão humana e proveniência. A definição das classes
-de notificações automáticas Telegram fica no checkpoint seguinte. Não ampliar
-permissões nem autorizar EXECUTE em equipamento real.
+**Próxima atividade:** fechar primeiro o bloqueador P1 da memória permanente.
+O inventário confirmou que os fatos operacionais atuais não chegaram à ingestão
+e revelou incompatibilidade estrutural: os scripts de captura/ingestão ainda
+esperam `sessions.json` + JSONL, enquanto OpenClaw 2026.9.5 usa SQLite canônico
+por agente. `mimir-ingest-session.py` continua somente dry-run. Inventariar o
+store SQLite atual via CLI/API read-only, inspecionar a linha relevante do root
+crontab e projetar/validar em isolamento uma captura compatível antes de qualquer
+escrita em produção. Só depois retomar candidate → revisão humana → active →
+embedding. A definição das classes de notificações automáticas Telegram fica no
+checkpoint seguinte. Não ampliar permissões nem autorizar EXECUTE em equipamento
+real.
 
 ## Protocolo de continuidade entre sessões
 
