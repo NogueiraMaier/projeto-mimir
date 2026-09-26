@@ -124,3 +124,31 @@ A evolução da memória continua em branch/documento próprio e não é substit
 O model routing consome contexto e evidência fornecidos pela memória, mas não redefine sua governança.
 
 Agentes especialistas continuam sendo separados de engines: um agente de Redes, SOC ou Desenvolvimento poderá usar capacidades diferentes conforme a tarefa, desde que a política autorize.
+
+
+## Segurança, governança de risco e control assurance — evolução futura
+
+Documento:
+
+- [SECURITY_GOVERNANCE_AND_ASSURANCE_ROADMAP.md](SECURITY_GOVERNANCE_AND_ASSURANCE_ROADMAP.md)
+
+Status: **PLANEJADO / PÓS-v1 / NÃO IMPLEMENTADO**.
+
+A trilha registra evolução futura para:
+
+- inventário de ativos de IA e fluxos de dados;
+- autorização contextual baseada em princípios Zero Trust;
+- Risk Engine;
+- superfície de ataque e drift entre estado esperado/observado;
+- assurance de controles por evidência;
+- auditoria correlacionável;
+- vulnerability management com validação pós-correção;
+- detection engineering orientado por MITRE ATT&CK;
+- workflow de resposta a incidentes;
+- RPO/RTO e validação de recuperação;
+- mapeamento de cobertura pelo NIST CSF 2.0;
+- avaliação de maturidade e melhoria contínua.
+
+Essa trilha não altera o fechamento da v1 e não autoriza mudança de runtime.
+
+A capacidade de acesso/análise de desktop ou endpoint permanece explicitamente fora deste escopo até discussão arquitetural específica.
