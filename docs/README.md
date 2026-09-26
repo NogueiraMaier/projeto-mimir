@@ -101,3 +101,12 @@ Usar explicitamente:
 - **WATCHLIST** — candidato dependente de benchmark/evidência.
 
 Nunca promover TARGET ou WATCHLIST para CURRENT sem validação documentada.
+
+
+### Segurança, risco e assurance
+
+- `SECURITY_GOVERNANCE_AND_ASSURANCE_ROADMAP.md` — evolução futura de governança de segurança, Risk Engine, Zero Trust contextual, superfície de ataque, control assurance, auditoria, vulnerabilidades, ATT&CK, resposta e recuperação.
+
+Status: **TARGET / NÃO IMPLEMENTADO**.
+
+A discussão de acesso/análise de desktop ou endpoint não está incluída nesse roadmap e deverá ser tratada separadamente antes de ser documentada como arquitetura.
