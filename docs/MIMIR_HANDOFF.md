@@ -705,22 +705,55 @@ The supported API boundary is therefore suitable for a fail-closed v2
 collector across the currently observed completed session classes. This does
 not authorize production ingestion or memory writes.
 
+Repository-only v2 capture implementation created on the development
+branch without touching the production workspace.
+
+New files:
+
+- `tools/memory/mimir-capture-sessions-v2.py`
+  (commit `c9369a163266bbea83e2fa693ca4ebdee259a013`);
+- `tools/memory/test_mimir_capture_sessions_v2.py`
+  (commit `5bf6d25b1468433a61bcdc3a6911f7b1a767b3f0`).
+
+Design implemented:
+
+- source boundary is only supported OpenClaw CLI/API:
+  `sessions --json` + `gateway call chat.history`;
+- no direct SQLite access, PostgreSQL write, staging write or message-content
+  output;
+- legacy July collector remains unchanged;
+- only surveyed session classes are eligible: Telegram, HUD, ACP bridge,
+  Maestro and main;
+- non-done sessions and unsupported classes are skipped;
+- every user message must carry positive `senderIsOwner=true`; foreign or
+  missing provenance blocks the session;
+- only user/assistant text enters the normalized candidate transcript;
+  system, toolResult, thinking and toolCall material is excluded;
+- canonical session UUID/key consistency, bounded pagination, secret scanning,
+  truncation/omission detection, source fingerprint and normalized-content
+  SHA-256 are implemented;
+- synthetic tests cover pagination/owner pass, foreign-owner block,
+  missing-owner block, secret block, unsupported/running skip, exclusion of
+  internal blocks and truncation block.
+
+The files have not yet been validated in the user's checkout or against the
+live VPS; do not mark the collector v2 operational yet.
+
 Next executable action:
 
-1. implement a new repository-only API-based dry-run collector using
-   `openclaw sessions --json` + `gateway call chat.history`;
-2. keep the legacy July collector unchanged for forensic/reference purposes;
-3. enforce explicit eligible classes (Telegram, HUD, ACP bridge, Maestro,
-   main), positive owner provenance for every user message, supported
-   pagination, UUID/session consistency, secret scanning and truncation guards;
-4. include only user/assistant text; exclude system, toolResult, thinking and
-   toolCall material;
-5. add synthetic tests for owner-pass, foreign-owner block, missing-owner
-   block, secret block, unsupported-class skip, pagination and truncation;
-6. validate the new collector in isolation before any VPS deployment or
-   PostgreSQL write;
-7. keep the evidence-shadow path separate and not yet declared healthy;
-8. keep migration 013, `mimir_ops`, PostgreSQL schema, Telegram DM policy and
+1. validate Python syntax and run the new synthetic tests from an isolated
+   checkout of the exact branch HEAD;
+2. inspect the dry-run output only for counts/status/hashes; message contents
+   must remain absent;
+3. if synthetic tests pass, run the v2 collector once against the live
+   OpenClaw Gateway from the isolated checkout only (no copy into production
+   workspace), still dry-run/no database writes;
+4. compare its ready/blocked/skipped counts with the 12-session structural
+   survey and inspect reasons before changing any ingestion client;
+5. do not deploy, schedule or enable production writes without separate
+   authorization;
+6. keep the evidence-shadow path separate and not yet declared healthy;
+7. keep migration 013, `mimir_ops`, PostgreSQL schema, Telegram DM policy and
    real-equipment EXECUTE boundaries unchanged.
 
 ## PostgreSQL laboratory
