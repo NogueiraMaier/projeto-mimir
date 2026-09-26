@@ -514,19 +514,39 @@ Active-run and trajectory diagnostics for the failed Telegram memory turn:
   checked before interpreting the missing fields as an actual provider
   boundary condition.
 
+Trajectory truncation check completed for the failed 23:02 Telegram turn.
+
+Evidence:
+
+- target `context.compiled` event timestamp:
+  `2026-09-26T02:02:25.474Z`;
+- event is not truncated: no `truncated`, `reason`, `originalBytes`,
+  `limitBytes` or `droppedFields` metadata is present;
+- `data.tools` is present;
+- `providerVisibleTools` is absent;
+- in OpenClaw 2026.9.5 `context.compiled` records `tools` from
+  `providerVisibleTools` directly when tool-search compaction is not active;
+  `providerVisibleTools` is only recorded as a separate field when
+  `toolSearchCompacted` is true.
+
+Therefore the previous conclusion that the model boundary contained no tools
+was incorrect. The event did retain its `tools` field. The next diagnostic
+must inspect the safe structural shape and tool names in that field before
+drawing conclusions about whether `mimir_memory_search` was among them.
+
 Next executable action:
 
-1. inspect only the 02:02:25 `context.compiled` event metadata for
-   `truncated`, `reason`, `originalBytes`, `limitBytes`,
-   `droppedFields` and the remaining data keys;
-2. if `tools` appears in `droppedFields`, treat the current trajectory as
-   inconclusive about provider-facing tool availability and use a fresh,
-   low-context reproduction to capture an untruncated `context.compiled`
-   event;
-3. if the event is not truncated and `tools` is genuinely absent, trace the
-   prompt-build/provider-visible tool projection layer;
+1. inspect only `data.tools` type/count and tool names for the
+   `2026-09-26T02:02:25.474Z` event, without printing descriptions,
+   parameters, prompts or history;
+2. if `mimir_memory_search` is present, treat the OpenClaw policy/projection
+   path as validated through the compiled provider boundary and move the
+   investigation to local Qwen/OpenAI-compatible tool-call behavior and context
+   pressure;
+3. if it is absent, compare the concrete tool-name set against
+   `tools.effective` to identify the exact prompt-build filtering layer;
 4. do not change tool policy, Telegram policy, plugin registration or model
-   routing until this boundary is proven;
+   routing until the concrete tool-name set is known;
 5. keep migration 013, `mimir_ops`, PostgreSQL schema and shadow
    evaluator/generator unchanged.
 
