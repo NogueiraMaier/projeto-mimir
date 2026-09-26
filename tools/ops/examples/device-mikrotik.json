@@ -1,0 +1,12 @@
+{
+  "device_id": "11111111-1111-4111-8111-111111111111",
+  "site_id": "22222222-2222-4222-8222-222222222222",
+  "name": "mikrotik-lab",
+  "device_type": "router",
+  "adapter": "mikrotik-routeros",
+  "permission_mode": "READ",
+  "primary_access_id": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+  "accesses": [{"access_id": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb", "method": "ssh", "host": "192.0.2.10", "port": 22, "username": "mimir-readonly", "credential_ref": "ssh-agent"}],
+  "vendor": "MikroTik",
+  "model": "lab"
+}

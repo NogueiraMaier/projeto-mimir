@@ -64,7 +64,7 @@ describe("mimir-memory", () => {
       ),
     );
 
-    expect(manifest.version).toBe("0.2.6");
+    expect(manifest.version).toBe("0.2.7");
     expect(manifest.activation.onStartup).toBe(true);
     expect(manifest.contracts.tools).toEqual([
       "mimir_memory_search",
@@ -80,6 +80,8 @@ describe("mimir-memory", () => {
     delete process.env.OPENCLAW_SECRET_TEST;
 
     expect(environment.OPENCLAW_SECRET_TEST).toBeUndefined();
+    expect(environment.PGHOST).toBe("/run/postgresql");
+    expect(environment.PGPORT).toBe("5432");
     expect(environment.PGUSER).toBe("mimir_search");
     expect(environment.PGDATABASE).toBe("mimir_memory");
     expect(environment.PGOPTIONS).toContain(
@@ -88,6 +90,66 @@ describe("mimir-memory", () => {
     expect(environment.PGOPTIONS).toContain(
       "statement_timeout=60000",
     );
+  });
+
+  it("maps only dedicated PostgreSQL transport overrides", () => {
+    process.env.PGHOST = "must-not-be-inherited";
+    process.env.MIMIR_MEMORY_PGHOST = "10.51.1.2";
+    process.env.MIMIR_MEMORY_PGPORT = "5433";
+    process.env.MIMIR_MEMORY_PGDATABASE = "mimir_remote";
+    process.env.MIMIR_MEMORY_PGUSER = "mimir_search_remote";
+
+    const environment = __testing.createChildEnv(
+      "test-remote",
+    );
+
+    delete process.env.PGHOST;
+    delete process.env.MIMIR_MEMORY_PGHOST;
+    delete process.env.MIMIR_MEMORY_PGPORT;
+    delete process.env.MIMIR_MEMORY_PGDATABASE;
+    delete process.env.MIMIR_MEMORY_PGUSER;
+
+    expect(environment.PGHOST).toBe("10.51.1.2");
+    expect(environment.PGPORT).toBe("5433");
+    expect(environment.PGDATABASE).toBe("mimir_remote");
+    expect(environment.PGUSER).toBe("mimir_search_remote");
+  });
+
+  it("uses the configured memory model when present", () => {
+    expect(
+      __testing.resolveConfiguredSearchModel(
+        {
+          memory: {
+            search: {
+              model: "custom-embedding-model",
+            },
+          },
+        },
+        "fallback-model",
+      ),
+    ).toBe("custom-embedding-model");
+
+    expect(
+      __testing.resolveConfiguredSearchModel(
+        {},
+        "fallback-model",
+      ),
+    ).toBe("fallback-model");
+  });
+
+  it("validates the 768-dimensional embedding contract", () => {
+    const vector = Array.from(
+      { length: 768 },
+      (_, index) => (index + 1) / 1000,
+    );
+
+    expect(
+      __testing.validateEmbeddingVector(vector),
+    ).toEqual(vector);
+
+    expect(() =>
+      __testing.validateEmbeddingVector([1, 2, 3]),
+    ).toThrow(/768/);
   });
 
   it("canonicalizes inconsistent diagnostics to a safe error", () => {

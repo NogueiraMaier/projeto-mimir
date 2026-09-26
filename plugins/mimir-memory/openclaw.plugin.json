@@ -2,7 +2,7 @@
   "id": "mimir-memory",
   "name": "Mimir Memory",
   "description": "Consulta controlada da memória permanente e verificação em modo sombra.",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "configSchema": {
     "type": "object",
     "properties": {},

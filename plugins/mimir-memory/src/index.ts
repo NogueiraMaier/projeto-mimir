@@ -7,7 +7,13 @@ import { constants as fsConstants } from "node:fs";
 import { open } from "node:fs/promises";
 import { Type } from "typebox";
 import {
+  getEmbeddingProvider,
+  type EmbeddingProvider,
+  type EmbeddingProviderCreateOptions,
+} from "openclaw/plugin-sdk/embedding-providers";
+import {
   definePluginEntry,
+  type OpenClawPluginApi,
   type OpenClawPluginDefinition,
 } from "openclaw/plugin-sdk/plugin-entry";
 
@@ -20,6 +26,12 @@ const SHADOW_EVALUATOR =
   "mimir-evidence-shadow-evaluate.mjs";
 const SHADOW_LOG =
   "/var/log/openclaw/mimir-evidence-shadow.jsonl";
+
+const EMBEDDING_PROVIDER_ID = "local";
+const DEFAULT_EMBEDDING_MODEL =
+  "hf:ggml-org/embeddinggemma-300m-qat-q8_0-GGUF/" +
+  "embeddinggemma-300m-qat-Q8_0.gguf";
+const EMBEDDING_DIMENSIONS = 768;
 
 const EXECUTION_TIMEOUT_MS = 300_000;
 const SHADOW_TIMEOUT_MS = 170_000;
@@ -40,6 +52,20 @@ type SearchPayload = {
   result_count: number;
   results: unknown[];
 };
+
+type SearchRequest = {
+  query: string;
+  model: string;
+  embedding: number[];
+  limit: number;
+  min_similarity: number;
+};
+
+type ManagedEmbeddingCreateOptions =
+  EmbeddingProviderCreateOptions & {
+    acquireLocalService:
+      OpenClawPluginApi["runtime"]["llm"]["acquireLocalService"];
+  };
 
 type ShadowDiagnostic = {
   schema_version: number;
@@ -85,6 +111,14 @@ function isObject(
   );
 }
 
+function readDedicatedEnv(
+  name: string,
+  fallback: string,
+): string {
+  const value = process.env[name]?.trim();
+  return value ? value : fallback;
+}
+
 function createChildEnv(
   applicationName: string,
 ): NodeJS.ProcessEnv {
@@ -95,15 +129,228 @@ function createChildEnv(
     PATH: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
     LANG: "C.UTF-8",
     LC_ALL: "C.UTF-8",
-    PGHOST: "/run/postgresql",
-    PGDATABASE: "mimir_memory",
-    PGUSER: "mimir_search",
+    PGHOST: readDedicatedEnv(
+      "MIMIR_MEMORY_PGHOST",
+      "/run/postgresql",
+    ),
+    PGPORT: readDedicatedEnv(
+      "MIMIR_MEMORY_PGPORT",
+      "5432",
+    ),
+    PGDATABASE: readDedicatedEnv(
+      "MIMIR_MEMORY_PGDATABASE",
+      "mimir_memory",
+    ),
+    PGUSER: readDedicatedEnv(
+      "MIMIR_MEMORY_PGUSER",
+      "mimir_search",
+    ),
     PGAPPNAME: applicationName,
     PGCONNECT_TIMEOUT: "5",
     PGOPTIONS:
       "-c default_transaction_read_only=on " +
       "-c statement_timeout=60000 " +
       "-c lock_timeout=5000",
+  };
+}
+
+function resolveConfiguredSearchModel(
+  config: unknown,
+  fallback: string,
+): string {
+  const root = isObject(config) ? config : {};
+  const memory = isObject(root.memory) ? root.memory : {};
+  const search = isObject(memory.search) ? memory.search : {};
+  const configured =
+    typeof search.model === "string"
+      ? search.model.trim()
+      : "";
+
+  return configured || fallback;
+}
+
+function resolveConfiguredLocalOptions(
+  config: unknown,
+): {
+  modelPath?: string;
+  modelCacheDir?: string;
+} | undefined {
+  const root = isObject(config) ? config : {};
+  const memory = isObject(root.memory) ? root.memory : {};
+  const search = isObject(memory.search) ? memory.search : {};
+  const local = isObject(search.local) ? search.local : {};
+
+  const modelPath =
+    typeof local.modelPath === "string" &&
+    local.modelPath.trim()
+      ? local.modelPath.trim()
+      : undefined;
+  const modelCacheDir =
+    typeof local.modelCacheDir === "string" &&
+    local.modelCacheDir.trim()
+      ? local.modelCacheDir.trim()
+      : undefined;
+
+  if (
+    modelPath === undefined &&
+    modelCacheDir === undefined
+  ) {
+    return undefined;
+  }
+
+  return {
+    ...(modelPath !== undefined ? { modelPath } : {}),
+    ...(modelCacheDir !== undefined
+      ? { modelCacheDir }
+      : {}),
+  };
+}
+
+function validateEmbeddingVector(
+  value: unknown,
+): number[] {
+  if (
+    !Array.isArray(value) ||
+    value.length !== EMBEDDING_DIMENSIONS ||
+    !value.every(
+      (item) =>
+        typeof item === "number" &&
+        Number.isFinite(item),
+    )
+  ) {
+    throw new Error(
+      `Embedding inválido; esperado vetor finito com ${EMBEDDING_DIMENSIONS} dimensões.`,
+    );
+  }
+
+  const norm = Math.sqrt(
+    value.reduce(
+      (total, item) => total + item * item,
+      0,
+    ),
+  );
+
+  if (!Number.isFinite(norm) || norm <= 0) {
+    throw new Error(
+      "Embedding inválido; norma deve ser positiva.",
+    );
+  }
+
+  return value;
+}
+
+let embeddingProviderPromise:
+  Promise<EmbeddingProvider> | null = null;
+
+async function createManagedEmbeddingProvider(
+  api: OpenClawPluginApi,
+): Promise<EmbeddingProvider> {
+  const adapter = getEmbeddingProvider(
+    EMBEDDING_PROVIDER_ID,
+    api.config,
+  );
+
+  if (adapter === undefined) {
+    throw new Error(
+      "Provider local de embeddings não está registrado no OpenClaw.",
+    );
+  }
+
+  const fallbackModel =
+    adapter.defaultModel?.trim() ||
+    DEFAULT_EMBEDDING_MODEL;
+  const model = resolveConfiguredSearchModel(
+    api.config,
+    fallbackModel,
+  );
+  const local = resolveConfiguredLocalOptions(
+    api.config,
+  );
+
+  const options: ManagedEmbeddingCreateOptions = {
+    config: api.config,
+    provider: EMBEDDING_PROVIDER_ID,
+    model,
+    dimensions: EMBEDDING_DIMENSIONS,
+    acquireLocalService:
+      api.runtime.llm.acquireLocalService,
+    ...(local !== undefined ? { local } : {}),
+  };
+
+  const created = await adapter.create(options);
+
+  if (created.provider === null) {
+    throw new Error(
+      "Provider local de embeddings não ficou disponível.",
+    );
+  }
+
+  if (
+    created.provider.dimensions !== undefined &&
+    created.provider.dimensions !== EMBEDDING_DIMENSIONS
+  ) {
+    await created.provider.close?.();
+    throw new Error(
+      `Provider local retornou ${created.provider.dimensions} dimensões; esperado ${EMBEDDING_DIMENSIONS}.`,
+    );
+  }
+
+  return created.provider;
+}
+
+function getManagedEmbeddingProvider(
+  api: OpenClawPluginApi,
+): Promise<EmbeddingProvider> {
+  if (embeddingProviderPromise === null) {
+    embeddingProviderPromise =
+      createManagedEmbeddingProvider(api).catch(
+        (error) => {
+          embeddingProviderPromise = null;
+          throw error;
+        },
+      );
+  }
+
+  return embeddingProviderPromise;
+}
+
+async function closeManagedEmbeddingProvider(): Promise<void> {
+  const pending = embeddingProviderPromise;
+  embeddingProviderPromise = null;
+
+  if (pending === null) {
+    return;
+  }
+
+  try {
+    const provider = await pending;
+    await provider.close?.();
+  } catch {
+    // Falha ao liberar provider não bloqueia shutdown.
+  }
+}
+
+async function createSearchRequest(
+  api: OpenClawPluginApi,
+  query: string,
+  limit: number,
+  minSimilarity: number,
+): Promise<SearchRequest> {
+  const provider = await getManagedEmbeddingProvider(
+    api,
+  );
+  const embeddingInput =
+    `task: search result | query: ${query}`;
+  const vector = validateEmbeddingVector(
+    await provider.embed(embeddingInput),
+  );
+
+  return {
+    query,
+    model: provider.model,
+    embedding: vector,
+    limit,
+    min_similarity: minSimilarity,
   };
 }
 
@@ -224,21 +471,25 @@ function validateSearchPayload(
   };
 }
 
-function runSemanticSearch(
+async function runSemanticSearch(
+  api: OpenClawPluginApi,
   query: string,
   limit: number,
   minSimilarity: number,
 ): Promise<SearchPayload> {
-  return new Promise((resolve, reject) => {
+  const request = await createSearchRequest(
+    api,
+    query,
+    limit,
+    minSimilarity,
+  );
+
+  return await new Promise((resolve, reject) => {
     const child = spawn(
       NODE_BINARY,
       [
         SEARCH_SCRIPT,
         "--json",
-        "--limit",
-        String(limit),
-        "--min-similarity",
-        String(minSimilarity),
       ],
       {
         shell: false,
@@ -378,7 +629,10 @@ function runSemanticSearch(
       }
     });
 
-    child.stdin.end(query, "utf8");
+    child.stdin.end(
+      JSON.stringify(request),
+      "utf8",
+    );
   });
 }
 
@@ -1095,6 +1349,7 @@ const plugin: OpenClawPluginDefinition = definePluginEntry({
         }
 
         const payload = await runSemanticSearch(
+          api,
           query,
           limit,
           minSimilarity,
@@ -1128,6 +1383,7 @@ const plugin: OpenClawPluginDefinition = definePluginEntry({
       "gateway_stop",
       async () => {
         await stopShadowProcessing();
+        await closeManagedEmbeddingProvider();
       },
       {
         timeoutMs: 10_000,
@@ -1138,6 +1394,8 @@ const plugin: OpenClawPluginDefinition = definePluginEntry({
 
 export const __testing = {
   createChildEnv,
+  resolveConfiguredSearchModel,
+  validateEmbeddingVector,
   sanitizeShadowDiagnostic,
 };
 

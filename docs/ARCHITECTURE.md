@@ -6,11 +6,15 @@ O agente main possui a identidade Mimir.
 
 Ele coordena tarefas, consulta memória e direciona agentes especializados.
 
+## Agentes especializados
+
+O repositório documenta especializações futuras para SOC, OSINT, Cyber-Lab, redes, operações, desenvolvimento, negócios e auditoria de memória/segurança. A documentação não deve inferir implantação somente pela ausência de evidência.
+
 ## Memória operacional
 
 O memory-core nativo do OpenClaw mantém contexto operacional de curto prazo.
 
-Características confirmadas:
+Características do snapshot documentado em 2026-07-30, não revalidadas nesta revisão local:
 
 - Backend builtin
 - Banco SQLite local
@@ -37,6 +41,27 @@ Componentes:
 - Auditoria
 - Aprovação humana
 
+## Camada operacional
+
+IMPLEMENTADO no repositório, NÃO VALIDADO EM PRODUÇÃO. A camada em `tools/ops`
+estende a fundação operacional e permanece separada do plugin e das funções de
+memória. A migration de schema 013 modela CMDB e intervenções; o provisionamento
+da role dedicada `mimir_ops` fica em script separado.
+acessa somente uma API SQL controlada com autenticação peer e identidade
+inicialmente desabilitada. `mimir_app` não recebe acesso direto às tabelas ops.
+
+O CLI mantém entradas JSON para plano/diagnóstico legado e adiciona inventário,
+histórico e relatórios PostgreSQL. Catálogos por adapter restringem READ, PLAN e
+EXECUTE; alteração exige plano aprovado, preparação, auditoria e validação.
+Somente `set-hostname` transitório no adapter Linux está implementado para
+alteração. MikroTik permanece em diagnóstico. Rollback é manual.
+
+A finalização associa estado encontrado, ações, validação, observação atualizada
+do inventário, histórico e relatório. Intervenções técnicas `validated` não são
+promovidas à memória automaticamente: `memory_handoff` v1 é interface PARCIAL,
+confidential, para revisão humana, duplicidade, contradições e preservação de
+versões. `closed` permanece false. Nenhuma ferramenta de shell foi adicionada
+ao agente main. Detalhes e limites: [OPERATIONS.md](OPERATIONS.md).
 
 ## Ingestão protegida de sessões
 
