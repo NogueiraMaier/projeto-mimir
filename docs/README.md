@@ -110,3 +110,16 @@ Nunca promover TARGET ou WATCHLIST para CURRENT sem validação documentada.
 Status: **TARGET / NÃO IMPLEMENTADO**.
 
 A discussão de acesso/análise de desktop ou endpoint não está incluída nesse roadmap e deverá ser tratada separadamente antes de ser documentada como arquitetura.
+
+
+### Field Assessment / SOC-OSINT
+
+- `FIELD_ASSESSMENT_SOC_OSINT_ROADMAP.md` — projeto futuro de Field Probe, WireGuard, HUD, diagnóstico de host/rede, Windows, OSINT/SOC, Risk Engine, NIST CSF 2.0, checklist, evidências, relatório e remediação controlada.
+
+Queue ID: `MIMIR-FIELD-ASSESSMENT-01`
+
+Status: **FILA / TARGET / NÃO IMPLEMENTADO**.
+
+Ao retomar, iniciar por `FA-0 — especificação`.
+
+A existência do roadmap não autoriza criação do probe, EXECUTE ou acesso irrestrito ao equipamento.
