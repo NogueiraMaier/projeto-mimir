@@ -348,21 +348,60 @@ Validated:
 - no production runtime file was replaced and the Gateway remained loaded with
   0.2.6 during this checkpoint.
 
+Controlled production deployment completed successfully on 2026-09-25.
+
+Production runtime result:
+
+- deployed plugin source/build from validated commit
+  `a7153997a32ab70ee29b035d2ff66ba15d071cdf`;
+- OpenClaw Gateway stopped cleanly before the plugin/helper contract change and
+  restarted successfully afterward;
+- on-disk package and manifest version: `0.2.7`;
+- runtime packageVersion/version: `0.2.7`;
+- runtime status: `loaded`;
+- runtime activated: true;
+- `mimir_memory_search` registered;
+- typed hooks remain `gateway_stop` and `message_received`;
+- production runtime resolved `typebox` from plugin-local dependencies and
+  `openclaw/plugin-sdk/embedding-providers` from OpenClaw 2026.9.5;
+- deployment log:
+  `/var/backups/mimir-memory-0.2.7-deploy-20260925T215150`;
+- rollback backup remains:
+  `/var/backups/mimir-memory-0.2.6-20260925T203923`;
+- persisted install-record metadata still reports 0.2.6, while the actually
+  loaded runtime reports 0.2.7; do not rewrite that install record during this
+  checkpoint unless a separate registration-maintenance action is authorized.
+
+Production 0.2.7 SHA-256 baseline:
+
+- `src/index.ts`:
+  `06f6e00ae08c97a14afea345eb109538912090c19f23925d9d42c2a9d1449326`;
+- `src/openclaw-embedding-providers.d.ts`:
+  `d25f8bad1dc48b164e15b718550f12b0d6834a843597a0abd4799a7b9bd45f93`;
+- `dist/index.js`:
+  `599a316ff4eb6c421f305d8156d0b7d5c3fe5304d691d40943053c5d3ab72c0d`;
+- `package.json`:
+  `7e30e2c9e302ecf57d2a80d5d7cb1eba5c58adf3bb197448eae50523b4a58e83`;
+- `openclaw.plugin.json`:
+  `127a0115bb44324d85dac5d9cad393ecc78c414785cc1510cce20c3d699f5144`;
+- `tsconfig.json`:
+  `36fd3d6138dacde7445cc6571d24540ebfb1d1e870eb5c16922cc38a5e352bde`;
+- `tools/run-tool.mjs`:
+  `295e53fed105f3aebdfb5d7c66d7cf638829aae2d76f85bb07a39ec7ed4ddfe0`;
+- semantic helper:
+  `d586ee22a44f53fc08d439c601071db6106efb1671fe851a82ca2ef84a375d79`.
+
 Next executable action:
 
-1. execute the authorized controlled production deployment of
-   `mimir-memory 0.2.7` using the validated isolated checkout and the verified
-   0.2.6 backup/rollback checkpoint;
-2. stop the OpenClaw Gateway before replacing either the plugin or semantic
-   helper, preventing an old 0.2.6 process from invoking a new 0.2.7 helper
-   contract;
-3. deploy only the whitelisted 0.2.7 files, preserve the production
-   `node_modules` directory, rebuild with `--noEmitOnError`, and verify
-   runtime registration reports 0.2.7;
-4. run direct `tools.invoke` for `mimir_memory_search`; automatically roll
-   back to 0.2.6 if deployment/build/start/runtime validation fails;
-5. only after direct invocation passes, repeat the Telegram memory request;
-6. keep migration 013, `mimir_ops`, tool permissions and Telegram policy
+1. invoke `mimir_memory_search` directly through Gateway `tools.invoke`
+   against the existing Telegram direct session, verifying the complete path
+   from tool policy through managed local embedding lifecycle to PostgreSQL;
+2. on failure, capture the structured RPC error plus Gateway logs before making
+   any further runtime change; do not automatically reinterpret a tool failure
+   as a deploy failure because runtime 0.2.7 is already loaded and healthy;
+3. only after direct invocation succeeds, repeat the equivalent memory request
+   from Telegram;
+4. keep migration 013, `mimir_ops`, tool permissions and Telegram policy
    unchanged.
 
 ## PostgreSQL laboratory
