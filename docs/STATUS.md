@@ -103,7 +103,8 @@ históricas da memória e de governança não foram encerradas por esta revisão
 - **VALIDADO:** canal Telegram `@MimirAssistenteBot` operacional; entrada, resposta e envio proativo confirmados; DM restrita por allowlist; token fora do Git.
 - **VALIDADO TELEGRAM-02:** em sessão nova, o runtime registrou `context.compiled (2 tools)`, `tool.call mimir_memory_search`, `tool.result ... ok` e `session.ended success`; o caminho explícito Telegram -> agente -> memória 0.2.7 -> embedding -> PostgreSQL está aprovado.
 - **PENDENTE P1 MEMÓRIA — CAUSA CONFIRMADA:** produção possui apenas 5 memórias ativas, todas embedadas, todas originadas de `MEMORY.md` em 2026-07-30; nenhuma contém migration 013, LAB-01..LAB-09, `mimir_ops` ou `schema_version`. A falha semântica observada no Telegram é de cobertura do corpus, não de embedding/ranking.
-- **PRÓXIMO:** inventariar em modo somente leitura eventos de ingestão, fontes de sessão protegidas, candidatos, revisões e embeddings pendentes para localizar onde os fatos operacionais deixam de chegar ao corpus ativo; depois preparar atualização revisada com proveniência explícita. Classes de notificações Telegram ficam para o checkpoint seguinte.
+- **PIPELINE DE INGESTÃO — GARGALO LOCALIZADO:** `memory_events` tem somente 2 documentos Markdown + 1 sessão protegida, todos de 2026-07-30; não há candidatos, revisões recentes nem embeddings pendentes. O conhecimento operacional atual nunca chegou à ingestão, portanto o bloqueio ocorre antes de consolidação/revisão/promoção.
+- **PRÓXIMO:** inventariar somente leitura o mecanismo runtime de ingestão (cron/OpenRC/processos/scripts e sessão capturável) para confirmar se existe automação ou se o fluxo permaneceu manual/experimental; não escrever no banco durante esse diagnóstico.
 - **NÃO AUTORIZADO AINDA:** equipamento real em EXECUTE.
 
 Lista mestre de execução: [MIMIR_V1_EXECUTION_PLAN.md](MIMIR_V1_EXECUTION_PLAN.md).
