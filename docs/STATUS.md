@@ -122,3 +122,22 @@ A documentação estabelece que a migração física deve ocorrer separadamente 
 Revisão associada:
 
 - [review/architecture/2026-09-25-gateway-model-routing.md](review/architecture/2026-09-25-gateway-model-routing.md).
+
+
+## Atualização documental — security governance e assurance, 2026-09-26
+
+Foi adicionado:
+
+- [SECURITY_GOVERNANCE_AND_ASSURANCE_ROADMAP.md](SECURITY_GOVERNANCE_AND_ASSURANCE_ROADMAP.md)
+
+Estado: **PLANEJADO / NÃO IMPLEMENTADO**.
+
+O documento registra evolução futura de inventário de IA/data flow, Zero Trust contextual, Risk Engine, attack-surface drift, control assurance, auditabilidade, vulnerability management, ATT&CK/detection engineering, resposta a incidentes, RPO/RTO e maturidade.
+
+Nenhum controle novo foi ativado por essa atualização.
+
+Nenhuma permissão foi ampliada.
+
+O `NEXT_ACTION` operacional atual permanece inalterado.
+
+Acesso/análise de desktop ou endpoint foi deliberadamente excluído desta rodada documental.
