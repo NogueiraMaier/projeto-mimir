@@ -514,40 +514,40 @@ Active-run and trajectory diagnostics for the failed Telegram memory turn:
   checked before interpreting the missing fields as an actual provider
   boundary condition.
 
-Trajectory truncation check completed for the failed 23:02 Telegram turn.
+Trajectory payload projection follow-up for the failed 23:02 Telegram turn:
 
-Evidence:
-
-- target `context.compiled` event timestamp:
+- target `context.compiled` event remains
   `2026-09-26T02:02:25.474Z`;
-- event is not truncated: no `truncated`, `reason`, `originalBytes`,
-  `limitBytes` or `droppedFields` metadata is present;
-- `data.tools` is present;
-- `providerVisibleTools` is absent;
-- in OpenClaw 2026.9.5 `context.compiled` records `tools` from
-  `providerVisibleTools` directly when tool-search compaction is not active;
-  `providerVisibleTools` is only recorded as a separate field when
-  `toolSearchCompacted` is true.
+- the outer event is not oversized/truncated, but `data.tools` materializes as
+  the literal diagnostic sentinel `"[Truncated]"`;
+- OpenClaw 2026.9.5 `sanitizeDiagnosticPayload()` uses
+  `projectDiagnosticValue()` with a shared 64-node projection budget; when
+  that budget is exhausted a nested value is replaced by `"[Truncated]"`.
+  Therefore this sentinel is diagnostic-projection truncation, not evidence
+  that the provider received zero tools;
+- the prior `route=compact_only` log is also diagnostic-only in this code
+  path: OpenClaw explicitly logs that this pressure estimate does not compact
+  or discard history before the admitted provider attempt.
 
-Therefore the previous conclusion that the model boundary contained no tools
-was incorrect. The event did retain its `tools` field. The next diagnostic
-must inspect the safe structural shape and tool names in that field before
-drawing conclusions about whether `mimir_memory_search` was among them.
+The current long Telegram session therefore cannot prove the concrete
+provider-facing tool-name set from its retained trajectory alone.
 
 Next executable action:
 
-1. inspect only `data.tools` type/count and tool names for the
-   `2026-09-26T02:02:25.474Z` event, without printing descriptions,
-   parameters, prompts or history;
-2. if `mimir_memory_search` is present, treat the OpenClaw policy/projection
-   path as validated through the compiled provider boundary and move the
-   investigation to local Qwen/OpenAI-compatible tool-call behavior and context
-   pressure;
-3. if it is absent, compare the concrete tool-name set against
-   `tools.effective` to identify the exact prompt-build filtering layer;
-4. do not change tool policy, Telegram policy, plugin registration or model
-   routing until the concrete tool-name set is known;
-5. keep migration 013, `mimir_ops`, PostgreSQL schema and shadow
+1. run a fresh Telegram session reproduction using user-driven `/new` with the
+   test payload in the same message, so the new session starts with minimal
+   history while preserving the previous transcript in storage;
+2. immediately inspect the fresh session trajectory for
+   `context.compiled.data.tools`, tool names, `tool.call` and
+   `tool.result`;
+3. if `mimir_memory_search` is present and called successfully, classify the
+   old failure as long-session/model-behavior related rather than policy or
+   plugin availability;
+4. if it is present but not called, investigate Qwen/OpenAI-compatible tool
+   selection behavior; if absent, investigate prompt-build projection;
+5. do not change tool policy, Telegram policy, plugin registration or model
+   routing for this reproduction;
+6. keep migration 013, `mimir_ops`, PostgreSQL schema and shadow
    evaluator/generator unchanged.
 
 ## PostgreSQL laboratory
