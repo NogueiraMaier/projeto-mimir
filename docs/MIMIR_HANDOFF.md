@@ -402,20 +402,36 @@ Production runtime deployment checkpoint:
   package/runtime reports 0.2.7; this is recorded metadata drift, not a runtime
   version mismatch.
 
+Direct production invocation completed successfully on 2026-09-25.
+
+Evidence:
+
+- `tools.effective` and the direct Gateway `tools.invoke` validation block
+  completed under fail-fast semantics and reached
+  `=== MIMIR MEMORY DIRECT INVOCATION: PASS ===`;
+- direct invocation evidence directory:
+  `/var/backups/mimir-memory-0.2.7-direct-20260925T223314`;
+- the managed llama.cpp local embedding service was started by OpenClaw at
+  22:33:22 and reported ready with pid 6727, spawn 40 ms, ready 306 ms;
+- the older `node-llama-cpp` errors visible in the tailed logs are historical
+  entries from before the 0.2.7 deployment and are not evidence of the current
+  direct invocation failing;
+- therefore the explicit `mimir_memory_search` path is now validated through
+  Gateway policy, managed local embedding lifecycle and semantic-search
+  execution. The shadow path remains a separate validation item.
+
 Next executable action:
 
-1. query `tools.effective` for the existing Telegram direct session to confirm
-   `mimir_memory_search` remains policy-visible after restart;
-2. invoke `mimir_memory_search` directly through Gateway `tools.invoke`
-   against that session, using a low-risk read-only semantic query and checking
-   for `ok=true`, a 768-dimensional embedding payload and PostgreSQL-backed
-   results (zero results is still a valid transport-path success);
-3. on failure, capture the structured RPC error plus Gateway logs before making
-   any further runtime change;
-4. only after direct invocation succeeds, repeat the equivalent memory request
-   from Telegram;
-5. keep migration 013, `mimir_ops`, tool permissions and Telegram policy
-   unchanged.
+1. repeat a memory-recall request through the existing Telegram direct session
+   `agent:main:telegram:direct:242921698`;
+2. verify from Gateway logs/session output that Telegram can actually select and
+   execute `mimir_memory_search`, rather than merely answering from model
+   context;
+3. if successful, close `MIMIR-V1-TELEGRAM-02` and record the runtime memory
+   0.2.7 explicit-tool path as production-validated;
+4. keep migration 013, `mimir_ops`, tool permissions and Telegram policy
+   unchanged;
+5. do not mark the shadow evaluator/generator path healthy; it remains separate.
 
 ## PostgreSQL laboratory
 
