@@ -156,16 +156,17 @@ Validação em sessão Telegram nova confirmou o caminho explícito de memória:
 - o caminho shadow continua separado e não foi declarado saudável.
 
 **Próxima atividade:** fechar primeiro o bloqueador P1 da memória permanente.
-A fronteira suportada `chat.history` já foi validada na sessão Telegram:
-`senderIsOwner=true`, IDs/seq, timestamp, paginação e deltaCursor estão
-disponíveis sem acesso direto ao SQLite. Antes de implementar, executar survey
-estrutural read-only das demais sessões concluídas (HUD/ACP/Maestro/main) para
-definir fail-closed quais classes preservam proveniência owner positiva e quais
-devem ser excluídas. Depois implementar/testar em isolamento o coletor API-based
-v2, mantendo o script legado e sem deploy em produção. Só após validação pedir
-autorização separada para escrita/ativação e então retomar candidate → revisão
-humana → active → embedding. Não ampliar permissões nem autorizar EXECUTE em
-equipamento real.
+O survey estrutural read-only concluiu que todas as 12 sessões `done` atuais
+(Telegram, HUD, ACP bridge, Maestro e main) preservam proveniência owner
+positiva, IDs/seq/timestamp, paginação e não apresentam truncamento. Implementar
+agora no repositório um coletor API-based v2 somente dry-run usando
+`sessions --json` + `chat.history`, com política fail-closed, classes
+explicitamente permitidas, exclusão de system/toolResult/thinking/toolCall,
+detecção de segredo e guardas de paginação/truncamento. Manter o coletor legado
+intacto e não fazer deploy nem escrita em produção. Após testes isolados,
+solicitar autorização separada para validação na VPS e só então retomar
+candidate → revisão humana → active → embedding. Não ampliar permissões nem
+autorizar EXECUTE em equipamento real.
 
 ## Protocolo de continuidade entre sessões
 
