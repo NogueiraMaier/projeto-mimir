@@ -484,24 +484,48 @@ server-derived session inventory projection. It is useful evidence, but the
 remaining discrepancy is now between that projection and the concrete
 model-facing tool set of the actual Telegram run.
 
+Active-run diagnostic completed for the failed Telegram memory turn.
+
+Evidence:
+
+- the 23:02:24-23:02:44 -03 Telegram turn maps to the trajectory run beginning
+  at 02:02:25 in the session tail;
+- that run has `session.started -> context.compiled -> prompt.submitted ->
+  model.completed -> trace.artifacts -> session.ended success` and contains no
+  `tool.call` / `tool.result` event;
+- therefore the visible `TOOL_UNAVAILABLE: mimir_memory_search` response for
+  that turn was generated as model text; it was not a runtime rejection of an
+  attempted `mimir_memory_search` invocation;
+- the provider/model for the turn was
+  `mimir-gpu//var/lib/mimir/models/Qwen3-4B-Q4_K_M.gguf`, using the
+  OpenAI-compatible chat-completions transport;
+- no global `tools.byProvider` override is configured and
+  `agents.entries.main.tools.alsoAllow` still contains
+  `mimir_memory_search` and `web_search`;
+- immediately before provider submission OpenClaw logged
+  `route=compact_only`, `estimatedPromptTokens=15955` and
+  `promptBudgetBeforeReserve=12288`, so context pressure is a new relevant
+  observation. Do not yet conclude that compaction removed tools; the concrete
+  model-facing tool definitions must be inspected first;
+- an older trajectory entry does contain a historical
+  `mimir_memory_search` tool call followed by an error, but it is not the
+  current 23:02 post-deploy failure and must not be conflated with it.
+
 Next executable action:
 
-1. inspect the runtime trajectory for
-   `agent:main:telegram:direct:242921698` using read-only
-   `openclaw sessions tail --session-key ...` to determine the provider/model,
-   whether any tool call was emitted, and the terminal status of the 23:03
-   Telegram turn;
-2. inspect the main agent/provider-specific tool policy and active model
-   selection without mutating config, especially any provider/model/runtime
-   restriction applied after the session-level tool projection;
-3. if needed, inspect the stored transcript/trajectory for the failed turn to
-   distinguish (a) the model merely generating the literal
-   `TOOL_UNAVAILABLE` text from (b) the runtime rejecting an attempted tool
-   call;
-4. do not change `tools.profile`, `alsoAllow`, deny lists, Telegram policy,
-   plugin registration, or model routing until the exact active-run layer is
-   identified;
-5. keep migration 013, `mimir_ops`, PostgreSQL schema and shadow
+1. export the current session trajectory to a temporary workspace under
+   `/var/tmp` only, leaving `/var/lib/openclaw/workspace` untouched;
+2. parse only trajectory metadata/tool definitions for the latest failed turn,
+   especially `context.compiled.data.tools` /
+   `providerVisibleTools`, without printing prompt/history content;
+3. determine whether `mimir_memory_search` was actually included in the tool
+   schema sent to the local Qwen provider for the 23:02 turn;
+4. if it was included, investigate local Qwen/OpenAI-compatible tool-call
+   generation behavior and context-pressure effects; if it was absent, trace
+   the prompt-build/tool-projection layer that removed it;
+5. do not change tool policy, Telegram policy, plugin registration or model
+   routing until this boundary is proven;
+6. keep migration 013, `mimir_ops`, PostgreSQL schema and shadow
    evaluator/generator unchanged.
 
 ## PostgreSQL laboratory
