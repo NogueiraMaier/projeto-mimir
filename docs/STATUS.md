@@ -99,9 +99,11 @@ históricas da memória e de governança não foram encerradas por esta revisão
 - **PRODUÇÃO INTACTA:** `mimir_memory` segue em versões 1–12 e sem role `mimir_ops`.
 - **VALIDADO P0:** bootstrap canônico da memória v1 reproduziu versões 1–12 em banco descartável; o SQL histórico original da migration 001 continua não recuperado e é tratado como lacuna histórica documentada.
 - **LAB TEMPORÁRIO REMOVIDO:** `/var/tmp/mimir-pg13-lab` foi parado e removido após evidências, backup/restore e bootstrap; produção permaneceu operacional em 1–12.
-- **VALIDADO P0 RUNTIME:** `mimir-memory` runtime/package/recorded em 0.2.6, registry `fresh`, `plugins.allow` explícito e conjunto de 41 plugins habilitados preservado; config/doctor/health aprovados.
+- **VALIDADO P0 RUNTIME:** `mimir-memory 0.2.7` carregado/ativado em produção; `mimir_memory_search` registrado; caminho direto `tools.invoke` aprovado com embedding local gerenciado e consulta PostgreSQL; backup/rollback 0.2.6 preservado. O registro histórico de instalação ainda mostra 0.2.6 e não foi reescrito.
 - **VALIDADO:** canal Telegram `@MimirAssistenteBot` operacional; entrada, resposta e envio proativo confirmados; DM restrita por allowlist; token fora do Git.
-- **PRÓXIMO:** validar pelo Telegram consultas somente leitura e acesso às ferramentas já autorizadas ao agente `main`, mantendo os limites atuais.
+- **VALIDADO TELEGRAM-02:** em sessão nova, o runtime registrou `context.compiled (2 tools)`, `tool.call mimir_memory_search`, `tool.result ... ok` e `session.ended success`; o caminho explícito Telegram -> agente -> memória 0.2.7 -> embedding -> PostgreSQL está aprovado.
+- **PENDENTE P1 MEMÓRIA:** a resposta semântica do teste não recuperou corretamente os fatos de migration 013/LAB-01..LAB-09; cobertura/relevância do corpus e o caminho shadow permanecem separados da validação de disponibilidade da ferramenta.
+- **PRÓXIMO:** definir as classes de notificações automáticas permitidas no Telegram e validar, em trilha separada, qualidade/cobertura da memória permanente.
 - **NÃO AUTORIZADO AINDA:** equipamento real em EXECUTE.
 
 Lista mestre de execução: [MIMIR_V1_EXECUTION_PLAN.md](MIMIR_V1_EXECUTION_PLAN.md).
