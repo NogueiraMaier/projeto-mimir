@@ -107,7 +107,8 @@ históricas da memória e de governança não foram encerradas por esta revisão
 - **BLOQUEADOR P1 CONFIRMADO:** os scripts de captura/ingestão de sessão ainda são os de 2026-07-30 e esperam o layout legado `agents/main/sessions/sessions.json` + JSONL. O OpenClaw 2026.9.5 usa SQLite canônico em `agents/<agentId>/agent/openclaw-agent.sqlite`; `mimir-ingest-session.py` continua aceitando somente `--dry-run`.
 - **STORE ATUAL VALIDADO:** CLI canônica enxerga 18 sessões no SQLite principal, 12 com `status=done`; a única linha de cron encontrada é `mimir-security-audit --scheduled` e não existe evidência de agendamento de ingestão de memória. Compatibilidade do coletor: `sessions.json=true`, JSONL=true, SQLite=false.
 - **CHAT.HISTORY VALIDADO:** probe read-only da sessão Telegram confirmou `senderIsOwner=true`, IDs/seq, timestamp, paginação e deltaCursor; a fronteira suportada é suficiente para projetar o coletor sem SQL direto. O payload também contém system/toolResult/thinking/toolCall, que deverão ser excluídos explicitamente.
-- **PRÓXIMO:** fazer survey estrutural read-only das demais sessões `done` (HUD/ACP/Maestro/main) para definir quais classes preservam proveniência owner positiva; depois implementar/testar o coletor API-based v2 sem deploy em produção.
+- **SURVEY DE SESSÕES CONCLUÍDO:** 12/12 sessões `done` (Telegram, HUD, ACP bridge, Maestro e main) passaram com `senderIsOwner=true` para todas as mensagens user, IDs/seq/timestamp presentes, paginação disponível e nenhum sinal de truncamento.
+- **PRÓXIMO:** implementar/testar no repositório um coletor v2 dry-run baseado em `sessions --json` + `chat.history`, mantendo o coletor legado intacto e sem deploy/escrita em produção.
 - **NÃO AUTORIZADO AINDA:** equipamento real em EXECUTE.
 
 Lista mestre de execução: [MIMIR_V1_EXECUTION_PLAN.md](MIMIR_V1_EXECUTION_PLAN.md).
