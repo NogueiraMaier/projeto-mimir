@@ -220,3 +220,42 @@ evolução de model routing
 ```
 
 Não misturar mudança de host, mudança de modelo, mudança de provider, mudança de tool policy e mudança de governança de memória na mesma etapa sem decisão explícita.
+
+
+## Extensão TARGET — segurança orientada por risco e evidência
+
+A arquitetura TARGET poderá incorporar, de forma incremental e somente após validação, as capacidades descritas em [SECURITY_GOVERNANCE_AND_ASSURANCE_ROADMAP.md](SECURITY_GOVERNANCE_AND_ASSURANCE_ROADMAP.md).
+
+Visão conceitual:
+
+```text
+                      MÍMIR
+                        |
+             +----------+----------+
+             |                     |
+      Capability Router         Risk Engine
+             |                     |
+             +----------+----------+
+                        |
+                   Policy Engine
+                        |
+              Zero-Trust Decision
+                        |
+        +---------------+---------------+
+        |               |               |
+      Agent            Tool           Engine
+        |               |               |
+        +---------------+---------------+
+                        |
+                     Evidence
+                        |
+                 Control Assurance
+                        |
+               Audit / SOC / Memory
+```
+
+Esse desenho é **TARGET**, não CURRENT.
+
+A extensão não substitui Capability Router, Engine Registry, Memory, Operations ou agentes especialistas; ela acrescenta contexto de risco, autorização e verificação de efetividade dos controles.
+
+Acesso/análise do desktop ou endpoint não faz parte desta extensão documentada e permanece pendente de discussão separada.
