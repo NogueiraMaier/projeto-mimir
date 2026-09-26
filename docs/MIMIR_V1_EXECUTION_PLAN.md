@@ -156,16 +156,16 @@ Validação em sessão Telegram nova confirmou o caminho explícito de memória:
 - o caminho shadow continua separado e não foi declarado saudável.
 
 **Próxima atividade:** fechar primeiro o bloqueador P1 da memória permanente.
-O inventário confirmou que os fatos operacionais atuais não chegaram à ingestão
-e revelou incompatibilidade estrutural: os scripts de captura/ingestão ainda
-esperam `sessions.json` + JSONL, enquanto OpenClaw 2026.9.5 usa SQLite canônico
-por agente. `mimir-ingest-session.py` continua somente dry-run. Inventariar o
-store SQLite atual via CLI/API read-only, inspecionar a linha relevante do root
-crontab e projetar/validar em isolamento uma captura compatível antes de qualquer
-escrita em produção. Só depois retomar candidate → revisão humana → active →
-embedding. A definição das classes de notificações automáticas Telegram fica no
-checkpoint seguinte. Não ampliar permissões nem autorizar EXECUTE em equipamento
-real.
+O store canônico SQLite foi confirmado com 18 sessões, 12 concluídas, e não há
+agendamento de ingestão de memória identificado; a linha de cron encontrada é
+somente `mimir-security-audit`. O coletor atual é definitivamente legado
+(`sessions.json`/JSONL e sem suporte ao SQLite). Validar agora, somente leitura
+e sem expor conteúdo, se `chat.history` fornece owner marker, IDs/seq,
+paginação e sinais de truncamento/redaction suficientes para um novo coletor
+baseado nas APIs suportadas do OpenClaw 2026.9.5. Só depois implementar/testar em
+isolamento e pedir autorização separada para escrita em produção. Em seguida
+retomar candidate → revisão humana → active → embedding. Não ampliar permissões
+nem autorizar EXECUTE em equipamento real.
 
 ## Protocolo de continuidade entre sessões
 
