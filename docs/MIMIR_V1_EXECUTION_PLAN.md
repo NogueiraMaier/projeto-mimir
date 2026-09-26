@@ -156,17 +156,14 @@ Validação em sessão Telegram nova confirmou o caminho explícito de memória:
 - o caminho shadow continua separado e não foi declarado saudável.
 
 **Próxima atividade:** fechar primeiro o bloqueador P1 da memória permanente.
-O survey estrutural read-only concluiu que todas as 12 sessões `done` atuais
-(Telegram, HUD, ACP bridge, Maestro e main) preservam proveniência owner
-positiva, IDs/seq/timestamp, paginação e não apresentam truncamento. Implementar
-agora no repositório um coletor API-based v2 somente dry-run usando
-`sessions --json` + `chat.history`, com política fail-closed, classes
-explicitamente permitidas, exclusão de system/toolResult/thinking/toolCall,
-detecção de segredo e guardas de paginação/truncamento. Manter o coletor legado
-intacto e não fazer deploy nem escrita em produção. Após testes isolados,
-solicitar autorização separada para validação na VPS e só então retomar
-candidate → revisão humana → active → embedding. Não ampliar permissões nem
-autorizar EXECUTE em equipamento real.
+O coletor API-based v2 e seus testes sintéticos já foram adicionados ao
+repositório, mantendo o coletor legado intacto. Validar agora em checkout
+isolado a sintaxe e a suíte sintética; se aprovados, executar uma única leitura
+dry-run contra o Gateway vivo sem instalar/copiar o script para o workspace de
+produção e sem qualquer escrita no PostgreSQL. Comparar ready/blocked/skipped
+com o survey das 12 sessões e só depois desenhar a escrita controlada do cliente
+de ingestão. Deploy, agendamento e escrita em produção exigem autorização
+separada. Não ampliar permissões nem autorizar EXECUTE em equipamento real.
 
 ## Protocolo de continuidade entre sessões
 
