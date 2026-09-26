@@ -152,3 +152,44 @@ A trilha registra evolução futura para:
 Essa trilha não altera o fechamento da v1 e não autoriza mudança de runtime.
 
 A capacidade de acesso/análise de desktop ou endpoint permanece explicitamente fora deste escopo até discussão arquitetural específica.
+
+
+## Fila futura — Mímir Field Assessment / SOC-OSINT
+
+Queue ID:
+
+`MIMIR-FIELD-ASSESSMENT-01`
+
+Documento:
+
+- [FIELD_ASSESSMENT_SOC_OSINT_ROADMAP.md](FIELD_ASSESSMENT_SOC_OSINT_ROADMAP.md)
+
+Status:
+
+**FILA / PLANEJADO / NÃO IMPLEMENTADO**
+
+Objetivo futuro:
+
+- Field Probe em pendrive;
+- túnel WireGuard efêmero;
+- abertura do HUD;
+- inventário e baseline automáticos;
+- saúde de hardware;
+- diagnóstico Windows;
+- análise de Event Logs;
+- diagnóstico de rede/TCP;
+- portas efêmeras, TIME_WAIT, Auto-Tuning, congestion control, Nagle/ACK, MTU, retransmissões, RSS/RSC/offloads e DNS;
+- OSINT externo autorizado;
+- fluxo SOC e correlação;
+- Risk Engine;
+- NIST CSF 2.0 Current/Target Profile;
+- checklist de enquadramento baseado em evidência;
+- registro estruturado no sistema;
+- relatórios HTML/PDF;
+- catálogo futuro de remediação autorizada.
+
+O catálogo futuro poderá conter operações controladas como instalação, patch, quarentena/exclusão, disable de serviço, kill de processo e mudança de firewall, sempre sob policy, approval, backup/rollback e validação conforme risco.
+
+**Nota de fila:** quando este projeto for retomado, começar por `FA-0 — especificação`, e não pelo código do pendrive.
+
+Esta fila não altera o `NEXT_ACTION` corrente e não autoriza execução em equipamento real.
