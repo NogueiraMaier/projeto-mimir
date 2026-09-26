@@ -162,7 +162,7 @@ Working checkpoint:
 
 MIMIR-V1-TELEGRAM-02
 
-Checkpoint status: BLOCKED — custom memory tool runtime defect identified.
+Checkpoint status: CONCLUÍDO — Telegram explicit memory-tool path validated end to end on 2026-09-26.
 
 Observed from the Telegram direct session on 2026-09-25:
 
@@ -529,26 +529,44 @@ Trajectory payload projection follow-up for the failed 23:02 Telegram turn:
   path: OpenClaw explicitly logs that this pressure estimate does not compact
   or discard history before the admitted provider attempt.
 
-The current long Telegram session therefore cannot prove the concrete
-provider-facing tool-name set from its retained trajectory alone.
+The current long Telegram session could not prove the concrete provider-facing
+tool-name set from its retained trajectory alone, so a fresh-session
+reproduction was executed.
+
+Fresh-session Telegram validation on 2026-09-26:
+
+- user-driven `/new` reproduction created a low-context Telegram turn without
+  changing tool policy, plugin registration, Telegram policy or model routing;
+- the fresh trajectory recorded `context.compiled (2 tools)`;
+- the model emitted a real `tool.call` for `mimir_memory_search`;
+- OpenClaw recorded `tool.result ... mimir_memory_search ok`;
+- the run then completed on
+  `mimir-gpu//var/lib/mimir/models/Qwen3-4B-Q4_K_M.gguf` with
+  `session.ended ... success`;
+- therefore the complete explicit Telegram path is production-validated:
+  Telegram ingress -> main-agent tool projection -> local Qwen tool selection ->
+  `mimir_memory_search` -> managed local embedding -> PostgreSQL semantic
+  lookup -> tool result -> Telegram response;
+- `MIMIR-V1-TELEGRAM-02` is CLOSED / PASS;
+- the earlier long-session `TOOL_UNAVAILABLE` response is classified as a
+  session/model-behavior artifact, not as a plugin-registration, policy,
+  embedding-provider or PostgreSQL failure;
+- the bot's fresh semantic answer did not correctly answer the requested
+  migration/LAB facts, despite successful tool execution. Retrieval relevance
+  / memory-corpus freshness remains a separate P1 memory-quality issue and must
+  not be conflated with Telegram tool availability.
 
 Next executable action:
 
-1. run a fresh Telegram session reproduction using user-driven `/new` with the
-   test payload in the same message, so the new session starts with minimal
-   history while preserving the previous transcript in storage;
-2. immediately inspect the fresh session trajectory for
-   `context.compiled.data.tools`, tool names, `tool.call` and
-   `tool.result`;
-3. if `mimir_memory_search` is present and called successfully, classify the
-   old failure as long-session/model-behavior related rather than policy or
-   plugin availability;
-4. if it is present but not called, investigate Qwen/OpenAI-compatible tool
-   selection behavior; if absent, investigate prompt-build projection;
-5. do not change tool policy, Telegram policy, plugin registration or model
-   routing for this reproduction;
-6. keep migration 013, `mimir_ops`, PostgreSQL schema and shadow
-   evaluator/generator unchanged.
+1. document the notification classes that Telegram may emit automatically,
+   keeping them informational/read-only and within the existing operator
+   allowlist;
+2. separately inspect permanent-memory corpus coverage/retrieval relevance for
+   operational facts such as migration 013 and LAB-01..LAB-09 before claiming
+   semantic recall quality;
+3. keep the evidence-shadow path separate and not yet declared healthy;
+4. keep migration 013, `mimir_ops`, PostgreSQL schema, Telegram DM policy and
+   real-equipment EXECUTE boundaries unchanged.
 
 ## PostgreSQL laboratory
 
