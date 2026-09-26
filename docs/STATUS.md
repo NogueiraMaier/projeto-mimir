@@ -102,8 +102,8 @@ históricas da memória e de governança não foram encerradas por esta revisão
 - **VALIDADO P0 RUNTIME:** `mimir-memory 0.2.7` carregado/ativado em produção; `mimir_memory_search` registrado; caminho direto `tools.invoke` aprovado com embedding local gerenciado e consulta PostgreSQL; backup/rollback 0.2.6 preservado. O registro histórico de instalação ainda mostra 0.2.6 e não foi reescrito.
 - **VALIDADO:** canal Telegram `@MimirAssistenteBot` operacional; entrada, resposta e envio proativo confirmados; DM restrita por allowlist; token fora do Git.
 - **VALIDADO TELEGRAM-02:** em sessão nova, o runtime registrou `context.compiled (2 tools)`, `tool.call mimir_memory_search`, `tool.result ... ok` e `session.ended success`; o caminho explícito Telegram -> agente -> memória 0.2.7 -> embedding -> PostgreSQL está aprovado.
-- **PENDENTE P1 MEMÓRIA:** a resposta semântica do teste não recuperou corretamente os fatos de migration 013/LAB-01..LAB-09; cobertura/relevância do corpus e o caminho shadow permanecem separados da validação de disponibilidade da ferramenta.
-- **PRÓXIMO:** definir as classes de notificações automáticas permitidas no Telegram e validar, em trilha separada, qualidade/cobertura da memória permanente.
+- **PENDENTE P1 MEMÓRIA — CAUSA CONFIRMADA:** produção possui apenas 5 memórias ativas, todas embedadas, todas originadas de `MEMORY.md` em 2026-07-30; nenhuma contém migration 013, LAB-01..LAB-09, `mimir_ops` ou `schema_version`. A falha semântica observada no Telegram é de cobertura do corpus, não de embedding/ranking.
+- **PRÓXIMO:** inventariar em modo somente leitura eventos de ingestão, fontes de sessão protegidas, candidatos, revisões e embeddings pendentes para localizar onde os fatos operacionais deixam de chegar ao corpus ativo; depois preparar atualização revisada com proveniência explícita. Classes de notificações Telegram ficam para o checkpoint seguinte.
 - **NÃO AUTORIZADO AINDA:** equipamento real em EXECUTE.
 
 Lista mestre de execução: [MIMIR_V1_EXECUTION_PLAN.md](MIMIR_V1_EXECUTION_PLAN.md).
