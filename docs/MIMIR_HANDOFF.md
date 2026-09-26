@@ -597,20 +597,51 @@ Pipeline evidence from the read-only production inventory:
   unimplemented/unscheduled workflow rather than a failed daemon. This must be
   confirmed before adding automation.
 
+Read-only ingestion-runtime inventory partially completed.
+
+Evidence:
+
+- OpenRC has `postgresql-17`, `mimir-llama`, `openclaw` and `cronie`
+  started; `mimir-hud` is stopped;
+- no OpenRC init/conf file references the memory ingestion scripts;
+- root crontab contains one line matching the broad ingestion-related search,
+  but its exact command still needs safe inspection before classifying it;
+- no ingestion-related process was running during the inventory;
+- deployed memory ingestion/consolidation scripts are all still the 2026-07-30
+  versions;
+- `mimir-ingest-session.py` explicitly rejects every mode except
+  `--dry-run`, confirming the write client was never completed;
+- the inventory aborted when it attempted to read
+  `/var/lib/openclaw/.openclaw/agents/main/sessions/sessions.json`, which no
+  longer exists.
+
+OpenClaw 2026.9.5 uses SQLite as the canonical session store. Runtime session
+rows/transcripts live by default at
+`~/.openclaw/agents/<agentId>/agent/openclaw-agent.sqlite`; legacy
+`sessions.json`/JSONL files are migration sources only. Therefore the current
+Mímir session-capture code is structurally obsolete for the installed OpenClaw:
+it hardcodes the legacy `sessions.json` + JSONL layout and cannot enumerate the
+current canonical sessions.
+
+This is now the primary P1 ingestion blocker. Do not work around it by recreating
+legacy `sessions.json` files or reading SQLite internals ad hoc.
+
 Next executable action:
 
-1. perform a read-only runtime/scheduling inventory for memory ingestion:
-   crontabs, OpenRC services, running processes, script timestamps and the
-   current OpenClaw session index/capture dry-run summary;
-2. determine whether any automatic ingestion mechanism exists today or whether
-   ingestion has only ever been manual/experimental;
-3. do not run a writing ingestion client, import docs, create candidates,
-   approve memories or generate new embeddings during this diagnostic;
-4. after the ingestion mechanism is proven, design the smallest safe production
-   path for keeping durable operational facts current with explicit provenance
-   and human review;
-5. keep the evidence-shadow path separate and not yet declared healthy;
-6. keep migration 013, `mimir_ops`, PostgreSQL schema, Telegram DM policy and
+1. inspect the exact matching root crontab command with secrets redacted;
+2. use read-only OpenClaw 2026.9.5 APIs/CLI
+   (`openclaw sessions --agent main --limit all --json` and optionally
+   `doctor --session-sqlite inspect`) to inventory the live SQLite session
+   store;
+3. compare the current capture/ingest scripts against the supported SQLite
+   session access paths and design a replacement capture interface rather than
+   patching the legacy filename;
+4. do not write/import production sessions or mutate OpenClaw SQLite during this
+   diagnostic;
+5. after the compatible capture path is designed and tested in isolation,
+   request separate authorization before enabling production ingestion;
+6. keep the evidence-shadow path separate and not yet declared healthy;
+7. keep migration 013, `mimir_ops`, PostgreSQL schema, Telegram DM policy and
    real-equipment EXECUTE boundaries unchanged.
 
 ## PostgreSQL laboratory
