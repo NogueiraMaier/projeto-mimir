@@ -10,6 +10,38 @@ Ele coordena tarefas, consulta memória e direciona agentes especializados.
 
 O repositório documenta especializações futuras para SOC, OSINT, Cyber-Lab, redes, operações, desenvolvimento, negócios e auditoria de memória/segurança. A documentação não deve inferir implantação somente pela ausência de evidência.
 
+## Camada de segurança conversacional — proposta
+
+A arquitetura-alvo de segurança de entradas, canais, memória, ferramentas e
+roteamento de modelos está definida em
+[CONVERSATIONAL_SECURITY.md](CONVERSATIONAL_SECURITY.md).
+
+Invariante central: **todo conteúdo externo é dado não confiável**. Autoridade
+não é derivada do texto recebido, do canal, da voz ou do comportamento do
+modelo.
+
+A camada deverá impor fora do LLM, entre outros controles:
+
+- identidade e scope separados do conteúdo;
+- capabilities explícitas por agente/subagente;
+- policy gate antes de tool execution;
+- validação de parâmetros;
+- separação planner/executor para ações sensíveis;
+- proteção contra memory poisoning;
+- minimização de contexto;
+- controle de exposição da saída;
+- roteamento de modelos sem ampliação de privilégio;
+- auditoria e anti-replay;
+- política específica por canal.
+
+Status atual: **PROPOSTA / NÃO IMPLEMENTADO COMO CAMADA COMPLETA**. Os controles
+existentes de least privilege, ingestão protegida, revisão humana e execução
+operacional separada são compatíveis com a proposta, mas não devem ser usados
+como evidência de implementação integral.
+
+A matriz de validação planejada está em
+[AI_SECURITY_TEST_MATRIX.md](AI_SECURITY_TEST_MATRIX.md).
+
 ## Memória operacional
 
 O memory-core nativo do OpenClaw mantém contexto operacional de curto prazo.
