@@ -1228,19 +1228,31 @@ Design decision for the future protected-session consolidator:
 - never persist, expose or treat `reasoning_content` as candidate memory;
 - require strict JSON output and fail closed on empty/invalid content.
 
+Conversational-security current-state gap inventory is now versioned at
+`docs/AI_SECURITY_GAP_INVENTORY.md`.
+
+The inventory classifies controls as EXISTING_VALIDATED, PARTIAL, PROPOSED,
+MISSING or OUT_OF_SCOPE_NOW and identifies the protected-session consolidator
+as the first component that must carry the new untrusted-content contract.
+
+Important design direction recorded, not yet implemented:
+
+- keep semantic memory type separate from trust/validation class;
+- do not silently rename current `memory_type` values;
+- prefer a separate trust/validation dimension or explicit metadata after ADR;
+- no production schema change is authorized.
+
 Next executable action:
 
-1. produce the conversational-security current-state gap inventory from the
-   versioned Mímir architecture/code;
-2. classify each control as existing, partial, proposed or missing without
-   upgrading state based on model behavior alone;
-3. define the minimum security envelope for the protected-session local
-   consolidator;
-4. decide the mapping/extension for security-oriented memory classes without
-   changing production schema;
-5. then implement the consolidator repository-only and validate first with
-   synthetic protected source + fake loopback model;
-6. production stays schema 1..12; migration 014 and writer remain undeployed.
+1. version the protected-session local consolidator contract;
+2. define closed input/output JSON schema, loopback endpoint allowlist,
+   untrusted-source envelope and output secret checks;
+3. require `enable_thinking=false` per request and ignore/reject
+   `reasoning_content` for persistence;
+4. implement repository-only consolidator in dry-run mode;
+5. validate first with synthetic protected source + fake loopback model;
+6. run T-AI-002/005/023/024/032/033/034 against the harness;
+7. production stays schema 1..12; migration 014 and writer remain undeployed.
 
 
 ## PostgreSQL laboratory
