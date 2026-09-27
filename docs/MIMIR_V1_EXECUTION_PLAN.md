@@ -191,10 +191,13 @@ fallback=18782 e OpenClaw Gateway=18789. Portanto 8080 deve ser tratado como
 drift/configuração a diagnosticar, não como endpoint canônico. Um probe posterior
 confirmou `/health` e `/v1/models` em 8080; o chat probe ficou inconclusivo
 por erro no comando de teste (pipe + Python heredoc), não por falha comprovada
-da API. Antes de implementar o consolidador, localizar read-only a origem de
-`--port 8080` e reconciliar a configuração com 18782 mediante autorização.
-Depois executar o gap inventory da nova arquitetura de segurança conversacional
-e definir o envelope de conteúdo não confiável do consolidator. Só então ler por
+da API. O diagnóstico localizou a origem exata do drift:
+`/etc/init.d/mimir-llama` usa `--port ${listen_port}` e
+`/etc/conf.d/mimir-llama` fixa `listen_port="8080"`. A porta canônica do
+fallback VPS continua 18782. Nenhuma alteração foi feita. Quando houver
+autorização explícita de runtime, corrigir somente esse parâmetro, reiniciar
+apenas `mimir-llama`, validar o listener/API em 18782 e então executar o gap
+inventory da nova arquitetura de segurança conversacional. Só então ler por
 `read_consolidation_source(uuid)`, usar loopback local, operar em dry-run e
 manter revisão/submissão humana separadas. O consolidador NVIDIA existente
 continua proibido para essas fontes.
