@@ -497,3 +497,34 @@ Próxima atividade:
    fonte sintética;
 3. manter produção 1..12;
 4. manter migration 014, writer v2 e consolidator sem deployment.
+
+## Checkpoint MIMIR-V1-PROTECTED-CONSOLIDATOR-REAL-MODEL-LAB — 2026-09-27
+
+Estado: `BLOCKED_BY_MODEL_TIMEOUT`.
+
+Commit técnico atual:
+
+`9e2e1c13e76cc60e4b383cc0898b54aeef2bcef0`
+
+Resultados:
+
+- PostgreSQL LAB 1..12,14 recuperado e operacional;
+- Unix socket 55433 validado;
+- produção permaneceu 1..12;
+- protected writer/read sintético PASS;
+- PostgreSQL Base64 wrapping identificado e corrigido;
+- repository regression após correção: 8/8 PASS;
+- real-model LAB avançou até a interação com Qwen 18782;
+- timeout identificado como `TimeoutError: timed out`;
+- cleanup sintético: 0;
+- zero promoção automática.
+
+Próxima atividade:
+
+1. tratar timeout explicitamente no consolidator;
+2. adicionar regression test repository-only;
+3. revalidar repository-only;
+4. medir latência do Qwen real separadamente;
+5. avaliar tecnicamente o limite atual de 60 s;
+6. repetir o LAB somente após a medição;
+7. manter produção, sessão real e deployment fora de escopo.

@@ -1528,3 +1528,71 @@ Production remains unchanged:
 7. do not deploy migration 014, writer v2 or protected consolidator;
 8. preserve human review and zero automatic promotion;
 9. keep PR #1 Draft and unmerged.
+
+## CURRENT CHECKPOINT — PROTECTED CONSOLIDATOR REAL-MODEL LAB
+
+Date: 2026-09-27
+
+State: `BLOCKED_BY_MODEL_TIMEOUT`
+
+Current technical HEAD:
+
+`9e2e1c13e76cc60e4b383cc0898b54aeef2bcef0`
+
+Current consolidator SHA-256:
+
+`45e68e31df5cf71f8e1253d28d2ef8f08cda39c2e1e0a497cd3940cf935b5a66`
+
+Repository regression after PostgreSQL Base64 normalization:
+
+- 8/8 tests PASS;
+- RC=0;
+- host llama.cpp remained active on `127.0.0.1:18782`.
+
+The isolated PostgreSQL LAB is operational again after WAL recovery:
+
+- data directory: `/var/tmp/mimir-pg14-lab/data`;
+- socket: `/var/tmp/mimir-pg14-lab/socket/.s.PGSQL.55433`;
+- schema versions: `1..12,14`;
+- TCP disabled;
+- peer identity: `openclaw -> mimir_app -> peer:openclaw`.
+
+Real-model LAB attempt 1 exposed PostgreSQL Base64 line wrapping.
+That defect was fixed in commit `9e2e1c13...`.
+
+Real-model LAB attempt 2 advanced past protected source decoding and failed
+during the local-model interaction.
+
+Diagnostic result:
+
+`TimeoutError: timed out`
+
+Cleanup result:
+
+`synthetic_residue=0`
+
+Production remains unchanged:
+
+- PostgreSQL production remains 1..12;
+- migration 014 remains unapplied;
+- writer v2 remains undeployed;
+- consolidator remains undeployed;
+- no real session was used;
+- no automatic memory promotion occurred.
+
+Evidence:
+
+- `docs/review/operations/2026-09-27.md`
+- `docs/review/operations/2026-09-27-protected-consolidator-real-model-lab.md`
+
+## NEXT_ACTION — MODEL TIMEOUT
+
+1. add explicit HTTP/model timeout handling to the protected consolidator;
+2. add repository-only regression coverage for timeout;
+3. rerun the repository validator;
+4. measure Qwen 18782 latency independently with an equivalent synthetic request;
+5. determine whether the cause is cold start, generation latency, context size or stall;
+6. do not increase the timeout merely to obtain PASS;
+7. only then repeat the integrated LAB;
+8. preserve synthetic-only content and `synthetic_residue=0`;
+9. keep production and real sessions out of scope.

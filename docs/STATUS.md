@@ -141,3 +141,16 @@ históricas da memória e de governança não foram encerradas por esta revisão
 
 Lista mestre de execução: [MIMIR_V1_EXECUTION_PLAN.md](MIMIR_V1_EXECUTION_PLAN.md).
 Evidência da rodada: [review/operations/2026-09-24.md](review/operations/2026-09-24.md).
+
+## Atualização operacional — Protected Consolidator Real-Model LAB — 2026-09-27
+
+- **REPOSITORY REGRESSION — PASS:** após normalização do wrapping Base64 PostgreSQL, 8/8 testes do protected consolidator passaram com RC=0.
+- **CORREÇÃO VERSIONADA:** commit `9e2e1c13e76cc60e4b383cc0898b54aeef2bcef0`.
+- **LAB 014 RECUPERADO:** PostgreSQL isolado voltou operacional após WAL recovery, preservando schema `1..12,14`, Unix socket 55433 e sem TCP.
+- **REAL-MODEL LAB #1:** falhou antes do modelo por wrapping Base64 PostgreSQL; causa confirmada e corrigida; cleanup=0.
+- **REAL-MODEL LAB #2:** avançou além da leitura protegida e terminou em `TimeoutError: timed out` durante interação com Qwen local `127.0.0.1:18782`.
+- **FAIL-CLOSED PRESERVADO:** nenhuma promoção automática, nenhum deployment e nenhum conteúdo real utilizados.
+- **CLEANUP:** `synthetic_residue=0`.
+- **PRODUÇÃO INTACTA:** PostgreSQL permanece 1..12, sem migration 014 e sem deployment do writer/consolidator.
+- **BLOQUEADOR ATUAL:** tratamento explícito e diagnóstico de latência/timeout do Qwen.
+- **PRÓXIMO P1:** adicionar timeout handling + regression test, medir latência real e somente então repetir o LAB integrado.
