@@ -434,6 +434,8 @@ Estado inicial:
 - [ ] decidir mapping/extension entre os `memory_type` atuais e as classes
   FACT/PREFERENCE/EPHEMERAL_CONTEXT/OPERATIONAL_STATE/SECURITY_DECISION/
   UNTRUSTED_OBSERVATION;
+- [x] versionar contrato fechado do consolidator protected-source
+  (`docs/PROTECTED_SESSION_CONSOLIDATOR_V1.md`);
 - [ ] implementar os controles mínimos necessários ao consolidator confidential;
 - [ ] executar primeiro os testes T-AI ligados a conteúdo externo, memória e
   saída;
