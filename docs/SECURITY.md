@@ -11,6 +11,27 @@
 - Backup testado
 - Reversão documentada
 
+## Segurança conversacional e conteúdo não confiável — proposta
+
+A especificação arquitetural completa está em
+[CONVERSATIONAL_SECURITY.md](CONVERSATIONAL_SECURITY.md) e a matriz adversarial
+em [AI_SECURITY_TEST_MATRIX.md](AI_SECURITY_TEST_MATRIX.md).
+
+Invariante de projeto:
+
+> Todo conteúdo externo é DADO NÃO CONFIÁVEL.
+
+Isso inclui mensagens de canais, voz/STT, documentos, OCR, web, APIs, RAG,
+resultados de ferramentas e conteúdo gerado por outros agentes/modelos.
+
+Confiança de origem não equivale a autorização. O modelo não autoriza a própria
+ação, prompt não amplia capability e controles críticos precisam continuar
+efetivos mesmo se o LLM estiver comprometido.
+
+Status: **PROPOSTA PARA IMPLEMENTAÇÃO**. Não declarar prompt-injection defense,
+output DLP, policy engine, cross-channel identity, model-routing enforcement ou
+a suíte T-AI-001..035 como implementados até existir evidência reproduzível.
+
 ## Controle da memória
 
 O agente main possui consulta controlada à memória permanente.
