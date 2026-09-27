@@ -932,19 +932,19 @@ Migration 014 has still not been applied anywhere.
 
 Next executable action:
 
-1. safely stop and remove the partial `/var/tmp/mimir-pg14-lab` cluster after
-   verifying its PGDATA/port;
-2. remove the old validation checkout and clone a fresh checkout at the new
-   branch HEAD containing the socket-permission fix;
-3. rerun `prepare-session-ingestion-v2-lab.sh` from scratch;
-4. verify baseline 1..12, socket-permission guard, peer identity and production
-   unchanged;
-5. only then execute `validate-session-ingestion-v2-lab.sh mimir_memory`;
-6. do not implement or deploy the writer until the 014 lab checkpoint passes;
-7. do not deploy, schedule or execute any write path in production without a
-   separate explicit authorization;
-8. keep migration 013, `mimir_ops`, production schema, Telegram DM policy and
-   real-equipment EXECUTE boundaries unchanged.
+1. inspect the failed temporary cluster's own log and effective socket/group
+   configuration only; do not touch production;
+2. collect `id openclaw`, `getent group <openclaw-primary-group>`,
+   permissions for LAB_ROOT/DATA/socket parent, and the last PostgreSQL log
+   lines;
+3. do not retry `pg_ctl` or modify the lab until the startup error is
+   identified from the log;
+4. migration 014 remains unapplied everywhere;
+5. after root cause is proven, patch the repository script, discard the partial
+   lab and rebuild from scratch;
+6. keep production schema 1..12 and `mimir_ops` absent;
+7. do not deploy or enable any writer in production.
+
 
 ## PostgreSQL laboratory
 
