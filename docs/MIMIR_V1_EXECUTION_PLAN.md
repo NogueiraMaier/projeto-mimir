@@ -194,10 +194,13 @@ por erro no comando de teste (pipe + Python heredoc), não por falha comprovada
 da API. O diagnóstico localizou a origem exata do drift:
 `/etc/init.d/mimir-llama` usa `--port ${listen_port}` e
 `/etc/conf.d/mimir-llama` fixa `listen_port="8080"`. A porta canônica do
-fallback VPS continua 18782. Nenhuma alteração foi feita. Quando houver
-autorização explícita de runtime, corrigir somente esse parâmetro, reiniciar
-apenas `mimir-llama`, validar o listener/API em 18782 e então executar o gap
-inventory da nova arquitetura de segurança conversacional. Só então ler por
+fallback VPS continua 18782. A correção de runtime foi executada: `listen_port` passou para 18782,
+somente `mimir-llama` foi reiniciado e o processo/listener confirmaram
+`127.0.0.1:18782`, sem 8080 na saída. Os probes imediatos responderam
+`503 Loading model`, portanto a correção de porta está concluída, mas o
+readiness do modelo ainda precisa ser confirmado antes do teste sintético de
+chat e do gap inventory da nova arquitetura de segurança conversacional. Só
+então ler por
 `read_consolidation_source(uuid)`, usar loopback local, operar em dry-run e
 manter revisão/submissão humana separadas. O consolidador NVIDIA existente
 continua proibido para essas fontes.
