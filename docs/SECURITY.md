@@ -56,15 +56,20 @@ Não liberar ao agente main:
 
 ## Fonte protegida das sessões
 
-- Armazenar transcrições somente em mimir.session_sources
-- Negar SELECT direto para mimir_app
-- Gravar somente por mimir.ingest_session
-- Exigir autenticação peer do usuário openclaw
-- Manter o evento com classification confidential
-- Não copiar a transcrição para memory_events
-- Bloquear conteúdo divergente para o mesmo session_id
+- Armazenar transcrições somente em `mimir.session_sources`
+- Negar SELECT direto para `mimir_app`
+- Para sessões atuais, gravar somente por `mimir.ingest_session_v2`
+- Manter `mimir.ingest_session` apenas como legado sem EXECUTE para
+  `mimir_app` após a migration 014
+- Exigir autenticação peer do usuário `openclaw`
+- Manter o evento com `classification=confidential`
+- Não copiar a transcrição para `memory_events`
+- Bloquear conteúdo/proveniência divergentes para o mesmo `session_id`
+- Ler conteúdo para consolidação somente por
+  `mimir.read_consolidation_source(uuid)`
 - Não enviar sessões para API externa
-- Exigir fluxo humano antes de qualquer liberação
+- Consolidação confidential deve usar somente modelo local/loopback
+- Exigir fluxo humano antes de candidate/active
 
 ## Dados fora do Git
 
