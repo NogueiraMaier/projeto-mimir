@@ -4,7 +4,7 @@ Data: 2026-09-27
 
 Escopo: exclusivo do Projeto Mímir.
 
-Estado: IMPLEMENTED_NOT_VALIDATED
+Estado: REPOSITORY_VALIDATED
 
 ## Branch e commits
 
@@ -125,13 +125,44 @@ Produção permanece, conforme o último estado validado:
 
 ## NEXT_ACTION
 
-1. criar checkout isolado da branch no VPS fora de
-   `/var/lib/openclaw/workspace`;
-2. conferir HEAD exato;
-3. executar
-   `tools/memory/validate-protected-consolidator-v1-repository.sh`;
-4. se PASS, registrar o checkpoint
-   `MIMIR-V1-PROTECTED-CONSOLIDATOR-REPO-01`;
-5. somente depois validar o consolidator contra o PostgreSQL isolado 1..12,14
-   e o Qwen real em 127.0.0.1:18782 usando conteúdo totalmente sintético;
-6. não usar sessão real e não acessar o PostgreSQL de produção.
+1. preparar ou revalidar o PostgreSQL lab isolado em schema 1..12,14;
+2. provar que socket, porta e `data_directory` do lab não correspondem à produção;
+3. validar o protected consolidator contra o lab e o Qwen real
+   `127.0.0.1:18782`;
+4. usar somente conteúdo sintético;
+5. não usar sessão real;
+6. não acessar PostgreSQL de produção;
+7. não implantar migration 014, writer v2 ou protected consolidator.
+
+## Validação formal repository-only
+
+Checkpoint:
+
+`MIMIR-V1-PROTECTED-CONSOLIDATOR-REPO-01 = PASS`
+
+HEAD validado:
+
+`3d119d4a8308c1dbaf9744c9f3c7f3b77a5a8c64`
+
+Data: 2026-09-27
+
+Condições observadas:
+
+- checkout isolado;
+- working tree limpo antes da execução;
+- 8 testes executados;
+- 8 testes aprovados;
+- `CHECKPOINT_RC=0`;
+- fake model isolado em network namespace;
+- `127.0.0.1:18782` livre dentro do namespace de teste;
+- llama.cpp real permaneceu em `127.0.0.1:18782` antes e depois;
+- working tree permaneceu limpo após a execução;
+- nenhuma sessão real foi utilizada;
+- PostgreSQL de produção não foi acessado;
+- migration 014 não foi aplicada em produção;
+- writer v2 e protected consolidator continuam não implantados.
+
+Próximo checkpoint permitido:
+
+validar o consolidator contra PostgreSQL lab isolado 1..12,14 e Qwen real
+`127.0.0.1:18782`, somente com conteúdo sintético.

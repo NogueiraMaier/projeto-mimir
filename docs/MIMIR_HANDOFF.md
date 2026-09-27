@@ -1448,7 +1448,7 @@ Before starting a new major phase, commit the updated handoff.
 
 Date: 2026-09-27
 
-State: `IMPLEMENTED_NOT_VALIDATED`
+State: `REPOSITORY_VALIDATED`
 
 Implementation base commits:
 
@@ -1482,11 +1482,28 @@ Implemented controls:
 - secret/output gate is outside the LLM;
 - no candidate/active/database write path exists in this consolidator.
 
-The preliminary isolated harness execution passed 8 tests, including the
-repository controls for T-AI-002/005/023/024/032/033/034.
+Formal repository validation completed on 2026-09-27.
 
-Do not mark those tests PASS yet. The exact Git HEAD must first be revalidated
-from a clean isolated checkout.
+Validated HEAD:
+
+`3d119d4a8308c1dbaf9744c9f3c7f3b77a5a8c64`
+
+Result:
+
+`MIMIR-V1-PROTECTED-CONSOLIDATOR-REPO-01 = PASS`
+
+Evidence:
+
+- clean worktree before execution;
+- 8/8 adversarial repository tests passed;
+- validator returned RC=0;
+- test model executed in an isolated network namespace;
+- host llama.cpp remained listening on `127.0.0.1:18782` before and after;
+- no production PostgreSQL access;
+- no migration, deployment or runtime modification occurred.
+
+Repository controls T-AI-002/005/023/024/032/033/034 are validated for this
+repository-only checkpoint.
 
 Production remains unchanged:
 
@@ -1500,18 +1517,14 @@ Production remains unchanged:
 
 ## NEXT_ACTION
 
-1. on the VPS, create or refresh an isolated checkout outside
-   `/var/lib/openclaw/workspace`;
-2. verify branch `feat/mimir-operational-foundation` and the actual HEAD;
-3. require a clean working tree;
-4. execute
-   `tools/memory/validate-protected-consolidator-v1-repository.sh`;
-5. if and only if it passes, record
-   `MIMIR-V1-PROTECTED-CONSOLIDATOR-REPO-01 = PASS`;
-6. then validate the same consolidator against the isolated PostgreSQL
-   1..12,14 lab and the real local Qwen endpoint `127.0.0.1:18782`, using
-   fully synthetic protected content only;
-7. do not use a real session;
-8. do not access production PostgreSQL;
-9. do not deploy migration 014, writer v2 or consolidator;
-10. keep PR #1 Draft and unmerged.
+1. prepare or reuse the isolated PostgreSQL laboratory at schema 1..12,14;
+2. confirm the laboratory cannot resolve to the production PostgreSQL socket,
+   port or data directory;
+3. validate the protected consolidator against that isolated laboratory and
+   the real local Qwen endpoint `127.0.0.1:18782`;
+4. use only fully synthetic protected content;
+5. do not use a real session;
+6. do not access production PostgreSQL;
+7. do not deploy migration 014, writer v2 or protected consolidator;
+8. preserve human review and zero automatic promotion;
+9. keep PR #1 Draft and unmerged.

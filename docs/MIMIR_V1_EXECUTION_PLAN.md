@@ -449,7 +449,19 @@ implementado. Cada item precisa de implementação, validação e evidência pr�
 
 ## Checkpoint MIMIR-V1-PROTECTED-CONSOLIDATOR-REPO-PREFLIGHT — 2026-09-27
 
-Estado: `IMPLEMENTED_NOT_VALIDATED`.
+Estado: `REPOSITORY_VALIDATED`.
+
+Checkpoint formal:
+
+`MIMIR-V1-PROTECTED-CONSOLIDATOR-REPO-01 = PASS`
+
+HEAD validado:
+
+`3d119d4a8308c1dbaf9744c9f3c7f3b77a5a8c64`
+
+A validação formal executou 8/8 testes com RC=0 em checkout limpo.
+O fake model foi isolado em network namespace, enquanto o llama.cpp real
+permaneceu ativo em `127.0.0.1:18782` antes e depois do teste.
 
 Foram versionados:
 
@@ -471,14 +483,17 @@ Controles implementados:
 - tool call rejeitada;
 - zero promoção e zero escrita de memória.
 
-A execução preliminar do harness passou 8 testes, mas ainda não foi repetida a
-partir de checkout limpo do HEAD Git versionado.
+A validação formal repository-only passou em checkout limpo do HEAD
+`3d119d4a8308c1dbaf9744c9f3c7f3b77a5a8c64`.
+
+Resultado:
+
+`MIMIR-V1-PROTECTED-CONSOLIDATOR-REPO-01 = PASS`
 
 Próxima atividade:
 
-1. checkout isolado da branch no VPS;
-2. executar `validate-protected-consolidator-v1-repository.sh`;
-3. se PASS, registrar `MIMIR-V1-PROTECTED-CONSOLIDATOR-REPO-01`;
-4. depois validar PostgreSQL lab 1..12,14 + Qwen real 18782 somente com fonte
-   sintética;
-5. manter produção 1..12 e sem deployment da 014/writer/consolidator.
+1. preparar/revalidar PostgreSQL lab 1..12,14;
+2. validar consolidator + lab isolado + Qwen real 18782 exclusivamente com
+   fonte sintética;
+3. manter produção 1..12;
+4. manter migration 014, writer v2 e consolidator sem deployment.
