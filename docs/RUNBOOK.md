@@ -70,17 +70,26 @@ Comparar os hashes local e remoto:
 
 ## Validar ingestão protegida
 
-Versão do esquema:
+Produção permanece em `schema_version 1..12`; a migration 014 e o writer v2
+foram validados somente em laboratório e não devem ser aplicados sem autorização
+separada.
 
-    psql -X -d mimir_memory -c         "SELECT version, description FROM mimir.schema_version WHERE version = 8;"
+Privilégio direto esperado:
 
-Privilégios da fonte:
+    psql -X -d mimir_memory -c "SELECT has_table_privilege('mimir_app', 'mimir.session_sources', 'SELECT');"
 
-    psql -X -d mimir_memory -c         "SELECT has_table_privilege('mimir_app', 'mimir.session_sources', 'SELECT');"
+A resposta esperada é `false`.
 
-A resposta esperada para SELECT é false.
+No laboratório com migration 014, validar também:
 
-Nenhuma sessão deve ser importada sem execução explícita do cliente de ingestão.
+    psql -X -d mimir_memory -c "SELECT has_function_privilege('mimir_app', 'mimir.ingest_session_v2(uuid,text,text,text,text,integer,integer,integer,bigint,timestamptz,text,integer,integer,integer,integer)', 'EXECUTE');"
+
+O resultado esperado no lab é `true`, enquanto EXECUTE no ingresso legado deve
+ser `false`.
+
+Nenhuma sessão real deve ser importada sem seleção explícita de
+`session_key/session_id`, fingerprints esperados e aprovação do dry-run. A
+ingestão não promove memória automaticamente.
 
 ## Regra de alteração
 
