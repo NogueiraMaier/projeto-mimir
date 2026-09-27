@@ -157,15 +157,15 @@ Validação em sessão Telegram nova confirmou o caminho explícito de memória:
 
 **Próxima atividade:** fechar primeiro o bloqueador P1 da memória permanente.
 O contrato API-based v2 está versionado como migration 014 e o preflight do
-capture v2 no HEAD `700f640fb0a2e92be90de7a02459cb2eb02f104c` passou:
-source guard, py_compile, 2 testes sintéticos e live dry-run, mantendo
-12 ready / 0 blocked / 6 skipped / 0 errors e validando os novos metadados de
-proveniência. Inventariar agora o `mimir_lab*` disponível e executar a 014
-somente no laboratório descartável pelo validador dedicado. Não implementar
-writer nem promover memória até esse checkpoint passar. O fluxo continua
-event/source → candidate → revisão humana → active → embedding. Produção exige
-autorização separada. Não ampliar permissões nem autorizar EXECUTE em equipamento
-real.
+capture v2 passou. Não há hoje banco `mimir_lab*` disponível porque o lab
+anterior foi limpo intencionalmente. Reconstruir um PostgreSQL 17 temporário
+isolado em `/var/tmp/mimir-pg14-lab` usando o novo script versionado
+`prepare-session-ingestion-v2-lab.sh`, que parte do bootstrap canônico e replay
+002..012 e não clona produção. Após confirmar baseline 1..12, peer
+`openclaw -> mimir_app` e produção intacta, executar a migration 014 somente
+nesse cluster pelo validador dedicado. Não implementar writer nem promover
+memória até esse checkpoint passar. Produção exige autorização separada. Não
+ampliar permissões nem autorizar EXECUTE em equipamento real.
 
 ## Protocolo de continuidade entre sessões
 
