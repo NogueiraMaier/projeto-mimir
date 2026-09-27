@@ -368,6 +368,8 @@ def analyze(
     source_updated_at_ms: int,
     messages: list[dict[str, Any]],
     max_source_chars: int,
+    *,
+    include_content: bool = False,
 ) -> dict[str, Any]:
     roles: Counter[str] = Counter()
     blocks: Counter[str] = Counter()
@@ -506,6 +508,13 @@ def analyze(
     result["content_sha256"] = hashlib.sha256(
         encoded_content
     ).hexdigest()
+
+    # Internal-only handoff for the controlled writer. The CLI collector never
+    # enables this flag, so normalized transcript text is not serialized to
+    # stdout or a staging file.
+    if include_content:
+        result["_content"] = content
+
     return result
 
 
