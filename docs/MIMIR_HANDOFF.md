@@ -1028,23 +1028,44 @@ Checkpoint result:
 Migration 014 is validated in an isolated lab but remains unapplied to
 production. No writer has been deployed or enabled.
 
+Repository-only controlled writer v2 has now been implemented but has not yet
+been executed on the VPS.
+
+New/changed artifacts:
+
+- `mimir-capture-sessions-v2.py` gained an internal-only
+  `include_content=True` handoff. Normal CLI behavior remains content-free;
+- `mimir-ingest-session-v2.py` implements exact session selection, expected
+  source/content fingerprints, dry-run approval digest, explicit
+  `--write --approve`, local Unix-socket-only PostgreSQL transport and
+  production-socket guard;
+- normalized content stays in-process and is base64-encoded only in memory for
+  the SQL sent to `psql` via stdin; it is not placed in argv, environment,
+  stdout or staging;
+- `test_mimir_ingest_session_v2.py` adds synthetic coverage for safe dry-run,
+  hash mismatch, owner/secret guard reuse and plaintext-free SQL transport;
+- `validate-session-writer-v2-lab.sh` adds an end-to-end synthetic lab path:
+  capture metadata → writer dry-run → approval → write → idempotent replay →
+  persisted-state/protected-read checks → no automatic memory record → cleanup.
+
+These writer changes occurred after the previously validated capture-v2
+preflight, so the capture test suite and live dry-run must be rerun before the
+writer lab test is accepted.
+
 Next executable action:
 
-1. implement the v2 ingestion writer in the repository only;
-2. refactor/reuse the validated capture-v2 logic so normalized transcript
-   content is passed to the writer only in-process and is never emitted to
-   stdout or staging;
-3. require explicit selection/approval of a single ready session by canonical
-   session key/id and expected source/content fingerprints;
-4. default to dry-run; an explicit write flag must still target only a supplied
-   PostgreSQL endpoint and invoke `mimir.ingest_session_v2`;
-5. add synthetic tests proving no content leakage, selection mismatch rejection,
-   secret/owner/truncation guards, SQL argument transport without shell
-   interpolation, and no automatic promotion;
-6. validate that writer only against the existing isolated lab before any
-   production authorization;
-7. production remains schema 1..12 and no migration/writer deployment is
-   authorized.
+1. use a fresh isolated checkout at current branch HEAD;
+2. run Python syntax checks for capture/writer/test files;
+3. rerun both capture-v2 and writer-v2 synthetic test suites;
+4. rerun one live capture-v2 dry-run and confirm the same
+   12 ready / 0 blocked / 6 skipped / 0 errors with no content exposure;
+5. if all pass, run `validate-session-writer-v2-lab.sh` against the existing
+   lab at `/var/tmp/mimir-pg14-lab/socket:55433`;
+6. require writer dry-run/write content-leak guards, idempotent event_id,
+   protected read, zero automatic memory records, synthetic cleanup and
+   production unchanged;
+7. do not deploy writer or migration 014 to production without separate
+   explicit authorization.
 
 
 ## PostgreSQL laboratory
