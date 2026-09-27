@@ -156,16 +156,16 @@ Validação em sessão Telegram nova confirmou o caminho explícito de memória:
 - o caminho shadow continua separado e não foi declarado saudável.
 
 **Próxima atividade:** fechar primeiro o bloqueador P1 da memória permanente.
-O contrato API-based v2 está versionado como migration 014 e o preflight do
-capture v2 passou. Não há hoje banco `mimir_lab*` disponível porque o lab
-anterior foi limpo intencionalmente. Reconstruir um PostgreSQL 17 temporário
-isolado em `/var/tmp/mimir-pg14-lab` usando o novo script versionado
-`prepare-session-ingestion-v2-lab.sh`, que parte do bootstrap canônico e replay
-002..012 e não clona produção. Após confirmar baseline 1..12, peer
-`openclaw -> mimir_app` e produção intacta, executar a migration 014 somente
-nesse cluster pelo validador dedicado. Não implementar writer nem promover
-memória até esse checkpoint passar. Produção exige autorização separada. Não
-ampliar permissões nem autorizar EXECUTE em equipamento real.
+O primeiro rebuild do lab temporário confirmou produção intacta, cluster
+isolado, bootstrap v1 e replay 002..012, mas parou antes da 014 porque
+`openclaw` não conseguia atravessar o diretório pai 0700 até o Unix socket.
+O problema foi corrigido no script versionado com grupo do `openclaw`, pai
+0710, socket 0770/`unix_socket_group` e guardas explícitas. Descartar o lab
+parcial e repetir o rebuild do zero no HEAD novo; somente após confirmar
+baseline 1..12 + peer `openclaw -> mimir_app` executar a migration 014 no lab.
+Não implementar writer nem promover memória até esse checkpoint passar.
+Produção exige autorização separada. Não ampliar permissões nem autorizar
+EXECUTE em equipamento real.
 
 ## Protocolo de continuidade entre sessões
 
