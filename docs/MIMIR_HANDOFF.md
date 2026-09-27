@@ -800,24 +800,60 @@ prints normalized transcript content, so a future writer must reuse/refactor the
 capture logic in-process rather than consume a plaintext transcript from stdout
 or an unprotected staging file.
 
+Repository-only v2 ingestion contract has now been implemented but remains
+unapplied to production.
+
+New artifacts:
+
+- `docs/SESSION_INGESTION_V2.md`
+  defines the API-based provenance model and versioning decision;
+- `tools/memory/migrations/014_api_session_ingestion_v2.sql`
+  adds explicit source metadata, `mimir.ingest_session_v2(...)`, updates
+  `read_consolidation_source` and revokes `mimir_app` EXECUTE on the legacy
+  JSONL ingress;
+- `tools/memory/validate-session-ingestion-v2-lab.sh`
+  is a guarded lab-only validation harness that refuses production database
+  names, creates a pre-014 dump, applies/validates 014, tests peer identity,
+  idempotency, protected read, class/hash rejection and rollback residue;
+- capture v2 now also emits safe provenance metadata
+  `source_ref`, `source_updated_at_ms`,
+  `source_fingerprint_sha256` and `content_bytes` without exposing content.
+
+Migration numbering decision:
+
+- production remains versions 1..12;
+- 013 remains reserved for the independent operational inventory and is not
+  renumbered;
+- session-ingestion v2 uses version 014 with explicit dependency on memory 012;
+- 014 may be validated with or without the reviewed operational 013, but if 13
+  is present its description must match the known operational revision exactly;
+- 014 never applies/enables `mimir_ops`.
+
+Important validation status:
+
+- the earlier capture-v2 PASS was against source commit
+  `b8c020805bdf358d5211d8e1cb6b74aed9d2bc96`;
+- capture-v2 code changed afterward to add v2 provenance fields, so syntax,
+  synthetic tests and live dry-run must be repeated at the new branch HEAD
+  before lab DB testing is accepted;
+- migration 014 and its lab harness have not yet been executed anywhere by this
+  checkpoint;
+- production PostgreSQL remains unchanged.
+
 Next executable action:
 
-1. define a versioned v2 session-ingestion database contract before any writer:
-   logical source identity based on canonical session key/id, capture timestamp,
-   source/content fingerprints, API provenance, collector version and explicit
-   protected-source metadata;
-2. resolve migration numbering safely because production is at schema 12 while
-   the repository already reserves 013 for the separate operational inventory
-   work; do not apply/renumber 013 casually;
-3. refactor capture logic into a reusable internal module or equivalent so the
-   write client can receive normalized content only in-process while CLI dry-run
-   remains content-free;
-4. add lab-only tests for idempotency, conflicting hashes, provenance fields,
-   transaction rollback and no automatic memory promotion;
-5. do not deploy, schedule or execute any write path in production without a
+1. create a fresh isolated checkout at the current branch HEAD and rerun
+   `py_compile` + `test_mimir_capture_sessions_v2.py` + one live dry-run;
+2. confirm 12 ready / 0 blocked / 6 skipped / 0 errors remains stable and the
+   new provenance fields are present for ready sessions;
+3. inventory the available disposable `mimir_lab*` database and run
+   `validate-session-ingestion-v2-lab.sh <lab_db>` only against that lab;
+4. inspect migration/ACL/idempotency/protected-read/rejection/rollback results;
+5. do not implement or deploy the writer until the 014 lab checkpoint passes;
+6. do not deploy, schedule or execute any write path in production without a
    separate explicit authorization;
-6. keep the evidence-shadow path separate and not yet declared healthy;
-7. keep migration 013, `mimir_ops`, production schema, Telegram DM policy and
+7. keep the evidence-shadow path separate and not yet declared healthy;
+8. keep migration 013, `mimir_ops`, production schema, Telegram DM policy and
    real-equipment EXECUTE boundaries unchanged.
 
 ## PostgreSQL laboratory
