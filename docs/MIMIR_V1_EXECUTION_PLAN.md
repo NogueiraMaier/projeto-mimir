@@ -183,10 +183,15 @@ parou antes do write por um bug do harness: variáveis psql em consultas
 O writer end-to-end passou no lab 1..12,14: dry-run/aprovação, write
 sintético, replay idempotente, proveniência persistida, protected read, zero
 promoção automática e cleanup sem resíduo. Produção permaneceu 1..12, sem 014 e
-sem writer. O próximo bloqueador P1 passa a ser a consolidação local das fontes
-de sessão confidential: ler somente por `read_consolidation_source(uuid)`,
-usar modelo local/loopback, operar em dry-run e manter revisão/submissão humana
-separadas. O consolidador NVIDIA existente continua proibido para essas fontes.
+sem writer. O próximo bloqueador P1 passa a ser a consolidação local das fontes de
+sessão confidential. O inventário read-only do VPS confirmou um
+`llama-server` local com Qwen3-4B-Q4_K_M em `127.0.0.1:8080`; as portas
+8601/18781/18782 estão fechadas e 18789 é o Gateway OpenClaw, não o endpoint de
+modelo. Antes de implementar o consolidador, validar `/health`, `/v1/models`
+e uma requisição sintética mínima em 8080. Depois ler somente por
+`read_consolidation_source(uuid)`, usar loopback local, operar em dry-run e
+manter revisão/submissão humana separadas. O consolidador NVIDIA existente
+continua proibido para essas fontes.
 Produção exige autorização separada. Não ampliar permissões nem autorizar
 EXECUTE em equipamento real.
 
