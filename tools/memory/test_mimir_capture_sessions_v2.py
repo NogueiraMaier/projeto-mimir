@@ -194,26 +194,31 @@ class CaptureSessionsV2Test(unittest.TestCase):
                                 "agent:main:telegram:direct:1",
                             "sessionId": telegram_id,
                             "status": "done",
+                            "updatedAt": 1790400000000,
                         },
                         {
                             "key": "agent:main:hud:foreign",
                             "sessionId": foreign_id,
                             "status": "done",
+                            "updatedAt": 1790400000000,
                         },
                         {
                             "key": "agent:main:hud:missing",
                             "sessionId": missing_id,
                             "status": "done",
+                            "updatedAt": 1790400000000,
                         },
                         {
                             "key": "agent:main:main",
                             "sessionId": secret_id,
                             "status": "done",
+                            "updatedAt": 1790400000000,
                         },
                         {
                             "key": "agent:main:cron:job",
                             "sessionId": cron_id,
                             "status": "done",
+                            "updatedAt": 1790400000000,
                         },
                         {
                             "key": "agent:main:hud:running",
@@ -376,6 +381,22 @@ class CaptureSessionsV2Test(unittest.TestCase):
                 1,
             )
             self.assertEqual(ready["owner_true"], 1)
+            self.assertEqual(
+                ready["source_updated_at_ms"],
+                1790400000000,
+            )
+            self.assertEqual(
+                ready["source_ref"],
+                "openclaw://agent/main/session/" + telegram_id,
+            )
+            self.assertRegex(
+                ready["source_fingerprint_sha256"],
+                r"^[0-9a-f]{64}$",
+            )
+            self.assertGreater(
+                ready["content_bytes"],
+                0,
+            )
 
             self.assertEqual(
                 sessions[
@@ -448,6 +469,7 @@ class CaptureSessionsV2Test(unittest.TestCase):
                             "key": key,
                             "sessionId": session_id,
                             "status": "done",
+                            "updatedAt": 1790400000000,
                         }
                     ],
                 },
