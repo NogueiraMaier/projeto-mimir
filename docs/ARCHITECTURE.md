@@ -65,15 +65,21 @@ ao agente main. Detalhes e limites: [OPERATIONS.md](OPERATIONS.md).
 
 ## Ingestão protegida de sessões
 
-As sessões concluídas são armazenadas em mimir.session_sources.
+O OpenClaw 2026.9.5 usa SQLite canônico por agente, mas o Mímir não lê o schema
+privado diretamente. O read-path validado usa `sessions --json` +
+`chat.history` e aplica owner-only fail-closed.
 
-A tabela contém a transcrição original e não permite acesso direto para mimir_app.
+As sessões elegíveis continuam destinadas a `mimir.session_sources`, sem
+SELECT direto para `mimir_app`. `memory_events` recebe somente proveniência e
+metadados estruturais; a classificação inicial permanece `confidential`.
 
-A função mimir.ingest_session executa a escrita com identidade peer validada.
+O contrato legado `mimir.ingest_session` representa fonte JSONL e não é
+adequado às sessões canônicas atuais. A migration proposta
+`014_api_session_ingestion_v2.sql` cria `mimir.ingest_session_v2`, registra
+proveniência `openclaw-chat-history-v2` e revoga de `mimir_app` o EXECUTE no
+ingresso legado. A 014 ainda não foi aplicada em produção.
 
-memory_events recebe somente o evento de proveniência e os metadados estruturais.
-
-A classificação inicial é confidential.
+Detalhes: [SESSION_INGESTION_V2.md](SESSION_INGESTION_V2.md).
 
 ## Consulta semântica
 
