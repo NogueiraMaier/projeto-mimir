@@ -2,7 +2,10 @@
 
 ## Próxima etapa
 
-Completar a escrita do cliente de ingestão protegida, atualmente restrito a dry-run, e o fluxo local de consolidação de sessões, sem promoção automática e sem API externa.
+O writer v2 de ingestão protegida já passou no laboratório isolado. A próxima
+etapa é completar o fluxo **local** de consolidação das sessões protegidas,
+usando `mimir.read_consolidation_source(uuid)`, modelo somente local/loopback,
+dry-run, revisão humana e nenhuma promoção automática ou API externa.
 
 ## Pipeline planejado
 
