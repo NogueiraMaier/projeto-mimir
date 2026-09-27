@@ -829,25 +829,46 @@ Migration numbering decision:
   is present its description must match the known operational revision exactly;
 - 014 never applies/enables `mimir_ops`.
 
-Important validation status:
+Capture-v2 provenance preflight revalidation completed successfully at the
+current branch checkpoint `700f640fb0a2e92be90de7a02459cb2eb02f104c`.
 
-- the earlier capture-v2 PASS was against source commit
-  `b8c020805bdf358d5211d8e1cb6b74aed9d2bc96`;
-- capture-v2 code changed afterward to add v2 provenance fields, so syntax,
-  synthetic tests and live dry-run must be repeated at the new branch HEAD
-  before lab DB testing is accepted;
-- migration 014 and its lab harness have not yet been executed anywhere by this
-  checkpoint;
-- production PostgreSQL remains unchanged.
+Evidence:
+
+- fresh isolated checkout:
+  `/var/tmp/mimir-capture-v2-validation-014-preflight`;
+- exact source guard: PASS;
+- Python syntax: PASS;
+- synthetic suite: 2 tests, PASS;
+- live Gateway dry-run: PASS;
+- mode remained `dry-run`;
+- `database_write=false`;
+- `staging_write=false`;
+- `content_exposed=false`;
+- `direct_sqlite_access=false`;
+- 18 canonical session rows considered;
+- 12 ready, 0 blocked, 6 skipped, 0 errors;
+- ready classes:
+  Telegram=1, HUD=3, ACP bridge=6, Maestro=1, main=1;
+- all 12 ready sessions carried the new v2 provenance fields and passed
+  `v2_provenance_guard`;
+- the six skipped sessions remained `status=unknown`;
+- production workspace guard passed.
+
+Checkpoint result:
+`MIMIR-CAPTURE-V2-014-PREFLIGHT = PASS`.
+
+Migration 014 and its lab harness still have not been executed by this
+checkpoint. Production PostgreSQL remains unchanged.
 
 Next executable action:
 
-1. create a fresh isolated checkout at the current branch HEAD and rerun
-   `py_compile` + `test_mimir_capture_sessions_v2.py` + one live dry-run;
-2. confirm 12 ready / 0 blocked / 6 skipped / 0 errors remains stable and the
-   new provenance fields are present for ready sessions;
-3. inventory the available disposable `mimir_lab*` database and run
-   `validate-session-ingestion-v2-lab.sh <lab_db>` only against that lab;
+1. inventory the currently available PostgreSQL databases matching
+   `mimir_lab*` without modifying them;
+2. if no suitable disposable lab exists, create/restore a lab only from the
+   previously validated lab backup procedure rather than cloning production ad
+   hoc;
+3. execute `validate-session-ingestion-v2-lab.sh <lab_db>` only against the
+   selected disposable lab;
 4. inspect migration/ACL/idempotency/protected-read/rejection/rollback results;
 5. do not implement or deploy the writer until the 014 lab checkpoint passes;
 6. do not deploy, schedule or execute any write path in production without a
