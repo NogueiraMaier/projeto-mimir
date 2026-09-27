@@ -1123,19 +1123,29 @@ Important: the inventory did not yet query port 8080 with an HTTP model API
 request, so OpenAI-compatible behavior on 8080 must still be validated before
 the consolidator is coded against it.
 
+Conversational security architecture is now versioned as a proposal for
+Projeto Mímir only:
+
+- `docs/CONVERSATIONAL_SECURITY.md`;
+- `docs/AI_SECURITY_TEST_MATRIX.md`;
+- no runtime policy or production permission changed.
+
+Design gap: the proposed security-oriented memory classes do not directly match
+the current Mímir `memory_type` values. Define an explicit mapping or schema
+extension before changing the database.
+
 Next executable action:
 
-1. probe only `127.0.0.1:8080` read-only using `/health` and `/v1/models`;
-2. if those identify the expected llama.cpp API, send one tiny synthetic
-   non-confidential chat-completions request and record response shape only;
-3. do not query real session content during this endpoint validation;
-4. then implement the local protected-session consolidator against an explicit
-   loopback endpoint contract, not against OpenClaw Gateway port 18789;
-5. read protected session content only via
-   `mimir.read_consolidation_source(uuid)`;
-6. keep consolidation dry-run only, with no candidate/active promotion;
-7. production stays schema 1..12; migration 014 and writer deployment still
-   require separate explicit authorization.
+1. complete the synthetic read-only probe of `127.0.0.1:8080`;
+2. inventory current enforcement versus the new security architecture;
+3. define the minimum untrusted-content envelope for the local consolidator;
+4. decide the memory-class mapping without changing production schema;
+5. then implement the consolidator using
+   `mimir.read_consolidation_source(uuid)`, loopback model access and dry-run
+   only;
+6. begin the memory/output-related adversarial tests first;
+7. production stays schema 1..12; migration 014 and writer deployment remain
+   separately authorized.
 
 
 ## PostgreSQL laboratory
