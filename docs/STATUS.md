@@ -121,7 +121,8 @@ históricas da memória e de governança não foram encerradas por esta revisão
 - **WRITER V2 PREFLIGHT — PASS:** syntax, capture regression, 4 testes sintéticos do writer e live capture regression passaram no commit `91309ff92dea041f03a66910402bb4fdcc0328c4`; live permaneceu 12 ready / 0 blocked / 6 skipped / 0 errors sem serializar conteúdo interno.
 - **WRITER LAB — HARNESS BUG CORRIGIDO:** o primeiro end-to-end parou no residue precheck antes de qualquer write porque placeholders `:'sid'` enviados via `psql -c` chegaram literais ao servidor. O harness foi corrigido para usar stdin/heredoc em todas as consultas com variáveis psql. Lab 1..12,14 permanece reutilizável e sem sessão sintética inserida.
 - **MIMIR-V1-MEMORY-WRITER-V2-LAB-01 — PASS:** writer dry-run/aprovação/write sintético/idempotência/proveniência/protected read/zero promoção automática/cleanup passaram no lab 1..12,14. Resíduo final: 0. Produção permaneceu 1..12, sem v14 e sem `mimir_ops`.
-- **PRÓXIMO P1:** implementar consolidação local de fontes de sessão protegidas via `read_consolidation_source(uuid)`, sem NVIDIA/API externa, dry-run somente e sem promoção automática; depois validar com fonte/modelo sintéticos.
+- **LOCAL MODEL INVENTORY — PASS:** VPS possui `llama-server` local como `openclaw`, modelo Qwen3-4B-Q4_K_M, bind `127.0.0.1:8080`, ctx 4096, 6 threads, parallel 1. Portas 8601/18781/18782 estão fechadas; 18789 é Gateway OpenClaw e não respondeu como `/v1/models` de modelo. Produção continuou 1..12 sem v14.
+- **PRÓXIMO P1:** validar HTTP/API somente em `127.0.0.1:8080` com requests sintéticos mínimos; depois implementar consolidação local protected-source via `read_consolidation_source(uuid)`, dry-run e sem promoção automática.
 - **NÃO AUTORIZADO AINDA:** equipamento real em EXECUTE.
 
 Lista mestre de execução: [MIMIR_V1_EXECUTION_PLAN.md](MIMIR_V1_EXECUTION_PLAN.md).
