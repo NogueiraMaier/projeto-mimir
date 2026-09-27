@@ -1196,18 +1196,51 @@ The empty content must not be treated as a successful model-answer validation.
 Qwen/llama.cpp may be consuming the small token budget in a reasoning field, but
 that is only a hypothesis until the synthetic response structure is inspected.
 
+Qwen chat-mode diagnosis completed on the canonical VPS endpoint
+`127.0.0.1:18782`.
+
+Evidence:
+
+- normal/default mode: HTTP 200, `finish_reason=stop`;
+- response message exposed both `content` and `reasoning_content`;
+- normal-mode `content`: 36 chars;
+- normal-mode `reasoning_content`: 947 chars;
+- normal-mode usage: 24 prompt + 236 completion = 260 total tokens;
+- request-local `chat_template_kwargs.enable_thinking=false`: HTTP 200,
+  `finish_reason=stop`;
+- direct-mode message contained only `content` + `role`;
+- direct-mode `content`: 36 chars;
+- direct-mode usage: 28 prompt + 11 completion = 39 total tokens;
+- direct-mode content was valid JSON exactly matching the synthetic contract:
+  `{"status":"ok","source":"synthetic"}`;
+- listener guard remained 18782 for llama.cpp and 18789 for OpenClaw Gateway;
+- no runtime configuration change was required for thinking mode.
+
+Checkpoint result:
+`MIMIR-V1-LOCAL-LLAMA-18782-CHAT-01 = PASS`.
+
+Design decision for the future protected-session consolidator:
+
+- use the canonical VPS endpoint `127.0.0.1:18782`;
+- set `chat_template_kwargs.enable_thinking=false` per request for structured
+  consolidation;
+- parse/persist only assistant `content`;
+- never persist, expose or treat `reasoning_content` as candidate memory;
+- require strict JSON output and fail closed on empty/invalid content.
+
 Next executable action:
 
-1. run a synthetic response-shape probe on 18782 that reports message keys,
-   content length, reasoning-field length and usage counts without using real
-   session data;
-2. repeat with a larger token budget and, if supported by this llama.cpp build,
-   `chat_template_kwargs.enable_thinking=false`;
-3. require non-empty assistant `content` and a valid synthetic JSON answer
-   before declaring chat inference PASS;
-4. do not change service/runtime configuration during this probe;
-5. after chat inference PASS, resume the conversational-security gap inventory
-   and protected-session local consolidator contract.
+1. produce the conversational-security current-state gap inventory from the
+   versioned Mímir architecture/code;
+2. classify each control as existing, partial, proposed or missing without
+   upgrading state based on model behavior alone;
+3. define the minimum security envelope for the protected-session local
+   consolidator;
+4. decide the mapping/extension for security-oriented memory classes without
+   changing production schema;
+5. then implement the consolidator repository-only and validate first with
+   synthetic protected source + fake loopback model;
+6. production stays schema 1..12; migration 014 and writer remain undeployed.
 
 
 ## PostgreSQL laboratory
