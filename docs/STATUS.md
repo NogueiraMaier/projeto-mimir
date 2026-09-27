@@ -115,7 +115,8 @@ históricas da memória e de governança não foram encerradas por esta revisão
 - **LAB 014 — RECONSTRUÇÃO NECESSÁRIA:** não existe `mimir_lab*` no cluster de produção; o laboratório anterior foi limpo intencionalmente. Foi adicionado `prepare-session-ingestion-v2-lab.sh` para recriar um PostgreSQL 17 isolado em `/var/tmp/mimir-pg14-lab` a partir do bootstrap canônico + migrations 002..012, sem clonar produção. O validador 014 agora rejeita explicitamente socket/porta de produção e verifica o `data_directory` temporário.
 - **LAB 014 SOCKET — CAUSA EXATA CONFIRMADA:** o retry falhou porque `unix_socket_group=openclaw` exigia que o processo PostgreSQL mudasse o grupo do socket para `openclaw`, mas a conta `postgres` não pertence a esse grupo; o kernel retornou `Operation not permitted`. A 014 não foi aplicada e produção permaneceu intacta.
 - **CORREÇÃO VERSIONADA:** LAB_ROOT permanece `postgres:openclaw 0710` e socket dir `postgres:openclaw 0770`; o socket fica `postgres:postgres 0777`. O diretório restringe quem alcança o socket e peer/pg_ident continua impondo `openclaw -> mimir_app`, sem alteração persistente de grupos do host.
-- **PRÓXIMO:** apagar o lab parado, clonar HEAD novo e reconstruir do zero; somente após socket/peer/baseline PASS executar a 014 no cluster temporário.
+- **LAB 014 BASELINE — PASS:** rebuild limpo no commit `7815cb4b9d8b62c4d7e64e6e5c2decf15564cfa3` confirmou cluster isolado, socket `postgres:postgres 0777` atrás de diretórios restritos, bootstrap v1 + migrations 002..012, schema 1..12, peer `mimir_app|peer:openclaw` e produção intacta.
+- **PRÓXIMO:** manter esse lab/checkout e executar `validate-session-ingestion-v2-lab.sh mimir_memory` somente no socket 55433; writer/deploy continuam bloqueados.
 - **NÃO AUTORIZADO AINDA:** equipamento real em EXECUTE.
 
 Lista mestre de execução: [MIMIR_V1_EXECUTION_PLAN.md](MIMIR_V1_EXECUTION_PLAN.md).
