@@ -1,14 +1,15 @@
 #!/bin/bash
 set -euo pipefail
 
-DB="${1:-}"
+DB="${1:-mimir_memory}"
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 MIGRATION="$ROOT_DIR/tools/memory/migrations/014_api_session_ingestion_v2.sql"
 
+LAB_ROOT="${MIMIR_LAB_ROOT:-/var/tmp/mimir-pg14-lab}"
 PSQL="${PSQL:-/usr/lib64/postgresql-17/bin/psql}"
 PG_DUMP="${PG_DUMP:-/usr/lib64/postgresql-17/bin/pg_dump}"
-PGHOST="${PGHOST:-/run/postgresql}"
-PGPORT="${PGPORT:-5432}"
+PGHOST="${PGHOST:-$LAB_ROOT/socket}"
+PGPORT="${PGPORT:-55433}"
 
 fail() {
     echo "FAIL: $*" >&2
@@ -19,23 +20,32 @@ if [[ $EUID -ne 0 ]]; then
     fail "execute como root para alternar entre postgres e openclaw"
 fi
 
-if [[ -z "$DB" ]]; then
-    fail "uso: $0 mimir_lab..."
-fi
+[[ -n "$DB" ]] || fail "nome do banco ausente"
+[[ "$LAB_ROOT" == /var/tmp/mimir-* ]] || fail "LAB_ROOT deve ficar sob /var/tmp/mimir-*"
+[[ "$PGHOST" == "$LAB_ROOT/socket" ]] || fail "socket fora do LAB_ROOT recusado"
+[[ "$PGPORT" != "5432" ]] || fail "porta de produção recusada"
+[[ "$PGHOST" != "/run/postgresql" ]] || fail "socket de produção recusado"
+[[ -S "$PGHOST/.s.PGSQL.$PGPORT" ]] || fail "socket do laboratório ausente"
+[[ -s "$MIGRATION" ]] || fail "migration 014 não encontrada"
 
 case "$DB" in
-    mimir_lab*)
+    mimir_memory|mimir_lab*)
         ;;
     *)
-        fail "banco recusado: use somente banco descartável com prefixo mimir_lab"
+        fail "banco recusado: use mimir_memory no cluster lab ou prefixo mimir_lab"
         ;;
 esac
 
-[[ "$DB" != "mimir_memory" ]] || fail "produção explicitamente proibida"
-[[ -s "$MIGRATION" ]] || fail "migration 014 não encontrada"
+LAB_DATA_DIR="$(
+    runuser -u postgres -- "$PSQL"         -X -w         -h "$PGHOST"         -p "$PGPORT"         -d postgres         -At         -v ON_ERROR_STOP=1         -c "SHOW data_directory;"
+)"
+
+[[ "$LAB_DATA_DIR" == "$LAB_ROOT/data" ]]     || fail "data_directory não pertence ao laboratório esperado: $LAB_DATA_DIR"
 
 echo "=== MIMIR SESSION INGESTION V2 / LAB VALIDATION ==="
 echo "database=$DB"
+echo "lab_root=$LAB_ROOT"
+echo "data_directory=$LAB_DATA_DIR"
 echo "migration=$MIGRATION"
 
 echo
