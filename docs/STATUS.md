@@ -111,8 +111,8 @@ históricas da memória e de governança não foram encerradas por esta revisão
 - **COLETOR V2 READ-PATH — PASS:** checkout isolado em `/var/tmp` validou `py_compile`, 2 testes sintéticos e dry-run contra o Gateway real. Resultado: 18 sessões consideradas, 12 ready, 0 blocked, 6 skipped (`status=unknown`), 0 errors; sem escrita PostgreSQL, sem staging, sem exposição de conteúdo e sem SQL direto no SQLite. As 12 ready coincidem com o survey anterior e preservam owner provenance.
 - **WRITE-PATH V2 — CONTRATO REPOSITÓRIO IMPLEMENTADO:** `014_api_session_ingestion_v2.sql` define proveniência `openclaw-chat-history-v2`, cria `ingest_session_v2`, preserva fonte confidential/protegida e revoga o ingresso legado de `mimir_app`. A 013 operacional permanece reservada e não foi renumerada. Nada foi aplicado em produção.
 - **VALIDAÇÃO 014 PREPARADA:** `validate-session-ingestion-v2-lab.sh` exige banco `mimir_lab*`, faz dump pré-014 e testa ACL, peer, idempotência, protected read, rejeições e ausência de resíduo sintético.
-- **REVALIDAÇÃO READ-PATH NECESSÁRIA:** o coletor v2 recebeu novos metadados seguros de proveniência após o PASS anterior; repetir sintaxe/testes/live dry-run no HEAD atual antes de aceitar o checkpoint de lab.
-- **PRÓXIMO:** revalidar capture v2 no HEAD atual e então executar a migration 014 somente no PostgreSQL lab descartável; writer/deploy continuam bloqueados.
+- **CAPTURE V2 / 014 PREFLIGHT — PASS:** checkout isolado no HEAD `700f640fb0a2e92be90de7a02459cb2eb02f104c` passou source guard, py_compile, 2 testes sintéticos e live dry-run. Resultado permaneceu 18 consideradas / 12 ready / 0 blocked / 6 skipped / 0 errors; os 12 ready passaram `v2_provenance_guard` com os novos metadados seguros.
+- **PRÓXIMO:** inventariar banco `mimir_lab*` disponível e executar a 014 somente em laboratório descartável pelo validador dedicado. Writer/deploy continuam bloqueados.
 - **NÃO AUTORIZADO AINDA:** equipamento real em EXECUTE.
 
 Lista mestre de execução: [MIMIR_V1_EXECUTION_PLAN.md](MIMIR_V1_EXECUTION_PLAN.md).
