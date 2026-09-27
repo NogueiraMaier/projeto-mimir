@@ -197,13 +197,16 @@ da API. O diagnóstico localizou a origem exata do drift:
 fallback VPS continua 18782. A correção de runtime foi executada: `listen_port` passou para 18782,
 somente `mimir-llama` foi reiniciado e o processo/listener confirmaram
 `127.0.0.1:18782`, sem 8080 na saída. O readiness foi confirmado em 18782: `/health` 200/ok e
-`/v1/models` identificou Qwen3-4B-Q4_K_M. O chat sintético também respondeu
-HTTP 200 com shape OpenAI-compatible, mas terminou em `finish_reason=length`
-e `content` vazio. Portanto o endpoint está operacional, porém ainda não há
-evidência de resposta textual utilizável. Inspecionar a estrutura sintética,
-eventual reasoning field e token usage; testar orçamento maior e thinking
-desabilitado se suportado. Só após `content` não vazio seguir para o gap
-inventory da nova arquitetura de segurança conversacional. Então ler por
+`/v1/models` identificou Qwen3-4B-Q4_K_M. O diagnóstico de chat fechou o comportamento do Qwen3. Em modo normal a
+resposta trouxe `content` + `reasoning_content` (36 e 947 chars,
+respectivamente) e consumiu 236 completion tokens. Com
+`chat_template_kwargs.enable_thinking=false`, a mesma tarefa retornou apenas
+`content`, JSON sintético válido, em 11 completion tokens. Assim,
+`MIMIR-V1-LOCAL-LLAMA-18782-CHAT-01 = PASS`. Para consolidação estruturada,
+usar thinking desabilitado por request, processar somente `message.content` e
+nunca persistir/expor `reasoning_content`. O próximo passo é o gap inventory
+da nova arquitetura de segurança conversacional e o contrato seguro do
+consolidator. Então ler por
 `read_consolidation_source(uuid)`, usar loopback local, operar em dry-run e
 manter revisão/submissão humana separadas. O consolidador NVIDIA existente
 continua proibido para essas fontes.
