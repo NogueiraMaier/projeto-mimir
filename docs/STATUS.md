@@ -122,7 +122,9 @@ históricas da memória e de governança não foram encerradas por esta revisão
 - **WRITER LAB — HARNESS BUG CORRIGIDO:** o primeiro end-to-end parou no residue precheck antes de qualquer write porque placeholders `:'sid'` enviados via `psql -c` chegaram literais ao servidor. O harness foi corrigido para usar stdin/heredoc em todas as consultas com variáveis psql. Lab 1..12,14 permanece reutilizável e sem sessão sintética inserida.
 - **MIMIR-V1-MEMORY-WRITER-V2-LAB-01 — PASS:** writer dry-run/aprovação/write sintético/idempotência/proveniência/protected read/zero promoção automática/cleanup passaram no lab 1..12,14. Resíduo final: 0. Produção permaneceu 1..12, sem v14 e sem `mimir_ops`.
 - **LOCAL MODEL INVENTORY — PASS:** VPS possui `llama-server` local como `openclaw`, modelo Qwen3-4B-Q4_K_M, bind `127.0.0.1:8080`, ctx 4096, 6 threads, parallel 1. Portas 8601/18781/18782 estão fechadas; 18789 é Gateway OpenClaw e não respondeu como `/v1/models` de modelo. Produção continuou 1..12 sem v14.
-- **PRÓXIMO P1:** validar HTTP/API somente em `127.0.0.1:8080` com requests sintéticos mínimos; depois implementar consolidação local protected-source via `read_consolidation_source(uuid)`, dry-run e sem promoção automática.
+- **AI/CONVERSATIONAL SECURITY — PROPOSTA VERSIONADA:** `CONVERSATIONAL_SECURITY.md` formaliza conteúdo externo como dado não confiável e separa identidade/autorização de conteúdo; `AI_SECURITY_TEST_MATRIX.md` registra T-AI-001..035. Não declarar a camada como implementada sem enforcement e evidência.
+- **GAP DE MODELAGEM:** as classes de memória de segurança propostas não correspondem diretamente aos `memory_type` atuais; requer decisão explícita de mapping/extension antes de alterar schema.
+- **PRÓXIMO P1:** concluir o probe sintético de `127.0.0.1:8080`; depois fazer gap inventory da arquitetura atual versus a nova política e definir o envelope de segurança do consolidator local antes de codificá-lo.
 - **NÃO AUTORIZADO AINDA:** equipamento real em EXECUTE.
 
 Lista mestre de execução: [MIMIR_V1_EXECUTION_PLAN.md](MIMIR_V1_EXECUTION_PLAN.md).
