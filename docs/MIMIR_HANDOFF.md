@@ -1146,22 +1146,33 @@ Design gap: the proposed security-oriented memory classes do not directly match
 the current Mímir `memory_type` values. Define an explicit mapping or schema
 extension before changing the database.
 
+Port-drift diagnosis completed.
+
+Observed source of the VPS llama.cpp drift:
+
+- `/etc/init.d/mimir-llama` is parameterized and uses
+  `--port ${listen_port}`;
+- `/etc/conf.d/mimir-llama` explicitly sets
+  `listen_port="8080"`;
+- the running process therefore receives `--port 8080`;
+- the actual listener is `127.0.0.1:8080`;
+- canonical Mímir port map remains:
+  PcIA CUDA=18781, VPS CPU fallback=18782, OpenClaw Gateway=18789;
+- production PostgreSQL remained versions 1..12 and version14=false.
+
+Root cause: configuration drift in `/etc/conf.d/mimir-llama`, not an
+architectural decision and not a llama.cpp API limitation.
+
 Next executable action:
 
-1. diagnose read-only why VPS `mimir-llama` is bound to 8080 instead of the
-   established fallback port 18782;
-2. confirm the service/config source that injects `--port 8080`; do not change
-   it yet;
-3. only after the port drift is resolved/authorized, validate the canonical
-   local-model endpoint with synthetic content;
-4. inventory current enforcement versus the new security architecture;
-5. define the minimum untrusted-content envelope for the local consolidator and
-   the memory-class mapping without changing production schema;
-6. then implement the consolidator using
-   `mimir.read_consolidation_source(uuid)`, loopback model access and dry-run
-   only;
-7. production stays schema 1..12; migration 014, writer deployment and runtime
-   port changes remain separately authorized.
+1. do not change the service until explicit runtime authorization is given;
+2. when authorized, change only `listen_port` in
+   `/etc/conf.d/mimir-llama` from 8080 to 18782;
+3. validate syntax/state, restart only `mimir-llama`, and verify
+   `127.0.0.1:18782` is listening while 8080 is closed;
+4. then run the synthetic health/models/chat probe against 18782;
+5. only after that resume the local consolidator/security-gap work;
+6. production database remains out of scope for this port correction.
 
 
 ## PostgreSQL laboratory
