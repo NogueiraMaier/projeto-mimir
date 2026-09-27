@@ -180,9 +180,13 @@ sintéticos do writer e live capture regression mantiveram 12 ready / 0 blocked 
 6 skipped / 0 errors sem exposição de conteúdo. O primeiro end-to-end de lab
 parou antes do write por um bug do harness: variáveis psql em consultas
 `-c` chegaram literais ao servidor. O harness foi corrigido para stdin/heredoc.
-Atualizar o checkout e rerodar somente o writer end-to-end no lab 1..12,14,
-exigindo idempotência, protected read, zero promoção automática e cleanup
-sintético. Produção continua sem 014 e sem writer.
+O writer end-to-end passou no lab 1..12,14: dry-run/aprovação, write
+sintético, replay idempotente, proveniência persistida, protected read, zero
+promoção automática e cleanup sem resíduo. Produção permaneceu 1..12, sem 014 e
+sem writer. O próximo bloqueador P1 passa a ser a consolidação local das fontes
+de sessão confidential: ler somente por `read_consolidation_source(uuid)`,
+usar modelo local/loopback, operar em dry-run e manter revisão/submissão humana
+separadas. O consolidador NVIDIA existente continua proibido para essas fontes.
 Produção exige autorização separada. Não ampliar permissões nem autorizar
 EXECUTE em equipamento real.
 
