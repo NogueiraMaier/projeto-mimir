@@ -184,13 +184,17 @@ O writer end-to-end passou no lab 1..12,14: dry-run/aprovação, write
 sintético, replay idempotente, proveniência persistida, protected read, zero
 promoção automática e cleanup sem resíduo. Produção permaneceu 1..12, sem 014 e
 sem writer. O próximo bloqueador P1 passa a ser a consolidação local das fontes de
-sessão confidential. O inventário read-only do VPS confirmou um
-`llama-server` local com Qwen3-4B-Q4_K_M em `127.0.0.1:8080`; as portas
-8601/18781/18782 estão fechadas e 18789 é o Gateway OpenClaw, não o endpoint de
-modelo. Antes de implementar o consolidador, validar `/health`, `/v1/models`
-e uma requisição sintética mínima em 8080. Depois executar o gap inventory da
-nova arquitetura de segurança conversacional e definir o envelope de conteúdo
-não confiável do consolidator. Só então ler por
+sessão confidential. O inventário read-only do VPS encontrou um
+`llama-server` local com Qwen3-4B-Q4_K_M em `127.0.0.1:8080`, mas isso
+contraria o mapa de portas já definido para o Mímir: PcIA CUDA=18781, VPS CPU
+fallback=18782 e OpenClaw Gateway=18789. Portanto 8080 deve ser tratado como
+drift/configuração a diagnosticar, não como endpoint canônico. Um probe posterior
+confirmou `/health` e `/v1/models` em 8080; o chat probe ficou inconclusivo
+por erro no comando de teste (pipe + Python heredoc), não por falha comprovada
+da API. Antes de implementar o consolidador, localizar read-only a origem de
+`--port 8080` e reconciliar a configuração com 18782 mediante autorização.
+Depois executar o gap inventory da nova arquitetura de segurança conversacional
+e definir o envelope de conteúdo não confiável do consolidator. Só então ler por
 `read_consolidation_source(uuid)`, usar loopback local, operar em dry-run e
 manter revisão/submissão humana separadas. O consolidador NVIDIA existente
 continua proibido para essas fontes.
