@@ -133,7 +133,8 @@ históricas da memória e de governança não foram encerradas por esta revisão
 - **DECISÃO PARA CONSOLIDATOR:** usar `enable_thinking=false` por request, aceitar/persistir somente `message.content`, rejeitar conteúdo vazio/JSON inválido e nunca persistir/expor `reasoning_content`.
 - **AI SECURITY GAP INVENTORY — VERSIONADO:** `AI_SECURITY_GAP_INVENTORY.md` classifica controles atuais como EXISTING_VALIDATED/PARTIAL/PROPOSED/MISSING/OUT_OF_SCOPE_NOW e fixa os gaps do consolidator protected-source.
 - **DECISÃO DE MODELAGEM AINDA PENDENTE:** não sobrecarregar `memory_type`; avaliar dimensão separada de trust/validation por ADR antes de qualquer mudança de schema.
-- **PRÓXIMO P1:** versionar o contrato fechado do consolidator local protected-source e só então implementar dry-run repository-only + testes T-AI prioritários.
+- **PROTECTED SESSION CONSOLIDATOR CONTRACT — VERSIONADO:** `PROTECTED_SESSION_CONSOLIDATOR_V1.md` fixa endpoint 18782, `enable_thinking=false`, source untrusted, output `UNTRUSTED_OBSERVATION`, schema fechado, secret gate externo ao LLM e dry-run sem promoção.
+- **PRÓXIMO P1:** implementar o consolidator repository-only em dry-run + fake loopback model + bateria T-AI-002/005/023/024/032/033/034 antes de qualquer sessão real.
 - **NÃO AUTORIZADO AINDA:** equipamento real em EXECUTE.
 
 Lista mestre de execução: [MIMIR_V1_EXECUTION_PLAN.md](MIMIR_V1_EXECUTION_PLAN.md).
