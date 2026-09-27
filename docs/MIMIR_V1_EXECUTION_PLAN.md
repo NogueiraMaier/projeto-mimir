@@ -171,9 +171,15 @@ permissões validados, bootstrap v1 + replay 002..012, schema 1..12, peer
 lab, ACL e peer corretos, ingestão sintética idempotente, leitura protegida,
 negativos de classe/hash e zero resíduo após rollback. O lab terminou em
 1..12,14 e produção permaneceu 1..12, sem v14 e sem `mimir_ops`.
-Implementar agora o writer v2 somente no repositório, reutilizando a captura
-validada em processo, dry-run por padrão e seleção/aprovação explícita. Depois
-validar o writer somente no lab antes de qualquer autorização de produção.
+O writer v2 já foi implementado somente no repositório. Ele reutiliza a
+captura em processo, exige fingerprints esperados, é dry-run por padrão, emite
+approval digest e só escreve com `--write --approve` por socket Unix local; o
+conteúdo não entra em stdout/staging/argv. Testes sintéticos e um validador
+end-to-end de lab também foram adicionados. Como o capturador recebeu o handoff
+interno `include_content`, revalidar agora syntax + suítes + live capture
+dry-run no HEAD novo. Depois executar o writer somente no lab 1..12,14 e exigir
+idempotência, protected read, zero promoção automática e cleanup sintético antes
+de qualquer autorização de produção.
 Produção exige autorização separada. Não ampliar permissões nem autorizar
 EXECUTE em equipamento real.
 
