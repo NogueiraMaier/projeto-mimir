@@ -175,11 +175,14 @@ O writer v2 já foi implementado somente no repositório. Ele reutiliza a
 captura em processo, exige fingerprints esperados, é dry-run por padrão, emite
 approval digest e só escreve com `--write --approve` por socket Unix local; o
 conteúdo não entra em stdout/staging/argv. Testes sintéticos e um validador
-end-to-end de lab também foram adicionados. Como o capturador recebeu o handoff
-interno `include_content`, revalidar agora syntax + suítes + live capture
-dry-run no HEAD novo. Depois executar o writer somente no lab 1..12,14 e exigir
-idempotência, protected read, zero promoção automática e cleanup sintético antes
-de qualquer autorização de produção.
+end-to-end de lab também foram adicionados. A revalidação do capture/writer passou: syntax, capture tests, quatro testes
+sintéticos do writer e live capture regression mantiveram 12 ready / 0 blocked /
+6 skipped / 0 errors sem exposição de conteúdo. O primeiro end-to-end de lab
+parou antes do write por um bug do harness: variáveis psql em consultas
+`-c` chegaram literais ao servidor. O harness foi corrigido para stdin/heredoc.
+Atualizar o checkout e rerodar somente o writer end-to-end no lab 1..12,14,
+exigindo idempotência, protected read, zero promoção automática e cleanup
+sintético. Produção continua sem 014 e sem writer.
 Produção exige autorização separada. Não ampliar permissões nem autorizar
 EXECUTE em equipamento real.
 
