@@ -188,7 +188,9 @@ sessão confidential. O inventário read-only do VPS confirmou um
 `llama-server` local com Qwen3-4B-Q4_K_M em `127.0.0.1:8080`; as portas
 8601/18781/18782 estão fechadas e 18789 é o Gateway OpenClaw, não o endpoint de
 modelo. Antes de implementar o consolidador, validar `/health`, `/v1/models`
-e uma requisição sintética mínima em 8080. Depois ler somente por
+e uma requisição sintética mínima em 8080. Depois executar o gap inventory da
+nova arquitetura de segurança conversacional e definir o envelope de conteúdo
+não confiável do consolidator. Só então ler por
 `read_consolidation_source(uuid)`, usar loopback local, operar em dry-run e
 manter revisão/submissão humana separadas. O consolidador NVIDIA existente
 continua proibido para essas fontes.
@@ -389,3 +391,38 @@ A correção validada foi `last_action.payload#>>'{action,operation}'`, commit `
 O teste gerou `completed_at` no arquivo de request antes de executar `intervention.begin`, e por isso o valor persistido ficou alguns milissegundos anterior ao `started_at` registrado pelo banco. A API aceitou essa cronologia impossível porque hoje valida apenas a presença de `completed_at`, não `completed_at >= started_at`.
 
 Esse ponto deve ser corrigido e coberto por teste antes de avançar para o fluxo EXECUTE sintético.
+
+
+## P1 — Segurança conversacional, conteúdo não confiável e tool-use
+
+Documentos:
+- `docs/CONVERSATIONAL_SECURITY.md`
+- `docs/AI_SECURITY_TEST_MATRIX.md`
+
+Escopo exclusivo do Projeto Mímir. Não misturar estado ou implementação com
+Sistema-OS.
+
+Estado inicial:
+- [x] arquitetura de segurança conversacional versionada;
+- [x] matriz adversarial T-AI-001..035 versionada;
+- [ ] mapear controles já existentes versus requisitos propostos;
+- [ ] definir envelope canônico de provenance/trust para inputs externos;
+- [ ] definir identidade, principal, tenant e scope por canal;
+- [ ] definir capability model e policy gate externo ao LLM;
+- [ ] definir validação tipada de parâmetros de ferramentas;
+- [ ] definir delegação de subagentes sem herança automática de privilégio;
+- [ ] definir model-routing policy sem ampliação de capability/secret/scope;
+- [ ] definir context minimization e output exposure gate;
+- [ ] definir eventos de auditoria e anti-replay para ações sensíveis;
+- [ ] decidir mapping/extension entre os `memory_type` atuais e as classes
+  FACT/PREFERENCE/EPHEMERAL_CONTEXT/OPERATIONAL_STATE/SECURITY_DECISION/
+  UNTRUSTED_OBSERVATION;
+- [ ] implementar os controles mínimos necessários ao consolidator confidential;
+- [ ] executar primeiro os testes T-AI ligados a conteúdo externo, memória e
+  saída;
+- [ ] exigir evidência de enforcement fora do LLM para PASS crítico;
+- [ ] bloquear novos canais ou capabilities sensíveis até os gates
+  correspondentes estarem validados.
+
+Regra de estado: esta seção representa **PROPOSTA VERSIONADA**, não controle
+implementado. Cada item precisa de implementação, validação e evidência próprias.
