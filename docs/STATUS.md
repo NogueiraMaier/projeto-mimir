@@ -112,7 +112,8 @@ históricas da memória e de governança não foram encerradas por esta revisão
 - **WRITE-PATH V2 — CONTRATO REPOSITÓRIO IMPLEMENTADO:** `014_api_session_ingestion_v2.sql` define proveniência `openclaw-chat-history-v2`, cria `ingest_session_v2`, preserva fonte confidential/protegida e revoga o ingresso legado de `mimir_app`. A 013 operacional permanece reservada e não foi renumerada. Nada foi aplicado em produção.
 - **VALIDAÇÃO 014 PREPARADA:** `validate-session-ingestion-v2-lab.sh` exige banco `mimir_lab*`, faz dump pré-014 e testa ACL, peer, idempotência, protected read, rejeições e ausência de resíduo sintético.
 - **CAPTURE V2 / 014 PREFLIGHT — PASS:** checkout isolado no HEAD `700f640fb0a2e92be90de7a02459cb2eb02f104c` passou source guard, py_compile, 2 testes sintéticos e live dry-run. Resultado permaneceu 18 consideradas / 12 ready / 0 blocked / 6 skipped / 0 errors; os 12 ready passaram `v2_provenance_guard` com os novos metadados seguros.
-- **PRÓXIMO:** inventariar banco `mimir_lab*` disponível e executar a 014 somente em laboratório descartável pelo validador dedicado. Writer/deploy continuam bloqueados.
+- **LAB 014 — RECONSTRUÇÃO NECESSÁRIA:** não existe `mimir_lab*` no cluster de produção; o laboratório anterior foi limpo intencionalmente. Foi adicionado `prepare-session-ingestion-v2-lab.sh` para recriar um PostgreSQL 17 isolado em `/var/tmp/mimir-pg14-lab` a partir do bootstrap canônico + migrations 002..012, sem clonar produção. O validador 014 agora rejeita explicitamente socket/porta de produção e verifica o `data_directory` temporário.
+- **PRÓXIMO:** executar o preparo do lab isolado no HEAD atual, confirmar baseline 1..12/peer/prod intacta e então rodar a 014 somente nesse cluster temporário.
 - **NÃO AUTORIZADO AINDA:** equipamento real em EXECUTE.
 
 Lista mestre de execução: [MIMIR_V1_EXECUTION_PLAN.md](MIMIR_V1_EXECUTION_PLAN.md).
