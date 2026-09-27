@@ -159,10 +159,11 @@ Validação em sessão Telegram nova confirmou o caminho explícito de memória:
 O primeiro rebuild do lab temporário confirmou produção intacta, cluster
 isolado, bootstrap v1 e replay 002..012, mas parou antes da 014 porque
 `openclaw` não conseguia atravessar o diretório pai 0700 até o Unix socket.
-O problema foi corrigido no script versionado com grupo do `openclaw`, pai
-0710, socket 0770/`unix_socket_group` e guardas explícitas. Descartar o lab
-parcial e repetir o rebuild do zero no HEAD novo; somente após confirmar
-baseline 1..12 + peer `openclaw -> mimir_app` executar a migration 014 no lab.
+O primeiro ajuste de permissão permitiu avançar o desenho, porém o retry do lab
+falhou ainda no `pg_ctl start`, antes de qualquer migration 014. Não repetir o
+start às cegas: ler o log e a configuração efetiva do cluster temporário,
+identificar a causa exata, corrigir no repositório e somente então reconstruir
+do zero. Produção permanece 1..12 e sem `mimir_ops`.
 Não implementar writer nem promover memória até esse checkpoint passar.
 Produção exige autorização separada. Não ampliar permissões nem autorizar
 EXECUTE em equipamento real.
