@@ -117,7 +117,8 @@ históricas da memória e de governança não foram encerradas por esta revisão
 - **CORREÇÃO VERSIONADA:** LAB_ROOT permanece `postgres:openclaw 0710` e socket dir `postgres:openclaw 0770`; o socket fica `postgres:postgres 0777`. O diretório restringe quem alcança o socket e peer/pg_ident continua impondo `openclaw -> mimir_app`, sem alteração persistente de grupos do host.
 - **LAB 014 BASELINE — PASS:** rebuild limpo no commit `7815cb4b9d8b62c4d7e64e6e5c2decf15564cfa3` confirmou cluster isolado, socket `postgres:postgres 0777` atrás de diretórios restritos, bootstrap v1 + migrations 002..012, schema 1..12, peer `mimir_app|peer:openclaw` e produção intacta.
 - **MIMIR-V1-MEMORY-014-LAB-01 — PASS:** migration 014 aplicada somente no lab isolado com dump pré-014 SHA-256 `82c9ecc10835f47555ee4770bb7f7533e14b32b6876b6bc3a0dcbb92ffd0e2f4`. ACL, peer, idempotência, protected read, rejeição de classe/hash e rollback sem resíduo passaram. Lab ficou em 1..12,14; produção permaneceu 1..12, sem v14 e sem `mimir_ops`.
-- **PRÓXIMO:** implementar no repositório o writer v2 reutilizando a captura validada in-process, dry-run por padrão e seleção/aprovação explícita; validar somente no lab antes de qualquer produção.
+- **WRITER V2 — IMPLEMENTADO NO REPOSITÓRIO, NÃO VALIDADO:** `mimir-ingest-session-v2.py` reutiliza a captura in-process, exige hashes esperados, emite approval digest em dry-run e requer `--write --approve` para escrita local via socket Unix. Conteúdo vai ao psql somente por stdin, sem staging/argv/stdout. Foram adicionados testes sintéticos e validador end-to-end de laboratório.
+- **PRÓXIMO:** revalidar capture/writer no HEAD novo (py_compile + suítes + live capture dry-run) e só depois executar o writer sintético contra o lab 1..12,14 existente. Produção continua bloqueada.
 - **NÃO AUTORIZADO AINDA:** equipamento real em EXECUTE.
 
 Lista mestre de execução: [MIMIR_V1_EXECUTION_PLAN.md](MIMIR_V1_EXECUTION_PLAN.md).
