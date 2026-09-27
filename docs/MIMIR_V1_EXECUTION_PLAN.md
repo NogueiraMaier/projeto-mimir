@@ -421,7 +421,8 @@ Sistema-OS.
 Estado inicial:
 - [x] arquitetura de segurança conversacional versionada;
 - [x] matriz adversarial T-AI-001..035 versionada;
-- [ ] mapear controles já existentes versus requisitos propostos;
+- [x] mapear controles já existentes versus requisitos propostos
+  (`docs/AI_SECURITY_GAP_INVENTORY.md`);
 - [ ] definir envelope canônico de provenance/trust para inputs externos;
 - [ ] definir identidade, principal, tenant e scope por canal;
 - [ ] definir capability model e policy gate externo ao LLM;
