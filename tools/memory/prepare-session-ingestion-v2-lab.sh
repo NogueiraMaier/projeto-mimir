@@ -8,6 +8,7 @@ PORT="${MIMIR_LAB_PORT:-55433}"
 DB="mimir_memory"
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+OPENCLAW_GROUP="$(id -gn openclaw)"
 
 INITDB="${INITDB:-/usr/lib64/postgresql-17/bin/initdb}"
 PG_CTL="${PG_CTL:-/usr/lib64/postgresql-17/bin/pg_ctl}"
@@ -81,10 +82,15 @@ echo
 echo "--- 2. initialize isolated PostgreSQL 17 cluster ---"
 
 mkdir -p "$LAB_ROOT" "$SOCK"
-chown postgres:postgres "$LAB_ROOT"
-chmod 0700 "$LAB_ROOT"
-chown postgres:postgres "$SOCK"
-chmod 0777 "$SOCK"
+
+# The socket is intentionally reachable by the Linux openclaw identity only.
+# DATA stays private to postgres. The parent needs execute permission for the
+# openclaw group, otherwise a 0770 socket directory is still unreachable.
+chown postgres:"$OPENCLAW_GROUP" "$LAB_ROOT"
+chmod 0710 "$LAB_ROOT"
+
+chown postgres:"$OPENCLAW_GROUP" "$SOCK"
+chmod 0770 "$SOCK"
 
 runuser -u postgres -- "$INITDB" \
     -D "$DATA" \
@@ -100,7 +106,8 @@ cat >> "$DATA/postgresql.conf" <<EOF
 listen_addresses = ''
 port = $PORT
 unix_socket_directories = '$SOCK'
-unix_socket_permissions = 0777
+unix_socket_group = '$OPENCLAW_GROUP'
+unix_socket_permissions = 0770
 max_connections = 30
 fsync = on
 synchronous_commit = on
@@ -140,6 +147,26 @@ runuser -u postgres -- "$PG_CTL" \
     start >/dev/null
 
 test -S "$SOCK/.s.PGSQL.$PORT"
+
+runuser -u openclaw -- test -x "$LAB_ROOT"
+runuser -u openclaw -- test -x "$SOCK"
+
+SOCKET_META="$(
+    stat -c '%U:%G:%a' "$SOCK/.s.PGSQL.$PORT"
+)"
+
+EXPECTED_SOCKET_GROUP="$OPENCLAW_GROUP"
+
+case "$SOCKET_META" in
+    postgres:"$EXPECTED_SOCKET_GROUP":770)
+        ;;
+    *)
+        fail "permissões inesperadas no socket do laboratório: $SOCKET_META"
+        ;;
+esac
+
+echo "socket_permissions=PASS"
+echo "socket_meta=$SOCKET_META"
 
 LAB_DATA_DIR="$(
     runuser -u postgres -- "$PSQL" \
