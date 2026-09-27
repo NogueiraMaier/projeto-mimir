@@ -126,7 +126,9 @@ históricas da memória e de governança não foram encerradas por esta revisão
 - **AI/CONVERSATIONAL SECURITY — PROPOSTA VERSIONADA:** `CONVERSATIONAL_SECURITY.md` formaliza conteúdo externo como dado não confiável e separa identidade/autorização de conteúdo; `AI_SECURITY_TEST_MATRIX.md` registra T-AI-001..035. Não declarar a camada como implementada sem enforcement e evidência.
 - **GAP DE MODELAGEM:** as classes de memória de segurança propostas não correspondem diretamente aos `memory_type` atuais; requer decisão explícita de mapping/extension antes de alterar schema.
 - **LLAMA PORT DRIFT — CAUSA CONFIRMADA:** `/etc/init.d/mimir-llama` usa `--port ${listen_port}` e `/etc/conf.d/mimir-llama` define explicitamente `listen_port="8080"`. A porta canônica VPS continua 18782; 8080 é drift de configuração. Nenhuma alteração foi feita.
-- **PRÓXIMO P1:** após autorização explícita de runtime, corrigir somente `listen_port` para 18782, reiniciar apenas `mimir-llama`, validar listener/API sintética e então retomar o consolidator/security gap.
+- **LLAMA PORT CORRECTION — APLICADA:** `listen_port` foi corrigido para 18782 e somente `mimir-llama` foi reiniciado. Processo/listener confirmaram `127.0.0.1:18782`; 8080 não apareceu mais. OpenClaw Gateway permaneceu em 18789.
+- **MODEL READINESS — PENDENTE:** probes imediatos de `/health` e `/v1/models` retornaram `503 Loading model`; ainda falta confirmar que o modelo terminou de carregar e então testar chat sintético.
+- **PRÓXIMO P1:** aguardar/pollear readiness em 18782, validar models/chat sintético e depois retomar o consolidator/security gap.
 - **NÃO AUTORIZADO AINDA:** equipamento real em EXECUTE.
 
 Lista mestre de execução: [MIMIR_V1_EXECUTION_PLAN.md](MIMIR_V1_EXECUTION_PLAN.md).
