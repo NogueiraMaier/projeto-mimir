@@ -775,22 +775,49 @@ Checkpoint result:
 The v2 collector read path is now validated in isolation against production
 OpenClaw data. It is not deployed or scheduled and no write path is authorized.
 
+Post-validation write-path review found an important schema-contract gap
+that must be resolved before implementing a production writer.
+
+Existing production function
+`mimir.ingest_session(uuid,text,text,integer,integer,integer,bigint,timestamptz)`
+is still coupled to the legacy file-backed session model:
+
+- it constructs `source_ref` as
+  `agents/main/sessions/<session_id>.jsonl`;
+- it requires `p_source_mtime`, which represented the JSONL file mtime;
+- its event payload describes the protected source using the legacy ingestion
+  contract;
+- the validated v2 collector now obtains canonical source data through
+  `sessions --json` + `chat.history`, with no JSONL source file and no
+  filesystem mtime.
+
+Using the existing function unchanged would therefore create misleading
+provenance even though the normalized content itself could be valid. Do not
+paper over this by inventing a JSONL path or fake mtime.
+
+A second implementation detail is intentional: the v2 dry-run collector never
+prints normalized transcript content, so a future writer must reuse/refactor the
+capture logic in-process rather than consume a plaintext transcript from stdout
+or an unprotected staging file.
+
 Next executable action:
 
-1. design and implement repository-only controlled ingestion for the validated
-   v2 capture source, preserving the existing confidential classification,
-   provenance, source/content SHA-256 and owner-only guarantees;
-2. keep ingestion write disabled by default and require an explicit per-session
-   authorization/selection boundary before inserting any production event;
-3. reuse the existing candidate/review model rather than promoting captured
-   session text directly to active memory;
-4. add isolated tests for idempotency, duplicate-source rejection, source hash
-   mismatch, unauthorized session class/status, secret detection, PostgreSQL
-   transaction rollback and no automatic promotion;
-5. do not deploy, schedule or execute the write path in production without a
+1. define a versioned v2 session-ingestion database contract before any writer:
+   logical source identity based on canonical session key/id, capture timestamp,
+   source/content fingerprints, API provenance, collector version and explicit
+   protected-source metadata;
+2. resolve migration numbering safely because production is at schema 12 while
+   the repository already reserves 013 for the separate operational inventory
+   work; do not apply/renumber 013 casually;
+3. refactor capture logic into a reusable internal module or equivalent so the
+   write client can receive normalized content only in-process while CLI dry-run
+   remains content-free;
+4. add lab-only tests for idempotency, conflicting hashes, provenance fields,
+   transaction rollback and no automatic memory promotion;
+5. do not deploy, schedule or execute any write path in production without a
    separate explicit authorization;
 6. keep the evidence-shadow path separate and not yet declared healthy;
-7. keep migration 013, `mimir_ops`, PostgreSQL schema, Telegram DM policy and
+7. keep migration 013, `mimir_ops`, production schema, Telegram DM policy and
    real-equipment EXECUTE boundaries unchanged.
 
 ## PostgreSQL laboratory
