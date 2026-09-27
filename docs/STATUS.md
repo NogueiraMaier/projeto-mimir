@@ -181,3 +181,31 @@ Nenhuma permissão foi ampliada.
 Nenhum EXECUTE foi autorizado.
 
 O `NEXT_ACTION` atual permanece inalterado.
+
+
+## Atualização documental — vLLM challenger, 2026-09-26
+
+Foi documentada a avaliação futura do projeto `vllm-project/vllm` como engine challenger.
+
+Referências:
+
+- [MODEL_ROUTING_AND_INFERENCE_ROADMAP.md](MODEL_ROUTING_AND_INFERENCE_ROADMAP.md)
+- [review/architecture/2026-09-26-vllm-challenger.md](review/architecture/2026-09-26-vllm-challenger.md)
+
+Lab ID:
+
+`LAB-VLLM-01`
+
+Estado:
+
+**WATCHLIST / NÃO IMPLEMENTADO / NÃO EXECUTADO**.
+
+A avaliação futura deve comparar vLLM contra o `llama.cpp` atual em tool calling, structured outputs, concorrência, TTFT, throughput, latência, VRAM/RAM e estabilidade.
+
+Nenhum runtime foi alterado.
+
+A porta `18781` permanece reservada ao `llama.cpp` atual.
+
+Nenhum provider/modelo foi trocado.
+
+O `NEXT_ACTION` operacional atual permanece inalterado.
