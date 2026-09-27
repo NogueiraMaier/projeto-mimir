@@ -1177,16 +1177,37 @@ Runtime port correction completed on the VPS:
   payload `503 Loading model`, so the port correction is complete but model
   readiness has not yet been confirmed.
 
+Canonical VPS llama endpoint validation progressed:
+
+- `/health` on `127.0.0.1:18782`: HTTP 200, `status=ok`;
+- `/v1/models`: PASS and identifies
+  `/var/lib/openclaw/models/Qwen3-4B-Q4_K_M.gguf`;
+- synthetic `/v1/chat/completions`: HTTP 200 with
+  `object=chat.completion` and role=assistant;
+- however the first synthetic completion ended with
+  `finish_reason=length` and `content` length 0, so transport/API shape is
+  validated but usable textual completion is not yet proven;
+- canonical listener `127.0.0.1:18782`: PASS;
+- legacy 8080 listener absent: PASS;
+- OpenClaw Gateway remains on 18789;
+- production PostgreSQL remained versions 1..12 and version14=false.
+
+The empty content must not be treated as a successful model-answer validation.
+Qwen/llama.cpp may be consuming the small token budget in a reasoning field, but
+that is only a hypothesis until the synthetic response structure is inspected.
+
 Next executable action:
 
-1. poll only `127.0.0.1:18782/health` until the local model leaves
-   `Loading model`;
-2. then validate `/v1/models`;
-3. execute one tiny synthetic chat-completions probe using a command that keeps
-   the HTTP body separate from the Python parser stdin;
-4. confirm 8080 remains closed and 18782 remains the llama listener;
-5. run the production PostgreSQL read-only guard;
-6. only then resume the local consolidator/security-gap work.
+1. run a synthetic response-shape probe on 18782 that reports message keys,
+   content length, reasoning-field length and usage counts without using real
+   session data;
+2. repeat with a larger token budget and, if supported by this llama.cpp build,
+   `chat_template_kwargs.enable_thinking=false`;
+3. require non-empty assistant `content` and a valid synthetic JSON answer
+   before declaring chat inference PASS;
+4. do not change service/runtime configuration during this probe;
+5. after chat inference PASS, resume the conversational-security gap inventory
+   and protected-session local consolidator contract.
 
 
 ## PostgreSQL laboratory
