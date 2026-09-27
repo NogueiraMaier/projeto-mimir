@@ -1,5 +1,37 @@
 # Ingestão protegida de sessões
 
+## Estado atual — 26 de setembro de 2026
+
+A implementação abaixo descreve o contrato v1 baseado em arquivo
+`UUID.jsonl`. Ele permanece como histórico e não deve ser usado para novas
+sessões do OpenClaw 2026.9.5.
+
+O novo contrato API-based está proposto na migration:
+
+```text
+tools/memory/migrations/014_api_session_ingestion_v2.sql
+```
+
+Ela ainda **não foi aplicada em produção**.
+
+A v2 substitui a proveniência fictícia de arquivo por:
+
+```text
+source_kind = openclaw-chat-history-v2
+source_ref  = openclaw://agent/main/session/<session_id>
+session_key = chave canônica do OpenClaw
+```
+
+e mantém a transcrição protegida em `mimir.session_sources`, com
+`classification=confidential`, sem promoção automática.
+
+A versão 013 continua reservada para a camada operacional independente. A 014
+depende da memory migration 012 e valida explicitamente qualquer 013 presente.
+
+Detalhes:
+[SESSION_INGESTION_V2.md](SESSION_INGESTION_V2.md).
+
+
 Data da implementação: 30 de julho de 2026
 
 ## Objetivo
