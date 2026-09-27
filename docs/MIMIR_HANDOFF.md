@@ -1048,23 +1048,39 @@ New/changed artifacts:
   capture metadata → writer dry-run → approval → write → idempotent replay →
   persisted-state/protected-read checks → no automatic memory record → cleanup.
 
-These writer changes occurred after the previously validated capture-v2
-preflight, so the capture test suite and live dry-run must be rerun before the
-writer lab test is accepted.
+Writer-v2 validation preflight at
+`91309ff92dea041f03a66910402bb4fdcc0328c4` passed syntax, the capture-v2
+synthetic regression, all four writer-v2 synthetic tests and a live read-only
+capture regression (18 considered / 12 ready / 0 blocked / 6 skipped /
+0 errors, with no internal content serialized).
+
+The end-to-end writer lab test then stopped before any synthetic write at the
+residue precheck. PostgreSQL received the psql placeholder `:'sid'` literally
+from a `psql -c` invocation and returned a syntax error. The failure was in
+the lab harness, not in the writer, migration 014 or database state.
+
+Repository fix:
+
+- all lab-harness queries that use psql variables for synthetic UUID/hash/key
+  values now feed SQL through stdin/heredoc, matching the already working
+  psql-variable paths elsewhere in the validators;
+- the affected guards are residue precheck, persisted-state boolean guard,
+  protected-read guard and post-cleanup residue guard;
+- the failure occurred before writer dry-run/write, so no synthetic session
+  was inserted and the existing 1..12,14 lab can be reused.
 
 Next executable action:
 
-1. use a fresh isolated checkout at current branch HEAD;
-2. run Python syntax checks for capture/writer/test files;
-3. rerun both capture-v2 and writer-v2 synthetic test suites;
-4. rerun one live capture-v2 dry-run and confirm the same
-   12 ready / 0 blocked / 6 skipped / 0 errors with no content exposure;
-5. if all pass, run `validate-session-writer-v2-lab.sh` against the existing
+1. refresh only the writer validation checkout to current branch HEAD;
+2. run `bash -n` on the corrected lab harness;
+3. rerun `validate-session-writer-v2-lab.sh` against the existing isolated
    lab at `/var/tmp/mimir-pg14-lab/socket:55433`;
-6. require writer dry-run/write content-leak guards, idempotent event_id,
-   protected read, zero automatic memory records, synthetic cleanup and
-   production unchanged;
-7. do not deploy writer or migration 014 to production without separate
+4. require dry-run approval, controlled write, idempotent replay,
+   persisted-state/protected-read checks, zero automatic promotion, synthetic
+   cleanup and production unchanged;
+5. if another harness/writer finding appears, stop at that point and patch the
+   repository; do not alter the lab manually beyond the versioned validator;
+6. do not deploy writer or migration 014 to production without separate
    explicit authorization.
 
 
