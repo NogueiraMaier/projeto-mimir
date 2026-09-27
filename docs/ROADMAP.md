@@ -193,3 +193,30 @@ O catálogo futuro poderá conter operações controladas como instalação, pat
 **Nota de fila:** quando este projeto for retomado, começar por `FA-0 — especificação`, e não pelo código do pendrive.
 
 Esta fila não altera o `NEXT_ACTION` corrente e não autoriza execução em equipamento real.
+
+
+## Fila futura — vLLM Challenger
+
+Lab ID:
+
+`LAB-VLLM-01`
+
+Documento principal:
+
+- [MODEL_ROUTING_AND_INFERENCE_ROADMAP.md](MODEL_ROUTING_AND_INFERENCE_ROADMAP.md)
+
+Revisão:
+
+- [review/architecture/2026-09-26-vllm-challenger.md](review/architecture/2026-09-26-vllm-challenger.md)
+
+Status:
+
+**WATCHLIST / CHALLENGER / BENCHMARK REQUIRED / NÃO IMPLEMENTADO**.
+
+Objetivo:
+
+avaliar vLLM como engine local alternativa dentro do futuro Engine Registry, com foco em tool calling, structured outputs, concorrência, continuous batching e serving padronizado.
+
+A avaliação deve preservar o `llama.cpp` atual e a porta `18781`.
+
+Não promover vLLM a default sem `MIMIR-ENGINE-EVAL` reproduzível no PcIA real.
