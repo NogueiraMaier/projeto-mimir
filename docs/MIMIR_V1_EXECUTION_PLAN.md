@@ -436,7 +436,7 @@ Estado inicial:
   UNTRUSTED_OBSERVATION;
 - [x] versionar contrato fechado do consolidator protected-source
   (`docs/PROTECTED_SESSION_CONSOLIDATOR_V1.md`);
-- [ ] implementar os controles mínimos necessários ao consolidator confidential;
+- [x] implementar os controles mínimos necessários ao consolidator confidential em modo repository-only/dry-run;
 - [ ] executar primeiro os testes T-AI ligados a conteúdo externo, memória e
   saída;
 - [ ] exigir evidência de enforcement fora do LLM para PASS crítico;
@@ -445,3 +445,40 @@ Estado inicial:
 
 Regra de estado: esta seção representa **PROPOSTA VERSIONADA**, não controle
 implementado. Cada item precisa de implementação, validação e evidência próprias.
+
+
+## Checkpoint MIMIR-V1-PROTECTED-CONSOLIDATOR-REPO-PREFLIGHT — 2026-09-27
+
+Estado: `IMPLEMENTED_NOT_VALIDATED`.
+
+Foram versionados:
+
+- `mimir-consolidate-protected-v1.py`;
+- `test_mimir_consolidate_protected_v1.py`;
+- `validate-protected-consolidator-v1-repository.sh`.
+
+Controles implementados:
+
+- leitura somente por `mimir.read_consolidation_source(event_id)`;
+- endpoint/modelo em allowlist local;
+- proxy/redirect bloqueados;
+- `enable_thinking=false`;
+- somente `message.content`;
+- schema fechado e bindings de event/hash;
+- `UNTRUSTED_CONTENT -> UNTRUSTED_OBSERVATION`;
+- human review obrigatório;
+- secret/output gate externo ao modelo;
+- tool call rejeitada;
+- zero promoção e zero escrita de memória.
+
+A execução preliminar do harness passou 8 testes, mas ainda não foi repetida a
+partir de checkout limpo do HEAD Git versionado.
+
+Próxima atividade:
+
+1. checkout isolado da branch no VPS;
+2. executar `validate-protected-consolidator-v1-repository.sh`;
+3. se PASS, registrar `MIMIR-V1-PROTECTED-CONSOLIDATOR-REPO-01`;
+4. depois validar PostgreSQL lab 1..12,14 + Qwen real 18782 somente com fonte
+   sintética;
+5. manter produção 1..12 e sem deployment da 014/writer/consolidator.
