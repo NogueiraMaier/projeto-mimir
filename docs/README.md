@@ -123,3 +123,17 @@ Status: **FILA / TARGET / NÃO IMPLEMENTADO**.
 Ao retomar, iniciar por `FA-0 — especificação`.
 
 A existência do roadmap não autoriza criação do probe, EXECUTE ou acesso irrestrito ao equipamento.
+
+
+### vLLM challenger
+
+- `MODEL_ROUTING_AND_INFERENCE_ROADMAP.md` — contém a seção de avaliação do vLLM como engine challenger.
+- `review/architecture/2026-09-26-vllm-challenger.md` — registra a análise arquitetural e o desenho do laboratório.
+
+Lab ID: `LAB-VLLM-01`
+
+Status: **WATCHLIST / CHALLENGER / NÃO IMPLEMENTADO**.
+
+Regra de continuidade:
+
+não substituir `llama.cpp`, não alterar `18781` e não promover vLLM antes do benchmark `MIMIR-ENGINE-EVAL`.
