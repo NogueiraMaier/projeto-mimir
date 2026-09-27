@@ -570,3 +570,212 @@ Ele precisa saber:
 - como validar e auditar o resultado.
 
 Modelos e provedores podem mudar. O núcleo do Mímir deve permanecer.
+
+
+## 22. vLLM como engine challenger
+
+Status: **WATCHLIST / CHALLENGER / BENCHMARK REQUIRED / NÃO IMPLEMENTADO**.
+
+Revisão arquitetural:
+
+- [review/architecture/2026-09-26-vllm-challenger.md](review/architecture/2026-09-26-vllm-challenger.md)
+
+Projeto externo avaliado:
+
+- `vllm-project/vllm`
+
+Snapshot externo de referência desta avaliação:
+
+- `379e9a1ea8a5995464d9bf775bcd36bb03a0995f`, observado em 2026-09-26.
+
+### Papel no Mímir
+
+O vLLM deve ser tratado como runtime/serving engine substituível dentro do futuro Engine Registry.
+
+Ele não substitui:
+
+- Mímir;
+- Capability Router;
+- Policy Engine;
+- agentes especialistas;
+- memória;
+- ferramentas;
+- approval/audit.
+
+Registro candidato:
+
+```text
+engine_id = vllm-local-gpu
+runtime = vLLM
+location = PcIA
+status = challenger
+benchmark_status = required
+```
+
+O `llama.cpp` atual permanece como runtime CURRENT até que evidência de benchmark justifique mudança.
+
+### Motivos para avaliação
+
+Avaliar vLLM para:
+
+- tool calling estruturado;
+- structured outputs;
+- API OpenAI-compatible;
+- reasoning/tool parsers;
+- continuous batching;
+- PagedAttention/KV-cache management;
+- prefix caching;
+- streaming;
+- múltiplas requisições/agentes;
+- serving de modelos Hugging Face;
+- quantizações suportadas pelo runtime;
+- futuro multi-LoRA, somente se benchmark justificar.
+
+### Compatibilidade de hardware
+
+A documentação CUDA observada no snapshot da avaliação exige compute capability 7.5 ou superior e cita RTX 20xx como família compatível.
+
+A RTX 2060 12 GB do PcIA é, portanto, candidata tecnicamente compatível para laboratório.
+
+Compatibilidade não significa superioridade.
+
+O comportamento real na Turing deve ser medido localmente.
+
+### LAB-VLLM-01
+
+Status:
+
+**FILA / NÃO EXECUTADO**
+
+Objetivo:
+
+comparar `llama.cpp` CURRENT versus vLLM CHALLENGER no mesmo PcIA sem alterar o runtime principal.
+
+Regras:
+
+- preservar `127.0.0.1:18781` para o `llama.cpp` atual;
+- executar vLLM em porta separada;
+- não trocar modelo principal durante o laboratório;
+- não alterar Telegram;
+- não alterar tool policy;
+- não usar o laboratório como justificativa para mudança de produção;
+- manter rollback trivial: parar o challenger.
+
+### MIMIR-ENGINE-EVAL específico
+
+Além das métricas já definidas neste roadmap, medir:
+
+```text
+TTFT
+tokens/s
+latency p50/p95
+VRAM
+RAM
+GPU utilization
+cold start
+errors
+timeouts
+stability
+
+concurrency:
+1
+2
+4
+8 requests, se tecnicamente viável
+```
+
+### Tool calling
+
+O laboratório deve separar:
+
+```text
+A. tool-selection
+   o modelo decidiu usar a ferramenta correta?
+
+B. tool-serialization
+   nome/schema/argumentos foram produzidos corretamente?
+```
+
+Corpus sintético/controlado candidato:
+
+- `mimir_memory_search`;
+- `system_status`;
+- `inventory_lookup`;
+- `device_read`.
+
+Métricas:
+
+- tool selection accuracy;
+- call success;
+- function-name validity;
+- argument-schema validity;
+- argument correctness;
+- false tool calls;
+- abstention accuracy.
+
+A existência de tool calling no vLLM não deve ser interpretada como correção automática do checkpoint atual de Telegram/tools.
+
+### Structured outputs
+
+Avaliar aderência de schema para objetos futuros como:
+
+- finding;
+- risk;
+- evidence metadata;
+- NIST outcome;
+- routing decision;
+- tool arguments.
+
+Essa capacidade é especialmente relevante para:
+
+- SOC;
+- Field Assessment;
+- NIST CSF 2.0;
+- relatórios;
+- persistência estruturada.
+
+### Resultado possível
+
+O benchmark pode concluir por:
+
+1. manter `llama.cpp` como default;
+2. coexistência por perfil de carga;
+3. promover vLLM após validação.
+
+Coexistência conceitual possível:
+
+```text
+single request / low-overhead
+    -> llama.cpp
+
+multi-agent / concurrent / structured serving
+    -> vLLM
+```
+
+Esse desenho é hipótese de benchmark, não decisão atual.
+
+### Multi-LoRA
+
+Status: **WATCHLIST**.
+
+O suporte do runtime a múltiplos LoRAs pode ser avaliado futuramente para especialização, mas não autoriza fine-tuning.
+
+Exigir evidência de ganho contra:
+
+- prompt/identity;
+- memória/contexto;
+- ferramentas/adapters;
+- modelo base.
+
+### Decisão atual
+
+```text
+vLLM
+  -> DOCUMENTADO
+  -> WATCHLIST
+  -> CHALLENGER
+  -> LAB-VLLM-01 PENDENTE
+  -> NÃO IMPLEMENTADO
+```
+
+Não remover ou substituir `llama.cpp` antes de benchmark reproduzível.
