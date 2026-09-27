@@ -164,8 +164,12 @@ inválido para o processo PostgreSQL porque a conta `postgres` não pertence a
 esse grupo; o chgrp do socket falhou com `Operation not permitted`. A correção
 versionada mantém LAB_ROOT/socket-dir restritos ao grupo `openclaw`, mas deixa
 o socket `postgres:postgres 0777`; peer + pg_ident continua controlando a
-identidade de banco. Descartar o lab parado e repetir o rebuild do zero no HEAD
-novo; somente após socket/peer/baseline PASS executar a migration 014. Produção
+identidade de banco. O rebuild limpo do lab passou no commit
+`7815cb4b9d8b62c4d7e64e6e5c2decf15564cfa3`: cluster isolado, socket e
+permissões validados, bootstrap v1 + replay 002..012, schema 1..12, peer
+`openclaw -> mimir_app` e produção intacta. Manter esse lab e executar agora a
+migration 014 somente pelo validador dedicado, exigindo dump pré-014, ACL,
+idempotência, leitura protegida, negativos e zero resíduo sintético. Produção
 permanece 1..12 e sem `mimir_ops`.
 Não implementar writer nem promover memória até esse checkpoint passar.
 Produção exige autorização separada. Não ampliar permissões nem autorizar
