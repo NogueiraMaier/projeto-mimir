@@ -1242,17 +1242,39 @@ Important design direction recorded, not yet implemented:
 - prefer a separate trust/validation dimension or explicit metadata after ADR;
 - no production schema change is authorized.
 
+The protected-session local consolidator contract is now versioned at
+`docs/PROTECTED_SESSION_CONSOLIDATOR_V1.md`.
+
+The contract fixes:
+
+- canonical loopback endpoint `127.0.0.1:18782`;
+- Qwen structured mode with `enable_thinking=false`;
+- `message.content` as the only persistable model field;
+- `reasoning_content` never persisted/logged/promoted;
+- source read only through `mimir.read_consolidation_source(event_id)`;
+- source trust=`UNTRUSTED_CONTENT`;
+- output trust starts as `UNTRUSTED_OBSERVATION`;
+- strict JSON schema, unknown-field rejection and source/hash binding;
+- output secret gate outside the LLM;
+- dry-run only, no candidate/active write, no tools, no external API;
+- first adversarial set:
+  T-AI-002/005/023/024/032/033/034.
+
+No production schema/runtime change was made by this contract.
+
 Next executable action:
 
-1. version the protected-session local consolidator contract;
-2. define closed input/output JSON schema, loopback endpoint allowlist,
-   untrusted-source envelope and output secret checks;
-3. require `enable_thinking=false` per request and ignore/reject
-   `reasoning_content` for persistence;
-4. implement repository-only consolidator in dry-run mode;
-5. validate first with synthetic protected source + fake loopback model;
-6. run T-AI-002/005/023/024/032/033/034 against the harness;
-7. production stays schema 1..12; migration 014 and writer remain undeployed.
+1. implement the repository-only consolidator in dry-run mode from this contract;
+2. add a fake loopback model harness and synthetic protected-source fixture;
+3. enforce endpoint allowlist, source/hash binding, strict output schema and
+   secret/output checks outside the model;
+4. prove no tool use, no external egress, no reasoning persistence and no
+   automatic memory promotion;
+5. execute the first T-AI battery on the synthetic harness;
+6. only after those pass, validate against the isolated PostgreSQL 1..12,14 lab
+   and the real local model using synthetic content;
+7. production remains schema 1..12; migration 014/writer/consolidator are not
+   deployed.
 
 
 ## PostgreSQL laboratory
