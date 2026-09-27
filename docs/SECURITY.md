@@ -38,12 +38,15 @@ Não liberar ao agente main:
 
 ## Captura de sessões
 
-- Processar somente o diretório ativo do agente main
-- Excluir arquivos trajectory e prompts de sistema
-- Aceitar somente sessões concluídas
-- Aceitar mensagens do proprietário e respostas do agente
-- Excluir resultados e chamadas de ferramentas
+- Usar somente interfaces suportadas do OpenClaw para sessões atuais:
+  `sessions --json` + `chat.history`
+- Não acessar diretamente o schema SQLite privado do OpenClaw
+- Aceitar somente sessões concluídas de classes explicitamente validadas
+- Exigir `senderIsOwner=true` em toda mensagem user; ausência ou false bloqueia
+- Aceitar somente texto user/assistant
+- Excluir system, toolResult, thinking e toolCall
 - Bloquear padrões de segredos e credenciais
+- Bloquear histórico truncado/omitido e paginação inconsistente
 - Não exibir mensagens durante inventário ou dry run
 - Não versionar sessões, transcrições ou arquivos de staging
 - Manter qualquer staging futuro fora do workspace Git
