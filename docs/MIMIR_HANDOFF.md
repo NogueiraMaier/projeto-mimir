@@ -1100,21 +1100,40 @@ Checkpoint result:
 The writer v2 is now validated end to end in the isolated lab. It remains
 undeployed and migration 014 remains unapplied to production.
 
+Local-model read-only inventory on the VPS completed.
+
+Observed runtime:
+
+- OpenRC `openclaw` service: started;
+- local `llama-server` is running as Linux user `openclaw`;
+- model:
+  `/var/lib/openclaw/models/Qwen3-4B-Q4_K_M.gguf`;
+- bind:
+  `127.0.0.1:8080`;
+- launch parameters include:
+  `--ctx-size 4096 --threads 6 --parallel 1 --jinja`;
+- OpenClaw Gateway listens on `127.0.0.1:18789`;
+- HUD listens on `127.0.0.1:18880`;
+- known historical/local-model ports 8601, 18781 and 18782 were closed;
+- `/v1/models` on 18789 returned an unexpected/non-model response, confirming
+  that 18789 must not be treated as the local model API;
+- production PostgreSQL remained versions 1..12 and version14=false.
+
+Important: the inventory did not yet query port 8080 with an HTTP model API
+request, so OpenAI-compatible behavior on 8080 must still be validated before
+the consolidator is coded against it.
+
 Next executable action:
 
-1. advance the permanent-memory P1 path to local consolidation of protected
-   session sources;
-2. do not reuse the existing NVIDIA external consolidator for confidential
-   session content: it intentionally accepts only public/internal sources and
-   the protected session event keeps `memory_events.content=NULL`;
-3. use the controlled `mimir.read_consolidation_source(uuid)` path introduced
-   by migration 012/updated by 014;
-4. define a local-only consolidation contract that accepts only loopback model
-   endpoints, produces candidates in dry-run only and never promotes memory
-   automatically;
-5. keep candidate submission/human review separate from source ingestion;
-6. validate the local consolidator with synthetic protected sources and a fake
-   loopback model before considering production deployment;
+1. probe only `127.0.0.1:8080` read-only using `/health` and `/v1/models`;
+2. if those identify the expected llama.cpp API, send one tiny synthetic
+   non-confidential chat-completions request and record response shape only;
+3. do not query real session content during this endpoint validation;
+4. then implement the local protected-session consolidator against an explicit
+   loopback endpoint contract, not against OpenClaw Gateway port 18789;
+5. read protected session content only via
+   `mimir.read_consolidation_source(uuid)`;
+6. keep consolidation dry-run only, with no candidate/active promotion;
 7. production stays schema 1..12; migration 014 and writer deployment still
    require separate explicit authorization.
 
