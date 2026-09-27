@@ -156,17 +156,16 @@ Validação em sessão Telegram nova confirmou o caminho explícito de memória:
 - o caminho shadow continua separado e não foi declarado saudável.
 
 **Próxima atividade:** fechar primeiro o bloqueador P1 da memória permanente.
-O contrato API-based v2 já está versionado no repositório como migration 014,
-mantendo a 013 operacional intacta e independente. A 014 cria
-`ingest_session_v2`, explicita session key/source fingerprint/API provenance,
-preserva a fonte confidential e revoga o ingresso JSONL legado de
-`mimir_app`. Um validador lab-only também foi criado. Como o coletor v2 recebeu
-novos metadados de proveniência depois do PASS anterior, revalidar primeiro
-sintaxe/testes/live dry-run no HEAD atual; depois aplicar/testar a 014 somente em
-`mimir_lab*`. Não implementar writer nem promover memória até esse checkpoint
-passar. O fluxo continua event/source → candidate → revisão humana → active →
-embedding. Produção exige autorização separada. Não ampliar permissões nem
-autorizar EXECUTE em equipamento real.
+O contrato API-based v2 está versionado como migration 014 e o preflight do
+capture v2 no HEAD `700f640fb0a2e92be90de7a02459cb2eb02f104c` passou:
+source guard, py_compile, 2 testes sintéticos e live dry-run, mantendo
+12 ready / 0 blocked / 6 skipped / 0 errors e validando os novos metadados de
+proveniência. Inventariar agora o `mimir_lab*` disponível e executar a 014
+somente no laboratório descartável pelo validador dedicado. Não implementar
+writer nem promover memória até esse checkpoint passar. O fluxo continua
+event/source → candidate → revisão humana → active → embedding. Produção exige
+autorização separada. Não ampliar permissões nem autorizar EXECUTE em equipamento
+real.
 
 ## Protocolo de continuidade entre sessões
 
