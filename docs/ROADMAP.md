@@ -7,6 +7,19 @@ etapa é completar o fluxo **local** de consolidação das sessões protegidas,
 usando `mimir.read_consolidation_source(uuid)`, modelo somente local/loopback,
 dry-run, revisão humana e nenhuma promoção automática ou API externa.
 
+## Gate de segurança conversacional
+
+Antes de ampliar canais externos, ferramentas administrativas, subagentes ou
+roteamento dinâmico de modelos, executar a workstream definida em
+[CONVERSATIONAL_SECURITY.md](CONVERSATIONAL_SECURITY.md).
+
+O consolidator local de sessões também deve obedecer esse gate desde o início:
+conteúdo da sessão continua não confiável, não altera autorização e não pode
+promover memória automaticamente.
+
+A validação adversarial canônica será
+[AI_SECURITY_TEST_MATRIX.md](AI_SECURITY_TEST_MATRIX.md), T-AI-001..035.
+
 ## Pipeline planejado
 
 1. Capturar novas sessões em registro diário.
