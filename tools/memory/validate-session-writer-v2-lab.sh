@@ -205,14 +205,17 @@ PRECOUNT="$(
         -d "$DB" \
         -At \
         -v ON_ERROR_STOP=1 \
-        -v sid="$SESSION_ID" \
-        -c "
-            SELECT
-                (SELECT count(*) FROM mimir.session_sources WHERE session_id=:'sid'::uuid)
-                +
-                (SELECT count(*) FROM mimir.memory_events
-                 WHERE source_ref='openclaw://agent/main/session/' || :'sid');
-        "
+        -v sid="$SESSION_ID" <<'SQL'
+SELECT
+    (SELECT count(*)
+     FROM mimir.session_sources
+     WHERE session_id=:'sid'::uuid)
+    +
+    (SELECT count(*)
+     FROM mimir.memory_events
+     WHERE source_ref=
+        'openclaw://agent/main/session/' || :'sid');
+SQL
 )"
 
 [[ "$PRECOUNT" == "0" ]] || fail "sessão sintética já existe no lab"
@@ -414,25 +417,27 @@ STATE_GUARD="$(
         -At \
         -v ON_ERROR_STOP=1 \
         -v sid="$SESSION_ID" \
-        -v eid="$EVENT_ID" \
-        -c "
-            SELECT
-                EXISTS (
-                    SELECT 1 FROM mimir.session_sources
-                    WHERE session_id=:'sid'::uuid
-                      AND event_id=:'eid'::uuid
-                )
-                AND EXISTS (
-                    SELECT 1 FROM mimir.memory_events
-                    WHERE event_id=:'eid'::uuid
-                      AND classification='confidential'
-                      AND content IS NULL
-                )
-                AND NOT EXISTS (
-                    SELECT 1 FROM mimir.memory_records
-                    WHERE source_event_id=:'eid'::uuid
-                );
-        "
+        -v eid="$EVENT_ID" <<'SQL'
+SELECT
+    EXISTS (
+        SELECT 1
+        FROM mimir.session_sources
+        WHERE session_id=:'sid'::uuid
+          AND event_id=:'eid'::uuid
+    )
+    AND EXISTS (
+        SELECT 1
+        FROM mimir.memory_events
+        WHERE event_id=:'eid'::uuid
+          AND classification='confidential'
+          AND content IS NULL
+    )
+    AND NOT EXISTS (
+        SELECT 1
+        FROM mimir.memory_records
+        WHERE source_event_id=:'eid'::uuid
+    );
+SQL
 )"
 
 [[ "$STATE_GUARD" == "t" ]] || fail "estado persistido inválido"
@@ -452,23 +457,22 @@ PROTECTED_OK="$(
         -At \
         -v ON_ERROR_STOP=1 \
         -v eid="$EVENT_ID" \
-        -v csha="$CONTENT_SHA" \
-        -c "
-            SELECT
-                (mimir.read_consolidation_source(:'eid'::uuid)
-                    ->> 'source_kind') = 'openclaw-chat-history-v2'
-                AND encode(
-                    public.digest(
-                        convert_to(
-                            mimir.read_consolidation_source(:'eid'::uuid)
-                                ->> 'content',
-                            'UTF8'
-                        ),
-                        'sha256'
-                    ),
-                    'hex'
-                ) = :'csha';
-        "
+        -v csha="$CONTENT_SHA" <<'SQL'
+SELECT
+    (mimir.read_consolidation_source(:'eid'::uuid)
+        ->> 'source_kind') = 'openclaw-chat-history-v2'
+    AND encode(
+        public.digest(
+            convert_to(
+                mimir.read_consolidation_source(:'eid'::uuid)
+                    ->> 'content',
+                'UTF8'
+            ),
+            'sha256'
+        ),
+        'hex'
+    ) = :'csha';
+SQL
 )"
 
 [[ "$PROTECTED_OK" == "t" ]] || fail "protected read inválido"
@@ -505,15 +509,20 @@ POSTCOUNT="$(
         -At \
         -v ON_ERROR_STOP=1 \
         -v sid="$SESSION_ID" \
-        -v eid="$EVENT_ID" \
-        -c "
-            SELECT
-                (SELECT count(*) FROM mimir.session_sources WHERE session_id=:'sid'::uuid)
-                +
-                (SELECT count(*) FROM mimir.memory_events WHERE event_id=:'eid'::uuid)
-                +
-                (SELECT count(*) FROM mimir.memory_records WHERE source_event_id=:'eid'::uuid);
-        "
+        -v eid="$EVENT_ID" <<'SQL'
+SELECT
+    (SELECT count(*)
+     FROM mimir.session_sources
+     WHERE session_id=:'sid'::uuid)
+    +
+    (SELECT count(*)
+     FROM mimir.memory_events
+     WHERE event_id=:'eid'::uuid)
+    +
+    (SELECT count(*)
+     FROM mimir.memory_records
+     WHERE source_event_id=:'eid'::uuid);
+SQL
 )"
 
 [[ "$POSTCOUNT" == "0" ]] || fail "resíduo sintético após cleanup"
