@@ -960,17 +960,53 @@ Repository fix:
 
 Migration 014 has still not been applied anywhere.
 
+Clean rebuild of the isolated LAB-014 baseline completed successfully using
+source commit `7815cb4b9d8b62c4d7e64e6e5c2decf15564cfa3`.
+
+Evidence:
+
+- production pre-guard: versions 1..12, `mimir_ops=false`;
+- stopped partial lab and stale checkout were removed with exact-path guards;
+- fresh checkout source guard: PASS;
+- shell syntax: PASS;
+- isolated PostgreSQL 17 cluster initialized and started successfully;
+- socket permission guard: PASS;
+- socket metadata:
+  - LAB_ROOT `postgres:openclaw 0710`;
+  - socket directory `postgres:openclaw 0770`;
+  - Unix socket `postgres:postgres 0777`;
+- data directory:
+  `/var/tmp/mimir-pg14-lab/data`;
+- lab port: 55433;
+- canonical memory bootstrap v1: PASS;
+- migrations 002..012 replay: PASS;
+- lab schema versions: 1..12;
+- peer identity:
+  `mimir_app|peer:openclaw`;
+- independent verification matched the script;
+- production post-guard remained versions 1..12.
+
+Checkpoint result:
+`MIMIR-V1-MEMORY-014-LAB-BASELINE = PASS`.
+
+The lab is now a disposable production-equivalent memory schema baseline
+without production data. Migration 014 has still not been applied anywhere.
+
 Next executable action:
 
-1. remove the stopped partial `/var/tmp/mimir-pg14-lab` and stale validation
-   checkout using exact-path guards;
-2. clone a fresh checkout at current branch HEAD;
-3. rerun `prepare-session-ingestion-v2-lab.sh` from scratch;
-4. verify socket metadata `postgres:postgres:777`, peer identity
-   `mimir_app|peer:openclaw`, baseline 1..12 and production unchanged;
-5. only then execute `validate-session-ingestion-v2-lab.sh mimir_memory`;
-6. do not implement or deploy the writer until the 014 lab checkpoint passes;
-7. production schema/roles and migration 013 boundaries remain unchanged.
+1. keep the running isolated lab and the exact validation checkout at source
+   commit `7815cb4b9d8b62c4d7e64e6e5c2decf15564cfa3`;
+2. run `validate-session-ingestion-v2-lab.sh mimir_memory` against
+   `/var/tmp/mimir-pg14-lab/socket:55433` only;
+3. require the validator to create a pre-014 custom-format dump before applying
+   the migration;
+4. inspect migration 014 application, ACLs, peer identity, idempotent synthetic
+   ingest, protected read, negative class/hash tests and zero synthetic residue;
+5. verify production remains versions 1..12 afterward;
+6. if any step fails, stop at that finding and patch/rebuild the lab before
+   retrying; do not apply 014 to production;
+7. writer implementation/deployment remains blocked until the LAB-014 migration
+   checkpoint passes.
 
 
 ## PostgreSQL laboratory
