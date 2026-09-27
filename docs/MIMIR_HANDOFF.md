@@ -736,22 +736,59 @@ Design implemented:
   missing-owner block, secret block, unsupported/running skip, exclusion of
   internal blocks and truncation block.
 
-The files have not yet been validated in the user's checkout or against the
-live VPS; do not mark the collector v2 operational yet.
+Collector v2 isolated validation completed successfully on the VPS without
+copying files into the production workspace and without PostgreSQL writes.
+
+Validation evidence:
+
+- isolated checkout:
+  `/var/tmp/mimir-capture-v2-validation`;
+- exact source guard passed at
+  `b8c020805bdf358d5211d8e1cb6b74aed9d2bc96`;
+- Python `py_compile`: PASS;
+- synthetic suite: 2 tests, PASS;
+- live Gateway dry-run completed successfully;
+- collector reported:
+  `database_write=false`,
+  `staging_write=false`,
+  `content_exposed=false`,
+  `direct_sqlite_access=false`;
+- canonical store remained
+  `/var/lib/openclaw/.openclaw/agents/main/agent/openclaw-agent.sqlite`;
+- 18 session rows were considered;
+- result: 12 ready, 0 blocked, 6 skipped, 0 errors;
+- all 12 ready sessions correspond exactly to the previously surveyed
+  `status=done` set across Telegram, HUD, ACP bridge, Maestro and main;
+- the six skipped sessions all had non-eligible `status=unknown`; current
+  classes among all rows also include cron and recovered, which are not promoted
+  by this result;
+- every ready session preserved positive owner provenance with no false/missing
+  owner markers, pagination available and no truncation signal;
+- Telegram filtering correctly excluded one system message, one toolResult,
+  thinking blocks and one toolCall from normalized capture;
+- production workspace guard passed: validation checkout was outside
+  `/var/lib/openclaw/workspace`.
+
+Checkpoint result:
+`MIMIR-CAPTURE-V2-READ-PATH = PASS`.
+
+The v2 collector read path is now validated in isolation against production
+OpenClaw data. It is not deployed or scheduled and no write path is authorized.
 
 Next executable action:
 
-1. validate Python syntax and run the new synthetic tests from an isolated
-   checkout of the exact branch HEAD;
-2. inspect the dry-run output only for counts/status/hashes; message contents
-   must remain absent;
-3. if synthetic tests pass, run the v2 collector once against the live
-   OpenClaw Gateway from the isolated checkout only (no copy into production
-   workspace), still dry-run/no database writes;
-4. compare its ready/blocked/skipped counts with the 12-session structural
-   survey and inspect reasons before changing any ingestion client;
-5. do not deploy, schedule or enable production writes without separate
-   authorization;
+1. design and implement repository-only controlled ingestion for the validated
+   v2 capture source, preserving the existing confidential classification,
+   provenance, source/content SHA-256 and owner-only guarantees;
+2. keep ingestion write disabled by default and require an explicit per-session
+   authorization/selection boundary before inserting any production event;
+3. reuse the existing candidate/review model rather than promoting captured
+   session text directly to active memory;
+4. add isolated tests for idempotency, duplicate-source rejection, source hash
+   mismatch, unauthorized session class/status, secret detection, PostgreSQL
+   transaction rollback and no automatic promotion;
+5. do not deploy, schedule or execute the write path in production without a
+   separate explicit authorization;
 6. keep the evidence-shadow path separate and not yet declared healthy;
 7. keep migration 013, `mimir_ops`, PostgreSQL schema, Telegram DM policy and
    real-equipment EXECUTE boundaries unchanged.
