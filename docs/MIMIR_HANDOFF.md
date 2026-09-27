@@ -1108,8 +1108,13 @@ Observed runtime:
 - local `llama-server` is running as Linux user `openclaw`;
 - model:
   `/var/lib/openclaw/models/Qwen3-4B-Q4_K_M.gguf`;
-- bind:
+- observed runtime bind:
   `127.0.0.1:8080`;
+- this is **not** the canonical VPS fallback port. The established Mímir port
+  map is: PcIA CUDA llama.cpp `18781`, VPS CPU fallback `18782`, OpenClaw
+  Gateway `18789`;
+- therefore the 8080 listener is runtime/configuration drift to diagnose, not
+  an endpoint to standardize in the architecture;
 - launch parameters include:
   `--ctx-size 4096 --threads 6 --parallel 1 --jinja`;
 - OpenClaw Gateway listens on `127.0.0.1:18789`;
@@ -1119,9 +1124,16 @@ Observed runtime:
   that 18789 must not be treated as the local model API;
 - production PostgreSQL remained versions 1..12 and version14=false.
 
-Important: the inventory did not yet query port 8080 with an HTTP model API
-request, so OpenAI-compatible behavior on 8080 must still be validated before
-the consolidator is coded against it.
+A later synthetic probe showed `/health` and `/v1/models` responding on the
+observed 8080 listener, but that does not make 8080 canonical. The chat probe
+itself was inconclusive because the validation command incorrectly combined a
+pipe with a Python heredoc, so Python consumed the heredoc as stdin and could
+not read the curl response. Do not infer a chat API failure from that result.
+
+Before any consolidator work, diagnose why the VPS `mimir-llama` service is
+starting with `--port 8080` instead of the established fallback port 18782.
+Do not change production runtime until that drift is understood and explicitly
+authorized.
 
 Conversational security architecture is now versioned as a proposal for
 Projeto Mímir only:
@@ -1136,16 +1148,20 @@ extension before changing the database.
 
 Next executable action:
 
-1. complete the synthetic read-only probe of `127.0.0.1:8080`;
-2. inventory current enforcement versus the new security architecture;
-3. define the minimum untrusted-content envelope for the local consolidator;
-4. decide the memory-class mapping without changing production schema;
-5. then implement the consolidator using
+1. diagnose read-only why VPS `mimir-llama` is bound to 8080 instead of the
+   established fallback port 18782;
+2. confirm the service/config source that injects `--port 8080`; do not change
+   it yet;
+3. only after the port drift is resolved/authorized, validate the canonical
+   local-model endpoint with synthetic content;
+4. inventory current enforcement versus the new security architecture;
+5. define the minimum untrusted-content envelope for the local consolidator and
+   the memory-class mapping without changing production schema;
+6. then implement the consolidator using
    `mimir.read_consolidation_source(uuid)`, loopback model access and dry-run
    only;
-6. begin the memory/output-related adversarial tests first;
-7. production stays schema 1..12; migration 014 and writer deployment remain
-   separately authorized.
+7. production stays schema 1..12; migration 014, writer deployment and runtime
+   port changes remain separately authorized.
 
 
 ## PostgreSQL laboratory
