@@ -1163,16 +1163,30 @@ Observed source of the VPS llama.cpp drift:
 Root cause: configuration drift in `/etc/conf.d/mimir-llama`, not an
 architectural decision and not a llama.cpp API limitation.
 
+Runtime port correction completed on the VPS:
+
+- `/etc/conf.d/mimir-llama` changed from `listen_port="8080"` to
+  `listen_port="18782"`;
+- only `mimir-llama` was restarted via OpenRC;
+- service status returned started;
+- running `llama-server` now receives `--port 18782`;
+- listener `127.0.0.1:18782` is present;
+- no 8080 listener appeared in the validation output;
+- OpenClaw Gateway remains on 18789;
+- the first immediate probes to `/health` and `/v1/models` returned HTTP
+  payload `503 Loading model`, so the port correction is complete but model
+  readiness has not yet been confirmed.
+
 Next executable action:
 
-1. do not change the service until explicit runtime authorization is given;
-2. when authorized, change only `listen_port` in
-   `/etc/conf.d/mimir-llama` from 8080 to 18782;
-3. validate syntax/state, restart only `mimir-llama`, and verify
-   `127.0.0.1:18782` is listening while 8080 is closed;
-4. then run the synthetic health/models/chat probe against 18782;
-5. only after that resume the local consolidator/security-gap work;
-6. production database remains out of scope for this port correction.
+1. poll only `127.0.0.1:18782/health` until the local model leaves
+   `Loading model`;
+2. then validate `/v1/models`;
+3. execute one tiny synthetic chat-completions probe using a command that keeps
+   the HTTP body separate from the Python parser stdin;
+4. confirm 8080 remains closed and 18782 remains the llama listener;
+5. run the production PostgreSQL read-only guard;
+6. only then resume the local consolidator/security-gap work.
 
 
 ## PostgreSQL laboratory
