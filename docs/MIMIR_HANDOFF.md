@@ -930,20 +930,47 @@ Repository fix:
 The failed lab is disposable and stopped progression before migration 014.
 Migration 014 has still not been applied anywhere.
 
+Startup diagnosis completed and the exact second-stage socket failure is now
+confirmed.
+
+Evidence:
+
+- no lab PostgreSQL server remained running after the failed start;
+- PostgreSQL log reported:
+  `could not set group of file .../.s.PGSQL.55433: Operation not permitted`;
+- `postgres` is uid/gid 70 and belongs only to group `postgres`;
+- `openclaw` is uid/gid 998 and belongs only to group `openclaw`;
+- LAB_ROOT was already `postgres:openclaw 0710` and the socket directory
+  `postgres:openclaw 0770`, so parent traversal was no longer the failure;
+- the failing setting was `unix_socket_group=openclaw`: PostgreSQL runs as
+  `postgres` and cannot chgrp its socket to a group it does not belong to;
+- production remained versions 1..12 and `mimir_ops=false`.
+
+Repository fix:
+
+- no persistent host group membership is changed;
+- LAB_ROOT remains `postgres:openclaw 0710`;
+- socket directory remains `postgres:openclaw 0770`;
+- PostgreSQL socket stays `postgres:postgres` with
+  `unix_socket_permissions=0777`;
+- access is still restricted by the parent/socket directory boundary, while
+  peer + pg_ident enforce `openclaw -> mimir_app`;
+- post-start guard now requires `postgres:postgres:777` and verifies
+  `openclaw` can access the socket.
+
+Migration 014 has still not been applied anywhere.
+
 Next executable action:
 
-1. inspect the failed temporary cluster's own log and effective socket/group
-   configuration only; do not touch production;
-2. collect `id openclaw`, `getent group <openclaw-primary-group>`,
-   permissions for LAB_ROOT/DATA/socket parent, and the last PostgreSQL log
-   lines;
-3. do not retry `pg_ctl` or modify the lab until the startup error is
-   identified from the log;
-4. migration 014 remains unapplied everywhere;
-5. after root cause is proven, patch the repository script, discard the partial
-   lab and rebuild from scratch;
-6. keep production schema 1..12 and `mimir_ops` absent;
-7. do not deploy or enable any writer in production.
+1. remove the stopped partial `/var/tmp/mimir-pg14-lab` and stale validation
+   checkout using exact-path guards;
+2. clone a fresh checkout at current branch HEAD;
+3. rerun `prepare-session-ingestion-v2-lab.sh` from scratch;
+4. verify socket metadata `postgres:postgres:777`, peer identity
+   `mimir_app|peer:openclaw`, baseline 1..12 and production unchanged;
+5. only then execute `validate-session-ingestion-v2-lab.sh mimir_memory`;
+6. do not implement or deploy the writer until the 014 lab checkpoint passes;
+7. production schema/roles and migration 013 boundaries remain unchanged.
 
 
 ## PostgreSQL laboratory
