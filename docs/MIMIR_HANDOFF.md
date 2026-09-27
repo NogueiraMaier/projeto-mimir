@@ -1069,19 +1069,54 @@ Repository fix:
 - the failure occurred before writer dry-run/write, so no synthetic session
   was inserted and the existing 1..12,14 lab can be reused.
 
+The corrected writer-v2 end-to-end lab validation completed successfully.
+
+Evidence:
+
+- source guard at `a0d3234905143a34dbd407af281cfd7433484ad0`: PASS;
+- lab baseline remained versions 1..12,14;
+- production baseline remained versions 1..12;
+- synthetic residue precheck: zero;
+- capture metadata path: PASS;
+- writer dry-run: PASS;
+- approval digest generated:
+  `2b244312ca6fb6df8cdf094e65a7495a05351f8630f0bc495d95d161fb2ad1dc`;
+- controlled synthetic writer commit: PASS;
+- synthetic event id:
+  `79342b0e-8490-4ce6-8976-8c7adf07e247`;
+- idempotent replay returned the same event id: PASS;
+- persisted source provenance: PASS;
+- persisted event classification/protection flags: PASS;
+- automatic memory records: zero;
+- protected consolidation read: PASS;
+- synthetic cleanup deleted exactly one source and one event;
+- independent residue verification after cleanup: zero sources/events;
+- final production guard:
+  versions 1..12, version14=false, `mimir_ops=false`.
+
+Checkpoint result:
+`MIMIR-V1-MEMORY-WRITER-V2-LAB-01 = PASS`.
+
+The writer v2 is now validated end to end in the isolated lab. It remains
+undeployed and migration 014 remains unapplied to production.
+
 Next executable action:
 
-1. refresh only the writer validation checkout to current branch HEAD;
-2. run `bash -n` on the corrected lab harness;
-3. rerun `validate-session-writer-v2-lab.sh` against the existing isolated
-   lab at `/var/tmp/mimir-pg14-lab/socket:55433`;
-4. require dry-run approval, controlled write, idempotent replay,
-   persisted-state/protected-read checks, zero automatic promotion, synthetic
-   cleanup and production unchanged;
-5. if another harness/writer finding appears, stop at that point and patch the
-   repository; do not alter the lab manually beyond the versioned validator;
-6. do not deploy writer or migration 014 to production without separate
-   explicit authorization.
+1. advance the permanent-memory P1 path to local consolidation of protected
+   session sources;
+2. do not reuse the existing NVIDIA external consolidator for confidential
+   session content: it intentionally accepts only public/internal sources and
+   the protected session event keeps `memory_events.content=NULL`;
+3. use the controlled `mimir.read_consolidation_source(uuid)` path introduced
+   by migration 012/updated by 014;
+4. define a local-only consolidation contract that accepts only loopback model
+   endpoints, produces candidates in dry-run only and never promotes memory
+   automatically;
+5. keep candidate submission/human review separate from source ingestion;
+6. validate the local consolidator with synthetic protected sources and a fake
+   loopback model before considering production deployment;
+7. production stays schema 1..12; migration 014 and writer deployment still
+   require separate explicit authorization.
 
 
 ## PostgreSQL laboratory
