@@ -992,21 +992,59 @@ Checkpoint result:
 The lab is now a disposable production-equivalent memory schema baseline
 without production data. Migration 014 has still not been applied anywhere.
 
+LAB-014-01 migration validation completed successfully on the isolated
+PostgreSQL lab.
+
+Evidence:
+
+- exact validation source:
+  `7815cb4b9d8b62c4d7e64e6e5c2decf15564cfa3`;
+- lab baseline before 014: versions 1..12;
+- pre-014 custom-format dump created:
+  `/var/tmp/mimir_memory-pre014-20260927T025520Z.dump`;
+- backup SHA-256:
+  `82c9ecc10835f47555ee4770bb7f7533e14b32b6876b6bc3a0dcbb92ffd0e2f4`;
+- migration 014 applied with COMMIT in the lab only;
+- resulting lab versions: 1..12,14;
+- `mimir_app` EXECUTE on `ingest_session_v2`: true;
+- `mimir_app` EXECUTE on legacy `ingest_session`: false;
+- direct SELECT on `session_sources`: false;
+- no-automatic-promotion static guard: PASS;
+- peer identity:
+  `mimir_app|peer:openclaw`;
+- transactional synthetic ingestion: PASS;
+- repeated identical ingestion returned the same event: PASS;
+- protected consolidation read: PASS;
+- unauthorized cron class rejection: PASS;
+- content hash mismatch rejection: PASS;
+- synthetic rollback residue: zero;
+- independent post-014 verification found zero synthetic events/sources;
+- production remained versions 1..12, version 14 absent,
+  `mimir_ops=false`.
+
+Checkpoint result:
+`MIMIR-V1-MEMORY-014-LAB-01 = PASS`.
+
+Migration 014 is validated in an isolated lab but remains unapplied to
+production. No writer has been deployed or enabled.
+
 Next executable action:
 
-1. keep the running isolated lab and the exact validation checkout at source
-   commit `7815cb4b9d8b62c4d7e64e6e5c2decf15564cfa3`;
-2. run `validate-session-ingestion-v2-lab.sh mimir_memory` against
-   `/var/tmp/mimir-pg14-lab/socket:55433` only;
-3. require the validator to create a pre-014 custom-format dump before applying
-   the migration;
-4. inspect migration 014 application, ACLs, peer identity, idempotent synthetic
-   ingest, protected read, negative class/hash tests and zero synthetic residue;
-5. verify production remains versions 1..12 afterward;
-6. if any step fails, stop at that finding and patch/rebuild the lab before
-   retrying; do not apply 014 to production;
-7. writer implementation/deployment remains blocked until the LAB-014 migration
-   checkpoint passes.
+1. implement the v2 ingestion writer in the repository only;
+2. refactor/reuse the validated capture-v2 logic so normalized transcript
+   content is passed to the writer only in-process and is never emitted to
+   stdout or staging;
+3. require explicit selection/approval of a single ready session by canonical
+   session key/id and expected source/content fingerprints;
+4. default to dry-run; an explicit write flag must still target only a supplied
+   PostgreSQL endpoint and invoke `mimir.ingest_session_v2`;
+5. add synthetic tests proving no content leakage, selection mismatch rejection,
+   secret/owner/truncation guards, SQL argument transport without shell
+   interpolation, and no automatic promotion;
+6. validate that writer only against the existing isolated lab before any
+   production authorization;
+7. production remains schema 1..12 and no migration/writer deployment is
+   authorized.
 
 
 ## PostgreSQL laboratory
