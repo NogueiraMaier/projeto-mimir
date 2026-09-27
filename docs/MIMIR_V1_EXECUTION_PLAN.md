@@ -156,13 +156,15 @@ Validação em sessão Telegram nova confirmou o caminho explícito de memória:
 - o caminho shadow continua separado e não foi declarado saudável.
 
 **Próxima atividade:** fechar primeiro o bloqueador P1 da memória permanente.
-O coletor API-based v2 e seus testes sintéticos já foram adicionados ao
-repositório, mantendo o coletor legado intacto. Validar agora em checkout
-isolado a sintaxe e a suíte sintética; se aprovados, executar uma única leitura
-dry-run contra o Gateway vivo sem instalar/copiar o script para o workspace de
-produção e sem qualquer escrita no PostgreSQL. Comparar ready/blocked/skipped
-com o survey das 12 sessões e só depois desenhar a escrita controlada do cliente
-de ingestão. Deploy, agendamento e escrita em produção exigem autorização
+O read-path do coletor API-based v2 passou em checkout isolado: `py_compile`,
+2 testes sintéticos e leitura live do Gateway, com 12 ready / 0 blocked /
+6 skipped / 0 errors e nenhuma escrita ou exposição de conteúdo. Implementar
+agora apenas no repositório o write-path controlado de ingestão, desabilitado
+por padrão, transacional, idempotente e exigindo seleção/autorização explícita
+por sessão. A captura deve continuar produzindo somente fonte confidencial e
+não pode promover memória diretamente: o fluxo segue event/source → candidate
+→ revisão humana → active → embedding. Depois validar em PostgreSQL lab
+isolado. Deploy, agendamento e qualquer escrita na produção exigem autorização
 separada. Não ampliar permissões nem autorizar EXECUTE em equipamento real.
 
 ## Protocolo de continuidade entre sessões
