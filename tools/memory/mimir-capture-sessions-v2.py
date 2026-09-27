@@ -365,6 +365,7 @@ def analyze(
     key: str,
     session_id: str,
     cls: str,
+    source_updated_at_ms: int,
     messages: list[dict[str, Any]],
     max_source_chars: int,
 ) -> dict[str, Any]:
@@ -453,8 +454,18 @@ def analyze(
         "messages_with_seq": with_seq,
         "messages_with_timestamp": with_timestamp,
         "truncation_signal": truncation,
-        "source_sha256": source_sha256(key, session_id, messages),
+        "source_ref": (
+            "openclaw://agent/main/session/"
+            + session_id
+        ),
+        "source_updated_at_ms": source_updated_at_ms,
+        "source_fingerprint_sha256": source_sha256(
+            key,
+            session_id,
+            messages,
+        ),
         "content_chars": 0,
+        "content_bytes": 0,
         "content_sha256": None,
         "capture_status": "ready",
         "reason": None,
@@ -479,7 +490,9 @@ def analyze(
         return block("historico contem sinal de truncamento/omissao")
 
     content = "\n\n".join(transcript).strip()
+    encoded_content = content.encode("utf-8")
     result["content_chars"] = len(content)
+    result["content_bytes"] = len(encoded_content)
 
     if not content:
         return block("sessao sem conteudo textual elegivel")
@@ -491,7 +504,7 @@ def analyze(
         )
 
     result["content_sha256"] = hashlib.sha256(
-        content.encode("utf-8")
+        encoded_content
     ).hexdigest()
     return result
 
@@ -559,6 +572,16 @@ def main() -> int:
                 session_id = canonical_uuid(
                     row.get("sessionId") or row.get("id")
                 )
+
+                source_updated_at_ms = row.get("updatedAt")
+                if (
+                    not isinstance(source_updated_at_ms, int)
+                    or source_updated_at_ms <= 0
+                ):
+                    raise CaptureError(
+                        "updatedAt canônico ausente ou inválido"
+                    )
+
                 messages, paging = read_history(
                     config,
                     key,
@@ -568,6 +591,7 @@ def main() -> int:
                     key,
                     session_id,
                     cls,
+                    source_updated_at_ms,
                     messages,
                     config.max_source_chars,
                 )
