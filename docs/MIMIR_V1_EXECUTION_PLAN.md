@@ -167,11 +167,13 @@ o socket `postgres:postgres 0777`; peer + pg_ident continua controlando a
 identidade de banco. O rebuild limpo do lab passou no commit
 `7815cb4b9d8b62c4d7e64e6e5c2decf15564cfa3`: cluster isolado, socket e
 permissões validados, bootstrap v1 + replay 002..012, schema 1..12, peer
-`openclaw -> mimir_app` e produção intacta. Manter esse lab e executar agora a
-migration 014 somente pelo validador dedicado, exigindo dump pré-014, ACL,
-idempotência, leitura protegida, negativos e zero resíduo sintético. Produção
-permanece 1..12 e sem `mimir_ops`.
-Não implementar writer nem promover memória até esse checkpoint passar.
+`openclaw -> mimir_app` e produção intacta. A migration 014 passou no LAB-014-01: dump pré-014 criado, COMMIT somente no
+lab, ACL e peer corretos, ingestão sintética idempotente, leitura protegida,
+negativos de classe/hash e zero resíduo após rollback. O lab terminou em
+1..12,14 e produção permaneceu 1..12, sem v14 e sem `mimir_ops`.
+Implementar agora o writer v2 somente no repositório, reutilizando a captura
+validada em processo, dry-run por padrão e seleção/aprovação explícita. Depois
+validar o writer somente no lab antes de qualquer autorização de produção.
 Produção exige autorização separada. Não ampliar permissões nem autorizar
 EXECUTE em equipamento real.
 
