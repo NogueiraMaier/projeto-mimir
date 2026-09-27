@@ -127,8 +127,9 @@ históricas da memória e de governança não foram encerradas por esta revisão
 - **GAP DE MODELAGEM:** as classes de memória de segurança propostas não correspondem diretamente aos `memory_type` atuais; requer decisão explícita de mapping/extension antes de alterar schema.
 - **LLAMA PORT DRIFT — CAUSA CONFIRMADA:** `/etc/init.d/mimir-llama` usa `--port ${listen_port}` e `/etc/conf.d/mimir-llama` define explicitamente `listen_port="8080"`. A porta canônica VPS continua 18782; 8080 é drift de configuração. Nenhuma alteração foi feita.
 - **LLAMA PORT CORRECTION — APLICADA:** `listen_port` foi corrigido para 18782 e somente `mimir-llama` foi reiniciado. Processo/listener confirmaram `127.0.0.1:18782`; 8080 não apareceu mais. OpenClaw Gateway permaneceu em 18789.
-- **MODEL READINESS — PENDENTE:** probes imediatos de `/health` e `/v1/models` retornaram `503 Loading model`; ainda falta confirmar que o modelo terminou de carregar e então testar chat sintético.
-- **PRÓXIMO P1:** aguardar/pollear readiness em 18782, validar models/chat sintético e depois retomar o consolidator/security gap.
+- **LLAMA 18782 READINESS/API — PARCIAL PASS:** `/health` retornou 200/ok e `/v1/models` identificou Qwen3-4B-Q4_K_M. Chat sintético retornou HTTP 200/`chat.completion`, porém `finish_reason=length` com `content` vazio; logo transporte/API estão validados, mas resposta textual útil ainda não.
+- **PORT/PRODUCTION GUARDS — PASS:** 18782 permanece listener canônico, 8080 fechado, 18789 Gateway; PostgreSQL produção segue 1..12 sem v14.
+- **PRÓXIMO P1:** inspecionar somente a estrutura da resposta sintética (incluindo eventual reasoning field/usage), testar token budget maior e thinking desabilitado se suportado; exigir `content` não vazio antes do consolidator/security gap.
 - **NÃO AUTORIZADO AINDA:** equipamento real em EXECUTE.
 
 Lista mestre de execução: [MIMIR_V1_EXECUTION_PLAN.md](MIMIR_V1_EXECUTION_PLAN.md).
