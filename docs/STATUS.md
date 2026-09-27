@@ -131,7 +131,9 @@ históricas da memória e de governança não foram encerradas por esta revisão
 - **PORT/PRODUCTION GUARDS — PASS:** 18782 permanece listener canônico, 8080 fechado, 18789 Gateway; PostgreSQL produção segue 1..12 sem v14.
 - **MIMIR-V1-LOCAL-LLAMA-18782-CHAT-01 — PASS:** modo normal retornou content=36 chars + reasoning_content=947 chars, 236 completion tokens; com `enable_thinking=false`, retornou somente content=36 chars, JSON sintético válido, em 11 completion tokens. Endpoint canônico 18782 permanece estável.
 - **DECISÃO PARA CONSOLIDATOR:** usar `enable_thinking=false` por request, aceitar/persistir somente `message.content`, rejeitar conteúdo vazio/JSON inválido e nunca persistir/expor `reasoning_content`.
-- **PRÓXIMO P1:** produzir gap inventory da segurança conversacional atual e definir o envelope mínimo do consolidator protected-source antes de implementá-lo.
+- **AI SECURITY GAP INVENTORY — VERSIONADO:** `AI_SECURITY_GAP_INVENTORY.md` classifica controles atuais como EXISTING_VALIDATED/PARTIAL/PROPOSED/MISSING/OUT_OF_SCOPE_NOW e fixa os gaps do consolidator protected-source.
+- **DECISÃO DE MODELAGEM AINDA PENDENTE:** não sobrecarregar `memory_type`; avaliar dimensão separada de trust/validation por ADR antes de qualquer mudança de schema.
+- **PRÓXIMO P1:** versionar o contrato fechado do consolidator local protected-source e só então implementar dry-run repository-only + testes T-AI prioritários.
 - **NÃO AUTORIZADO AINDA:** equipamento real em EXECUTE.
 
 Lista mestre de execução: [MIMIR_V1_EXECUTION_PLAN.md](MIMIR_V1_EXECUTION_PLAN.md).
