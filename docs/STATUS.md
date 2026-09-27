@@ -129,7 +129,9 @@ históricas da memória e de governança não foram encerradas por esta revisão
 - **LLAMA PORT CORRECTION — APLICADA:** `listen_port` foi corrigido para 18782 e somente `mimir-llama` foi reiniciado. Processo/listener confirmaram `127.0.0.1:18782`; 8080 não apareceu mais. OpenClaw Gateway permaneceu em 18789.
 - **LLAMA 18782 READINESS/API — PARCIAL PASS:** `/health` retornou 200/ok e `/v1/models` identificou Qwen3-4B-Q4_K_M. Chat sintético retornou HTTP 200/`chat.completion`, porém `finish_reason=length` com `content` vazio; logo transporte/API estão validados, mas resposta textual útil ainda não.
 - **PORT/PRODUCTION GUARDS — PASS:** 18782 permanece listener canônico, 8080 fechado, 18789 Gateway; PostgreSQL produção segue 1..12 sem v14.
-- **PRÓXIMO P1:** inspecionar somente a estrutura da resposta sintética (incluindo eventual reasoning field/usage), testar token budget maior e thinking desabilitado se suportado; exigir `content` não vazio antes do consolidator/security gap.
+- **MIMIR-V1-LOCAL-LLAMA-18782-CHAT-01 — PASS:** modo normal retornou content=36 chars + reasoning_content=947 chars, 236 completion tokens; com `enable_thinking=false`, retornou somente content=36 chars, JSON sintético válido, em 11 completion tokens. Endpoint canônico 18782 permanece estável.
+- **DECISÃO PARA CONSOLIDATOR:** usar `enable_thinking=false` por request, aceitar/persistir somente `message.content`, rejeitar conteúdo vazio/JSON inválido e nunca persistir/expor `reasoning_content`.
+- **PRÓXIMO P1:** produzir gap inventory da segurança conversacional atual e definir o envelope mínimo do consolidator protected-source antes de implementá-lo.
 - **NÃO AUTORIZADO AINDA:** equipamento real em EXECUTE.
 
 Lista mestre de execução: [MIMIR_V1_EXECUTION_PLAN.md](MIMIR_V1_EXECUTION_PLAN.md).
