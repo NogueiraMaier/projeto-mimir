@@ -1,6 +1,6 @@
 # Mímir — Contrato do Consolidator Local de Sessões Protegidas v1
 
-Status: **PROPOSTA VERSIONADA / NÃO IMPLEMENTADO**
+Status: **IMPLEMENTED_NOT_VALIDATED**
 
 Escopo: exclusivo do Projeto Mímir.
 
@@ -295,3 +295,25 @@ Exige harness sintético que demonstre:
 11. zero resíduo após cleanup quando houver escrita sintética de suporte.
 
 Produção permanece fora de escopo até checkpoint separado.
+
+
+## 15. Implementação repository-only
+
+Implementada na branch `feat/mimir-operational-foundation` em 2026-09-27:
+
+- `tools/memory/mimir-consolidate-protected-v1.py`;
+- `tools/memory/test_mimir_consolidate_protected_v1.py`;
+- `tools/memory/validate-protected-consolidator-v1-repository.sh`.
+
+Checkpoint documental:
+
+`docs/review/operations/2026-09-27-protected-consolidator-v1.md`
+
+Estado deliberadamente mantido em `IMPLEMENTED_NOT_VALIDATED`.
+
+A bateria sintética foi exercitada antes do versionamento e passou 8 testes,
+mas o validator ainda deve ser reexecutado em checkout limpo do HEAD Git antes
+de declarar `MIMIR-V1-PROTECTED-CONSOLIDATOR-REPO-01 = PASS`.
+
+Nenhuma sessão real, migration, PostgreSQL de produção ou runtime de produção
+faz parte desta etapa.
