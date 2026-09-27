@@ -146,7 +146,7 @@ mimir_ops role = false
 
 No real equipment has been contacted.
 
-## NEXT_ACTION
+## HISTORICAL NEXT_ACTION — TELEGRAM
 
 Validate the Telegram channel as an operational surface for the Mímir main
 agent using read-only requests first.
@@ -1262,7 +1262,7 @@ The contract fixes:
 
 No production schema/runtime change was made by this contract.
 
-Next executable action:
+Historical next executable action, now implemented repository-only:
 
 1. implement the repository-only consolidator in dry-run mode from this contract;
 2. add a fake loopback model harness and synthetic protected-source fixture;
@@ -1442,3 +1442,76 @@ A long development or ChatGPT session is about to end
 The handoff must describe the next executable action, not only historical progress.
 
 Before starting a new major phase, commit the updated handoff.
+
+
+## CURRENT CHECKPOINT — PROTECTED CONSOLIDATOR REPOSITORY
+
+Date: 2026-09-27
+
+State: `IMPLEMENTED_NOT_VALIDATED`
+
+Implementation base commits:
+
+- `354aef9bf8a5381c5c7b5e0ee3f9baa1e3cd3ca5` — protected consolidator v1;
+- `4753941c846fa2b35893c38dfb4c1383b37e28c4` — adversarial synthetic harness;
+- `6b2801bfa2f71375940ac28f643fad3a4344e712` — repository validator.
+
+Evidence document:
+
+`docs/review/operations/2026-09-27-protected-consolidator-v1.md`
+
+Implemented controls:
+
+- protected source read only through
+  `mimir.read_consolidation_source(event_id)`;
+- confidential source required;
+- event/source binding checked;
+- local model endpoint fixed to `127.0.0.1:18782`;
+- external host/port/path rejected;
+- proxy and redirect disabled;
+- model id fixed to the validated Qwen local model;
+- `enable_thinking=false`;
+- only `message.content` is processed;
+- `reasoning_content` is ignored and never emitted;
+- no tools are supplied and model tool calls are rejected;
+- closed output schema;
+- source event/hash binding;
+- `UNTRUSTED_CONTENT` input;
+- `UNTRUSTED_OBSERVATION` output;
+- human review cannot be disabled;
+- secret/output gate is outside the LLM;
+- no candidate/active/database write path exists in this consolidator.
+
+The preliminary isolated harness execution passed 8 tests, including the
+repository controls for T-AI-002/005/023/024/032/033/034.
+
+Do not mark those tests PASS yet. The exact Git HEAD must first be revalidated
+from a clean isolated checkout.
+
+Production remains unchanged:
+
+- PostgreSQL production remains schema 1..12;
+- migration 014 remains unapplied in production;
+- writer v2 remains undeployed;
+- protected consolidator remains undeployed;
+- no real session was used;
+- no production source was read;
+- no equipment authorization was widened.
+
+## NEXT_ACTION
+
+1. on the VPS, create or refresh an isolated checkout outside
+   `/var/lib/openclaw/workspace`;
+2. verify branch `feat/mimir-operational-foundation` and the actual HEAD;
+3. require a clean working tree;
+4. execute
+   `tools/memory/validate-protected-consolidator-v1-repository.sh`;
+5. if and only if it passes, record
+   `MIMIR-V1-PROTECTED-CONSOLIDATOR-REPO-01 = PASS`;
+6. then validate the same consolidator against the isolated PostgreSQL
+   1..12,14 lab and the real local Qwen endpoint `127.0.0.1:18782`, using
+   fully synthetic protected content only;
+7. do not use a real session;
+8. do not access production PostgreSQL;
+9. do not deploy migration 014, writer v2 or consolidator;
+10. keep PR #1 Draft and unmerged.
