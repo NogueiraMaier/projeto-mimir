@@ -860,20 +860,50 @@ Checkpoint result:
 Migration 014 and its lab harness still have not been executed by this
 checkpoint. Production PostgreSQL remains unchanged.
 
+The production-cluster database inventory returned no `mimir_lab*` database.
+This is consistent with the archived LAB cleanup: the previous temporary
+PostgreSQL cluster was intentionally stopped and removed after LAB-09/bootstrap
+validation.
+
+Do not create a lab by cloning production.
+
+Repository-only lab preparation was added instead:
+
+- `tools/memory/prepare-session-ingestion-v2-lab.sh`
+  creates a new isolated PostgreSQL 17 cluster under
+  `/var/tmp/mimir-pg14-lab`, local Unix socket only, default port 55433;
+- it checks production read-only baseline 1..12 and absence of `mimir_ops`;
+- it creates an empty `mimir_memory` database inside the isolated cluster;
+- it replays the validated canonical memory-v1 bootstrap and migrations
+  002..012 from Git;
+- it configures only the temporary cluster's peer map so Linux `openclaw`
+  authenticates as `mimir_app`;
+- it verifies the temporary lab ends at schema versions 1..12 and production
+  remains unchanged.
+
+The 014 validator was hardened accordingly:
+
+- default target is the isolated lab database `mimir_memory`;
+- default socket is `/var/tmp/mimir-pg14-lab/socket`;
+- default port is 55433;
+- production socket `/run/postgresql` and port 5432 are explicitly rejected;
+- the validator confirms PostgreSQL `data_directory` equals the expected
+  `/var/tmp/mimir-pg14-lab/data` before any migration is applied.
+
+Neither new script has yet been executed by this checkpoint.
+
 Next executable action:
 
-1. inventory the currently available PostgreSQL databases matching
-   `mimir_lab*` without modifying them;
-2. if no suitable disposable lab exists, create/restore a lab only from the
-   previously validated lab backup procedure rather than cloning production ad
-   hoc;
-3. execute `validate-session-ingestion-v2-lab.sh <lab_db>` only against the
-   selected disposable lab;
-4. inspect migration/ACL/idempotency/protected-read/rejection/rollback results;
-5. do not implement or deploy the writer until the 014 lab checkpoint passes;
-6. do not deploy, schedule or execute any write path in production without a
+1. use a fresh isolated checkout at current branch HEAD;
+2. run `prepare-session-ingestion-v2-lab.sh` to reconstruct a disposable
+   production-equivalent memory baseline 1..12 from versioned sources only;
+3. verify cluster/socket/peer/baseline PASS and production unchanged;
+4. then run `validate-session-ingestion-v2-lab.sh mimir_memory` against that
+   temporary cluster only;
+5. inspect migration/ACL/idempotency/protected-read/rejection/rollback results;
+6. do not implement or deploy the writer until the 014 lab checkpoint passes;
+7. do not deploy, schedule or execute any write path in production without a
    separate explicit authorization;
-7. keep the evidence-shadow path separate and not yet declared healthy;
 8. keep migration 013, `mimir_ops`, production schema, Telegram DM policy and
    real-equipment EXECUTE boundaries unchanged.
 
