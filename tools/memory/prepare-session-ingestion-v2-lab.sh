@@ -106,8 +106,12 @@ cat >> "$DATA/postgresql.conf" <<EOF
 listen_addresses = ''
 port = $PORT
 unix_socket_directories = '$SOCK'
-unix_socket_group = '$OPENCLAW_GROUP'
-unix_socket_permissions = 0770
+# Keep the socket owned by postgres. PostgreSQL cannot chgrp a newly-created
+# socket to an unrelated group unless the postgres process is a member of it.
+# Access is restricted by the parent/socket directories (group=openclaw), while
+# peer + pg_ident enforce the database identity.
+unix_socket_group = 'postgres'
+unix_socket_permissions = 0777
 max_connections = 30
 fsync = on
 synchronous_commit = on
@@ -155,15 +159,16 @@ SOCKET_META="$(
     stat -c '%U:%G:%a' "$SOCK/.s.PGSQL.$PORT"
 )"
 
-EXPECTED_SOCKET_GROUP="$OPENCLAW_GROUP"
-
 case "$SOCKET_META" in
-    postgres:"$EXPECTED_SOCKET_GROUP":770)
+    postgres:postgres:777)
         ;;
     *)
         fail "permissões inesperadas no socket do laboratório: $SOCKET_META"
         ;;
 esac
+
+runuser -u openclaw -- test -r "$SOCK/.s.PGSQL.$PORT"
+runuser -u openclaw -- test -w "$SOCK/.s.PGSQL.$PORT"
 
 echo "socket_permissions=PASS"
 echo "socket_meta=$SOCKET_META"
