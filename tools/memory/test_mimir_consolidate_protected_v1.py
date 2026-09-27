@@ -159,11 +159,16 @@ class ProtectedConsolidatorV1Tests(unittest.TestCase):
         script = root / "fake-psql"
         script.write_text(
             "#!/usr/bin/env python3\n"
-            "import base64, json, os, sys\n"
-            f"open({str(stdin_log)!r}, 'w').write(sys.stdin.read())\n"
+            "import base64, json, os, sys, textwrap\n"
+            "sql=sys.stdin.read()\n"
+            f"open({str(stdin_log)!r}, 'w').write(sql)\n"
             "source=json.loads(os.environ['MIMIR_FAKE_PROTECTED_SOURCE'])\n"
             "raw=json.dumps(source,ensure_ascii=False,separators=(',',':')).encode('utf-8')\n"
-            "print(base64.b64encode(raw).decode('ascii'))\n",
+            "encoded=base64.b64encode(raw).decode('ascii')\n"
+            "encoded='\\n'.join(textwrap.wrap(encoded, 76))\n"
+            "if 'SELECT replace(' in sql and 'chr(10)' in sql:\n"
+            "    encoded=encoded.replace('\\n','')\n"
+            "print(encoded)\n",
             encoding="utf-8",
         )
         script.chmod(0o700)
@@ -250,6 +255,8 @@ class ProtectedConsolidatorV1Tests(unittest.TestCase):
                 "mimir.read_consolidation_source",
                 sql,
             )
+            self.assertIn("SELECT replace(", sql)
+            self.assertIn("chr(10)", sql)
             self.assertNotIn("mimir.memory_events", sql)
             self.assertNotIn("mimir.session_sources", sql)
             for verb in ("INSERT", "UPDATE", "DELETE"):

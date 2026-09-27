@@ -110,12 +110,16 @@ def validate_pg_socket(raw: str, port: int, allow_production: bool) -> str:
 
 def build_source_sql(event_id: uuid.UUID) -> str:
     return f"""\\set ON_ERROR_STOP on
-SELECT encode(
-    convert_to(
-        mimir.read_consolidation_source('{event_id}'::uuid)::text,
-        'UTF8'
+SELECT replace(
+    encode(
+        convert_to(
+            mimir.read_consolidation_source('{event_id}'::uuid)::text,
+            'UTF8'
+        ),
+        'base64'
     ),
-    'base64'
+    chr(10),
+    ''
 );
 """
 
