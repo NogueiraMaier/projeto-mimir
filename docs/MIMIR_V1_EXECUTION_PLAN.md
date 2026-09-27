@@ -156,17 +156,17 @@ Validação em sessão Telegram nova confirmou o caminho explícito de memória:
 - o caminho shadow continua separado e não foi declarado saudável.
 
 **Próxima atividade:** fechar primeiro o bloqueador P1 da memória permanente.
-O read-path API-based v2 passou integralmente, mas a revisão do write-path
-identificou incompatibilidade de proveniência: a função de produção
-`mimir.ingest_session` ainda representa a fonte como JSONL em
-`agents/main/sessions/<uuid>.jsonl` e exige mtime de arquivo, enquanto a fonte
-canônica atual é `sessions --json` + `chat.history`. Não falsificar esses
-campos. Definir primeiro um contrato DB versionado para a ingestão v2, resolver
-a numeração sem colidir com a 013 operacional já reservada e refatorar a captura
-para entregar conteúdo ao writer somente in-process. Validar tudo em PostgreSQL
-lab antes de qualquer deploy. O fluxo continuará event/source → candidate →
-revisão humana → active → embedding. Escrita na produção exige autorização
-separada. Não ampliar permissões nem autorizar EXECUTE em equipamento real.
+O contrato API-based v2 já está versionado no repositório como migration 014,
+mantendo a 013 operacional intacta e independente. A 014 cria
+`ingest_session_v2`, explicita session key/source fingerprint/API provenance,
+preserva a fonte confidential e revoga o ingresso JSONL legado de
+`mimir_app`. Um validador lab-only também foi criado. Como o coletor v2 recebeu
+novos metadados de proveniência depois do PASS anterior, revalidar primeiro
+sintaxe/testes/live dry-run no HEAD atual; depois aplicar/testar a 014 somente em
+`mimir_lab*`. Não implementar writer nem promover memória até esse checkpoint
+passar. O fluxo continua event/source → candidate → revisão humana → active →
+embedding. Produção exige autorização separada. Não ampliar permissões nem
+autorizar EXECUTE em equipamento real.
 
 ## Protocolo de continuidade entre sessões
 
