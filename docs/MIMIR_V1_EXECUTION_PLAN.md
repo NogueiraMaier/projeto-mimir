@@ -159,11 +159,14 @@ Validação em sessão Telegram nova confirmou o caminho explícito de memória:
 O primeiro rebuild do lab temporário confirmou produção intacta, cluster
 isolado, bootstrap v1 e replay 002..012, mas parou antes da 014 porque
 `openclaw` não conseguia atravessar o diretório pai 0700 até o Unix socket.
-O primeiro ajuste de permissão permitiu avançar o desenho, porém o retry do lab
-falhou ainda no `pg_ctl start`, antes de qualquer migration 014. Não repetir o
-start às cegas: ler o log e a configuração efetiva do cluster temporário,
-identificar a causa exata, corrigir no repositório e somente então reconstruir
-do zero. Produção permanece 1..12 e sem `mimir_ops`.
+O diagnóstico do retry fechou a causa: `unix_socket_group=openclaw` é
+inválido para o processo PostgreSQL porque a conta `postgres` não pertence a
+esse grupo; o chgrp do socket falhou com `Operation not permitted`. A correção
+versionada mantém LAB_ROOT/socket-dir restritos ao grupo `openclaw`, mas deixa
+o socket `postgres:postgres 0777`; peer + pg_ident continua controlando a
+identidade de banco. Descartar o lab parado e repetir o rebuild do zero no HEAD
+novo; somente após socket/peer/baseline PASS executar a migration 014. Produção
+permanece 1..12 e sem `mimir_ops`.
 Não implementar writer nem promover memória até esse checkpoint passar.
 Produção exige autorização separada. Não ampliar permissões nem autorizar
 EXECUTE em equipamento real.
