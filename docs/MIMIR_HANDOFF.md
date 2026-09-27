@@ -890,17 +890,56 @@ The 014 validator was hardened accordingly:
 - the validator confirms PostgreSQL `data_directory` equals the expected
   `/var/tmp/mimir-pg14-lab/data` before any migration is applied.
 
-Neither new script has yet been executed by this checkpoint.
+First execution of the isolated LAB-014 preparation reached the expected
+memory baseline 1..12 but failed at the peer-identity preflight.
+
+Observed result:
+
+- production guard: PASS, versions 1..12 and `mimir_ops=false`;
+- isolated PostgreSQL 17 cluster init/start: PASS;
+- data directory confirmed:
+  `/var/tmp/mimir-pg14-lab/data`;
+- empty lab database creation: PASS;
+- canonical memory-v1 bootstrap: PASS;
+- replay of migrations 002..012: PASS;
+- lab schema versions: 1..12;
+- failure occurred only when Linux `openclaw` attempted to traverse the Unix
+  socket path:
+  `Permission denied` on
+  `/var/tmp/mimir-pg14-lab/socket/.s.PGSQL.55433`.
+
+Root cause:
+
+- `LAB_ROOT` was mode 0700 owned by postgres;
+- although the nested socket directory/socket permissions were broader,
+  `openclaw` could not traverse the parent directory;
+- this is a filesystem permission issue in the disposable lab only, not a
+  PostgreSQL peer/HBA failure and not a production issue.
+
+Repository fix:
+
+- `prepare-session-ingestion-v2-lab.sh` now resolves the Linux primary group of
+  `openclaw`;
+- `LAB_ROOT` is `postgres:<openclaw-group>` mode 0710;
+- the socket directory is `postgres:<openclaw-group>` mode 0770;
+- PostgreSQL sets `unix_socket_group` to the openclaw group and
+  `unix_socket_permissions=0770`;
+- post-start guards verify openclaw traversal and exact socket ownership/mode
+  before the peer test.
+
+The failed lab is disposable and stopped progression before migration 014.
+Migration 014 has still not been applied anywhere.
 
 Next executable action:
 
-1. use a fresh isolated checkout at current branch HEAD;
-2. run `prepare-session-ingestion-v2-lab.sh` to reconstruct a disposable
-   production-equivalent memory baseline 1..12 from versioned sources only;
-3. verify cluster/socket/peer/baseline PASS and production unchanged;
-4. then run `validate-session-ingestion-v2-lab.sh mimir_memory` against that
-   temporary cluster only;
-5. inspect migration/ACL/idempotency/protected-read/rejection/rollback results;
+1. safely stop and remove the partial `/var/tmp/mimir-pg14-lab` cluster after
+   verifying its PGDATA/port;
+2. remove the old validation checkout and clone a fresh checkout at the new
+   branch HEAD containing the socket-permission fix;
+3. rerun `prepare-session-ingestion-v2-lab.sh` from scratch;
+4. verify baseline 1..12, socket-permission guard, peer identity and production
+   unchanged;
+5. only then execute `validate-session-ingestion-v2-lab.sh mimir_memory`;
 6. do not implement or deploy the writer until the 014 lab checkpoint passes;
 7. do not deploy, schedule or execute any write path in production without a
    separate explicit authorization;
