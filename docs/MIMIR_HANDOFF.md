@@ -429,3 +429,23 @@ It does not modify the current Telegram/tool-surface checkpoint.
 When resumed in the future, start with `FA-0 — specification`; do not begin by implementing the USB launcher or enabling EXECUTE.
 
 Generic graphical desktop control remains outside the initial scope.
+
+
+## Future inference queue note — vLLM challenger
+
+A future inference-engine evaluation has been documented:
+
+- Lab ID: `LAB-VLLM-01`
+- Roadmap: `docs/MODEL_ROUTING_AND_INFERENCE_ROADMAP.md`
+- Review: `docs/review/architecture/2026-09-26-vllm-challenger.md`
+- Status: **WATCHLIST / CHALLENGER / NOT IMPLEMENTED / DOES NOT CHANGE NEXT_ACTION**
+
+The evaluation is intended to compare vLLM with the current `llama.cpp` runtime for structured tool calling, structured outputs, concurrency and serving performance.
+
+This note does not authorize installation or runtime migration.
+
+Preserve the current `llama.cpp` endpoint on port `18781`.
+
+Do not change model/provider/tool policy as part of `LAB-VLLM-01`.
+
+The current Telegram/tool-surface `NEXT_ACTION` remains authoritative.
