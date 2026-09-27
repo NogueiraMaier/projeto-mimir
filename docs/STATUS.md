@@ -120,7 +120,8 @@ históricas da memória e de governança não foram encerradas por esta revisão
 - **WRITER V2 — IMPLEMENTADO NO REPOSITÓRIO, NÃO VALIDADO:** `mimir-ingest-session-v2.py` reutiliza a captura in-process, exige hashes esperados, emite approval digest em dry-run e requer `--write --approve` para escrita local via socket Unix. Conteúdo vai ao psql somente por stdin, sem staging/argv/stdout. Foram adicionados testes sintéticos e validador end-to-end de laboratório.
 - **WRITER V2 PREFLIGHT — PASS:** syntax, capture regression, 4 testes sintéticos do writer e live capture regression passaram no commit `91309ff92dea041f03a66910402bb4fdcc0328c4`; live permaneceu 12 ready / 0 blocked / 6 skipped / 0 errors sem serializar conteúdo interno.
 - **WRITER LAB — HARNESS BUG CORRIGIDO:** o primeiro end-to-end parou no residue precheck antes de qualquer write porque placeholders `:'sid'` enviados via `psql -c` chegaram literais ao servidor. O harness foi corrigido para usar stdin/heredoc em todas as consultas com variáveis psql. Lab 1..12,14 permanece reutilizável e sem sessão sintética inserida.
-- **PRÓXIMO:** atualizar somente o checkout do writer para o HEAD corrigido e rerodar o validador end-to-end no mesmo lab; produção continua bloqueada.
+- **MIMIR-V1-MEMORY-WRITER-V2-LAB-01 — PASS:** writer dry-run/aprovação/write sintético/idempotência/proveniência/protected read/zero promoção automática/cleanup passaram no lab 1..12,14. Resíduo final: 0. Produção permaneceu 1..12, sem v14 e sem `mimir_ops`.
+- **PRÓXIMO P1:** implementar consolidação local de fontes de sessão protegidas via `read_consolidation_source(uuid)`, sem NVIDIA/API externa, dry-run somente e sem promoção automática; depois validar com fonte/modelo sintéticos.
 - **NÃO AUTORIZADO AINDA:** equipamento real em EXECUTE.
 
 Lista mestre de execução: [MIMIR_V1_EXECUTION_PLAN.md](MIMIR_V1_EXECUTION_PLAN.md).
