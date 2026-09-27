@@ -211,6 +211,50 @@ embedding local
 
 Nenhum conteúdo de sessão deve ser promovido automaticamente.
 
+## Writer controlado v2
+
+O writer repository-only está em:
+
+```text
+tools/memory/mimir-ingest-session-v2.py
+```
+
+Ele reutiliza o capturador v2 no mesmo processo. O capturador somente entrega a
+transcrição normalizada internamente quando chamado com o caminho explícito do
+writer; o CLI de captura continua sem serializar conteúdo.
+
+Controles do writer:
+
+- seleção exata por `session_key` + UUID canônico;
+- sessão obrigatoriamente `done` e classe presente na allowlist validada;
+- reuso integral dos guards de owner, segredo, truncamento e normalização;
+- `expected-source-sha256` e `expected-content-sha256` obrigatórios;
+- dry-run por padrão;
+- dry-run emite um `approval_sha256` ligado a session id/key + fingerprints;
+- escrita exige simultaneamente `--write` e `--approve <approval_sha256>`;
+- escrita exige usuário Unix `openclaw`;
+- somente socket Unix local é aceito;
+- `/run/postgresql` é bloqueado sem `--allow-production` explícito;
+- conteúdo não entra em argv, variável de ambiente ou staging: é codificado
+  em memória e enviado ao `psql` somente via stdin;
+- stdout contém somente metadados/hashes/event_id;
+- nenhuma promoção para candidate/active ocorre pelo writer.
+
+Testes repository-only:
+
+```text
+tools/memory/test_mimir_ingest_session_v2.py
+tools/memory/validate-session-writer-v2-lab.sh
+```
+
+O primeiro cobre dry-run sem vazamento, hash mismatch, owner/secret guards e
+transporte SQL sem plaintext. O segundo valida end-to-end no PostgreSQL lab:
+dry-run → aprovação → write → replay idempotente → verificação persistida →
+protected read → ausência de promoção automática → cleanup sintético.
+
+Esses artefatos ainda precisam ser executados/validados no VPS após o commit
+que os introduziu. Eles não estão implantados em produção.
+
 ## Validação obrigatória antes de produção
 
 Antes de qualquer aplicação da 014:
