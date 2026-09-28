@@ -606,3 +606,23 @@ Technical commit: `8b04510fc693442ae94d0487581d942d5ae9319e`
 - repository regression 10/10 PASS.
 
 Next: integrated synthetic LAB using model timeout 120 s.
+
+## REAL MODEL OUTPUT SCHEMA REJECTED — 2026-09-28
+
+State: `DIAGNOSTIC_REQUIRED`
+
+Completed:
+
+- PostgreSQL/model timeout split validated;
+- integrated LAB exercised model timeout 120 s;
+- Qwen real returned;
+- fail-closed output schema validation rejected the response;
+- synthetic cleanup = 0.
+
+Next:
+
+1. capture top-level output keys;
+2. capture candidate count/key sets;
+3. do not expose unnecessary synthetic payload content;
+4. do not relax validator;
+5. validate any correction repository-only before another integrated LAB.

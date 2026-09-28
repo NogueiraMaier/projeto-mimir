@@ -1735,3 +1735,27 @@ NEXT_ACTION:
 
 Run the isolated synthetic real-model LAB with
 `--model-timeout-seconds 120`.
+
+## CHECKPOINT — REAL MODEL OUTPUT SCHEMA REJECTED
+
+Date: 2026-09-28
+
+State: `OUTPUT_SCHEMA_DIAGNOSTIC_REQUIRED`
+
+The integrated synthetic LAB reached Qwen successfully using the 120-second
+model timeout.
+
+Qwen returned, but the protected validator rejected the response fail-closed:
+
+`ERRO[POLICY_REJECT]: schema de saída possui campos ausentes ou desconhecidos`
+
+Cleanup:
+
+`synthetic_residue=0`
+
+VPS Qwen remains the CPU fallback at `127.0.0.1:18782`.
+
+NEXT_ACTION:
+
+Inspect safe structural metadata from the synthetic model response only.
+Do not relax the closed schema.

@@ -203,3 +203,12 @@ Evidência da rodada: [review/operations/2026-09-24.md](review/operations/2026-0
 - **VALIDADO:** 10/10 testes repository-only PASS.
 - **COMMIT:** `8b04510fc693442ae94d0487581d942d5ae9319e`.
 - **PRÓXIMO:** repetir LAB integrado sintético com model timeout 120 s.
+
+## REAL MODEL OUTPUT SCHEMA REJECTED — 2026-09-28
+
+- **MODEL TIMEOUT:** 120 s reached Qwen successfully.
+- **FAIL-CLOSED:** incompatible output schema rejected.
+- **CLEANUP:** `synthetic_residue=0`.
+- **CURRENT BLOCKER:** `REAL_MODEL_OUTPUT_SCHEMA_MISMATCH`.
+- **PRODUCTION:** unchanged.
+- **NEXT P1:** safe structural diagnostic of the Qwen JSON response.

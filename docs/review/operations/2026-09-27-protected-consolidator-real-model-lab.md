@@ -156,3 +156,23 @@ Novo contrato temporal:
 Repository validation: 10/10 PASS.
 
 Próximo passo: LAB integrado sintético com model timeout 120 s.
+
+## REAL MODEL OUTPUT SCHEMA REJECTED — 2026-09-28
+
+Integrated LAB with `--model-timeout-seconds 120` reached the real Qwen output
+validator.
+
+Result:
+
+`ERRO[POLICY_REJECT]: schema de saída possui campos ausentes ou desconhecidos`
+
+Cleanup:
+
+`synthetic_residue=0`
+
+The timeout issue is no longer the current blocker.
+
+NEXT_ACTION:
+
+Capture safe structural metadata only. Preserve fail-closed validation and do
+not relax the output contract.
