@@ -418,7 +418,7 @@ class ProtectedConsolidatorV1Tests(unittest.TestCase):
             with fake_model_read_timeout():
                 run = self.run_cli(
                     fake_psql,
-                    extra_args=["--timeout-seconds", "1"],
+                    extra_args=["--model-timeout-seconds", "1"],
                 )
 
         self.assertEqual(run.returncode, 1)
@@ -434,6 +434,23 @@ class ProtectedConsolidatorV1Tests(unittest.TestCase):
             SOURCE_CONTENT,
             run.stdout + run.stderr,
         )
+
+    def test_model_timeout_limit_is_fail_closed(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            fake_psql, stdin_log = self.make_fake_psql(root)
+
+            run = self.run_cli(
+                fake_psql,
+                extra_args=["--model-timeout-seconds", "181"],
+            )
+
+        self.assertEqual(run.returncode, 1)
+        self.assertIn(
+            "--model-timeout-seconds deve estar entre 1 e 180",
+            run.stderr,
+        )
+        self.assertFalse(stdin_log.exists())
 
     def test_reasoning_content_is_ignored_and_never_emitted(self) -> None:
         reasoning_secret = "tok" + "en=" + "R" * 32

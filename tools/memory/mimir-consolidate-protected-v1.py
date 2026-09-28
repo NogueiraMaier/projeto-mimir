@@ -66,7 +66,18 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--model", default=MODEL_ID)
     parser.add_argument("--max-candidates", type=int, default=5)
     parser.add_argument("--max-source-chars", type=int, default=MAX_SOURCE_CHARS)
-    parser.add_argument("--timeout-seconds", type=int, default=30)
+    parser.add_argument(
+        "--timeout-seconds",
+        type=int,
+        default=30,
+        help="Timeout PostgreSQL em segundos (1..60).",
+    )
+    parser.add_argument(
+        "--model-timeout-seconds",
+        type=int,
+        default=120,
+        help="Timeout do modelo local em segundos (1..180).",
+    )
     parser.add_argument("--psql-bin", default="psql")
     parser.add_argument("--pg-host", default=DB_SOCKET)
     parser.add_argument("--pg-port", type=int, default=5432)
@@ -532,6 +543,10 @@ def main() -> int:
             raise ConsolidatorError(
                 "--timeout-seconds deve estar entre 1 e 60"
             )
+        if not 1 <= args.model_timeout_seconds <= 180:
+            raise ConsolidatorError(
+                "--model-timeout-seconds deve estar entre 1 e 180"
+            )
         endpoint = validate_endpoint(args.endpoint)
         if args.model != MODEL_ID:
             raise ConsolidatorError("model id fora da allowlist")
@@ -568,7 +583,7 @@ def main() -> int:
         response_bytes = safe_http_post(
             endpoint,
             request_body,
-            args.timeout_seconds,
+            args.model_timeout_seconds,
         )
         message_content, response_sha256 = extract_message_content(
             response_bytes
