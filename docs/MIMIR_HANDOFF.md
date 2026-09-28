@@ -1654,3 +1654,32 @@ Measure Qwen 18782 latency with an equivalent fully synthetic request.
 Do not increase the consolidator timeout before obtaining latency evidence.
 After measurement, decide whether the issue is cold start, generation latency,
 context size or model stall.
+
+## CHECKPOINT — QWEN LATENCY CHARACTERIZED
+
+Date: 2026-09-27
+
+State: `LATENCY_CHARACTERIZED`
+
+Qwen real `127.0.0.1:18782` respondeu HTTP 200 de forma repetível.
+
+Observed:
+
+- first probe: 44.351 s;
+- warm runs: 32.324 / 30.927 / 32.104 s;
+- warm average: ~31.78 s;
+- prompt: 342 tokens;
+- completion: 190 tokens;
+- finish_reason=stop;
+- enable_thinking=false.
+
+Interpretation:
+
+The local CPU model is slow but stable for this payload. There is no evidence
+of a persistent model stall. The current evidence does not justify changing
+the consolidator timeout yet.
+
+NEXT_ACTION:
+
+Capture/measure the exact integrated synthetic LAB request and its model
+generation characteristics before changing timeout or model policy.

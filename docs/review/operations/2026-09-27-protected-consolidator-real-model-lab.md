@@ -102,3 +102,19 @@ Antes de novo real-model LAB:
 5. não relaxar policy;
 6. não aumentar timeout sem evidência;
 7. continuar usando conteúdo exclusivamente sintético.
+
+## Evidência de latência do modelo
+
+Probe sintético controlado em `127.0.0.1:18782`:
+
+- primeiro total: 44.351 s;
+- warm 1: 32.324 s;
+- warm 2: 30.927 s;
+- warm 3: 32.104 s;
+- prompt: 342 tokens;
+- completion: 190 tokens;
+- finish_reason: stop;
+- reasoning_content: vazio.
+
+O modelo não apresenta stall nesse payload. O timeout integrado ainda precisa
+ser correlacionado ao request real do LAB antes de qualquer ajuste de limite.

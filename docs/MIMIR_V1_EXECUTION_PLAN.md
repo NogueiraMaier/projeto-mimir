@@ -562,3 +562,18 @@ Technical commit: e62b2eed018fb3c9d5c9b499abce15ce66828667
 
 Next: measure real Qwen latency before changing the 60-second upper bound or
 repeating the integrated real-model LAB.
+
+## Qwen latency characterization — 2026-09-27
+
+State: `MEASURED`.
+
+- first probe: 44.351 s;
+- warm average: ~31.78 s;
+- warm range: 30.927–32.324 s;
+- 342 prompt tokens;
+- 190 completion tokens;
+- HTTP 200 / finish_reason=stop.
+
+Do not change timeout yet.
+
+Next: measure the exact integrated LAB request before repeating design changes.

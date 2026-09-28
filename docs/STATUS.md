@@ -176,3 +176,11 @@ Evidência da rodada: [review/operations/2026-09-24.md](review/operations/2026-0
 - COMMIT TÉCNICO: e62b2eed018fb3c9d5c9b499abce15ce66828667.
 - PRODUÇÃO: permanece inalterada.
 - PRÓXIMO: medir latência do Qwen real antes de qualquer mudança no timeout.
+
+## Qwen latency — 2026-09-27
+
+- **MEDIDO:** primeiro request 44.351 s.
+- **MEDIDO:** warm runs 32.324 / 30.927 / 32.104 s.
+- **ESTÁVEL:** 342 prompt + 190 completion tokens, finish_reason=stop.
+- **SEM EVIDÊNCIA DE STALL:** Qwen 18782 responde de forma repetível.
+- **TIMEOUT NÃO ALTERADO:** falta medir o payload exato do LAB integrado.
