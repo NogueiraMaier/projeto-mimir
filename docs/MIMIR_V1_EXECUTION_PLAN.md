@@ -577,3 +577,19 @@ State: `MEASURED`.
 Do not change timeout yet.
 
 Next: measure the exact integrated LAB request before repeating design changes.
+
+## Model timeout root cause — 2026-09-27
+
+State: `ROOT_CAUSE_CONFIRMED`.
+
+- exact LAB request captured;
+- synthetic residue: 0;
+- 90 s idle before model request;
+- Qwen HTTP 200;
+- exact request total: 71.536 s;
+- current integrated timeout: 60 s.
+
+Next:
+
+separate PostgreSQL timeout from model inference timeout and validate the new
+budget repository-only before repeating the integrated LAB.

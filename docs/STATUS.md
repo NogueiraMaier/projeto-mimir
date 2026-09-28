@@ -184,3 +184,11 @@ Evidência da rodada: [review/operations/2026-09-24.md](review/operations/2026-0
 - **ESTÁVEL:** 342 prompt + 190 completion tokens, finish_reason=stop.
 - **SEM EVIDÊNCIA DE STALL:** Qwen 18782 responde de forma repetível.
 - **TIMEOUT NÃO ALTERADO:** falta medir o payload exato do LAB integrado.
+
+## Protected consolidator timeout — root cause
+
+- **ROOT CAUSE CONFIRMADA:** Qwen CPU após idle pode exceder 60 s.
+- **REQUEST EXATO:** HTTP 200 em 71.536 s após 90 s ocioso.
+- **HARNESS:** usa `--timeout-seconds 60`.
+- **CLEANUP:** synthetic_residue=0.
+- **PRÓXIMO:** separar timeout PostgreSQL de timeout de inferência do modelo.

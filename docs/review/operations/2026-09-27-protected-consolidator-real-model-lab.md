@@ -118,3 +118,24 @@ Probe sintético controlado em `127.0.0.1:18782`:
 
 O modelo não apresenta stall nesse payload. O timeout integrado ainda precisa
 ser correlacionado ao request real do LAB antes de qualquer ajuste de limite.
+
+## Root cause do timeout
+
+Request exato do LAB capturado antes do modelo:
+
+SHA-256:
+`cb0a746384552ad20728a2cf6de5148bcd6045e68d5c5ba29db6c8868426f413`
+
+Após 90 s de ociosidade do Qwen:
+
+- HTTP 200;
+- start transfer: 71.535620 s;
+- total: 71.535960 s.
+
+O harness usa timeout explícito de 60 s.
+
+Root cause:
+
+`Qwen CPU cold/idle latency > current 60 s model timeout`.
+
+O modelo responde corretamente, porém pode exceder o orçamento temporal atual.

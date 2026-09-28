@@ -1683,3 +1683,31 @@ NEXT_ACTION:
 
 Capture/measure the exact integrated synthetic LAB request and its model
 generation characteristics before changing timeout or model policy.
+
+## CHECKPOINT — MODEL TIMEOUT ROOT CAUSE CONFIRMED
+
+Date: 2026-09-27
+
+State: `ROOT_CAUSE_CONFIRMED`
+
+Exact LAB request SHA-256:
+
+`cb0a746384552ad20728a2cf6de5148bcd6045e68d5c5ba29db6c8868426f413`
+
+After 90 seconds idle, Qwen 18782 processed the exact request in:
+
+`71.535960 s`
+
+with HTTP 200.
+
+The integrated harness explicitly uses a 60-second timeout.
+
+Root cause:
+
+Qwen CPU cold/idle inference latency can exceed the current 60-second model
+timeout.
+
+NEXT_ACTION:
+
+Design separate PostgreSQL and model timeout budgets. Preserve fail-closed
+behavior and do not weaken model/output security policy.
