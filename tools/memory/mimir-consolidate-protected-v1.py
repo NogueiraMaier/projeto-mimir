@@ -306,6 +306,10 @@ def safe_http_post(
             data = response.read(MAX_RESPONSE_BYTES + 1)
     except ConsolidatorError:
         raise
+    except TimeoutError as exc:
+        raise ConsolidatorError(
+            "timeout ao acessar modelo local"
+        ) from exc
     except urllib.error.HTTPError as exc:
         raise ConsolidatorError(
             f"modelo local respondeu HTTP {exc.code}"

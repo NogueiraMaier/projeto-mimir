@@ -153,6 +153,45 @@ def fake_model(response_bytes: bytes):
         thread.join(timeout=2)
 
 
+@contextmanager
+def fake_model_read_timeout():
+    class Handler(http.server.BaseHTTPRequestHandler):
+        def do_POST(self):
+            length = int(self.headers.get("Content-Length", "0"))
+            self.rfile.read(length)
+
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.send_header("Content-Length", "2")
+            self.end_headers()
+
+            # Cabeçalhos HTTP chegam ao cliente, mas o body não chega
+            # antes do timeout. Reproduz TimeoutError em response.read().
+            threading.Event().wait(2)
+
+            try:
+                self.wfile.write(b"{}")
+            except (BrokenPipeError, ConnectionResetError):
+                pass
+
+        def log_message(self, format, *args):
+            return
+
+    server = ReusableTCPServer(("127.0.0.1", 18782), Handler)
+    thread = threading.Thread(
+        target=server.serve_forever,
+        daemon=True,
+    )
+    thread.start()
+
+    try:
+        yield
+    finally:
+        server.shutdown()
+        server.server_close()
+        thread.join(timeout=3)
+
+
 class ProtectedConsolidatorV1Tests(unittest.TestCase):
     def make_fake_psql(self, root: Path) -> tuple[Path, Path]:
         stdin_log = root / "psql-stdin.txt"
@@ -370,6 +409,31 @@ class ProtectedConsolidatorV1Tests(unittest.TestCase):
                 run = self.run_cli(fake_psql)
         self.assertNotEqual(run.returncode, 0)
         self.assertIn("tool call", run.stderr)
+
+    def test_model_read_timeout_fails_closed(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            fake_psql, _ = self.make_fake_psql(root)
+
+            with fake_model_read_timeout():
+                run = self.run_cli(
+                    fake_psql,
+                    extra_args=["--timeout-seconds", "1"],
+                )
+
+        self.assertEqual(run.returncode, 1)
+        self.assertIn(
+            "ERRO[POLICY_REJECT]: timeout ao acessar modelo local",
+            run.stderr,
+        )
+        self.assertNotIn(
+            "falha interna no consolidator protegido",
+            run.stderr,
+        )
+        self.assertNotIn(
+            SOURCE_CONTENT,
+            run.stdout + run.stderr,
+        )
 
     def test_reasoning_content_is_ignored_and_never_emitted(self) -> None:
         reasoning_secret = "tok" + "en=" + "R" * 32
