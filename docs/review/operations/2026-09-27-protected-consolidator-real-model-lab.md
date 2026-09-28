@@ -139,3 +139,20 @@ Root cause:
 `Qwen CPU cold/idle latency > current 60 s model timeout`.
 
 O modelo responde corretamente, porém pode exceder o orçamento temporal atual.
+
+
+## Timeout split implementado
+
+Commit:
+
+`8b04510fc693442ae94d0487581d942d5ae9319e`
+
+Novo contrato temporal:
+
+- PostgreSQL: 1..60 s;
+- modelo: 1..180 s;
+- default do modelo: 120 s.
+
+Repository validation: 10/10 PASS.
+
+Próximo passo: LAB integrado sintético com model timeout 120 s.

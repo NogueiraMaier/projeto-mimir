@@ -593,3 +593,16 @@ Next:
 
 separate PostgreSQL timeout from model inference timeout and validate the new
 budget repository-only before repeating the integrated LAB.
+
+
+## Protected consolidator timeout split — 2026-09-27
+
+State: `REPOSITORY_VALIDATED`.
+
+Technical commit: `8b04510fc693442ae94d0487581d942d5ae9319e`
+
+- PostgreSQL timeout remains independently bounded at 60 s maximum;
+- model timeout default 120 s, maximum 180 s;
+- repository regression 10/10 PASS.
+
+Next: integrated synthetic LAB using model timeout 120 s.

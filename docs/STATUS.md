@@ -192,3 +192,14 @@ Evidência da rodada: [review/operations/2026-09-24.md](review/operations/2026-0
 - **HARNESS:** usa `--timeout-seconds 60`.
 - **CLEANUP:** synthetic_residue=0.
 - **PRÓXIMO:** separar timeout PostgreSQL de timeout de inferência do modelo.
+
+
+## Protected consolidator timeout split — 2026-09-27
+
+- **IMPLEMENTADO:** timeout PostgreSQL e inferência separados.
+- **POSTGRESQL:** máximo 60 s.
+- **MODELO:** default 120 s, máximo 180 s.
+- **FAIL-CLOSED:** preservado.
+- **VALIDADO:** 10/10 testes repository-only PASS.
+- **COMMIT:** `8b04510fc693442ae94d0487581d942d5ae9319e`.
+- **PRÓXIMO:** repetir LAB integrado sintético com model timeout 120 s.

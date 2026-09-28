@@ -1711,3 +1711,27 @@ NEXT_ACTION:
 
 Design separate PostgreSQL and model timeout budgets. Preserve fail-closed
 behavior and do not weaken model/output security policy.
+
+
+## CHECKPOINT — MODEL TIMEOUT SPLIT VALIDATED
+
+Date: 2026-09-27
+
+State: `REPOSITORY_VALIDATED`
+
+Technical HEAD:
+
+`8b04510fc693442ae94d0487581d942d5ae9319e`
+
+Validated:
+
+- PostgreSQL and model inference timeout budgets separated;
+- PostgreSQL maximum remains 60 s;
+- model timeout default is 120 s and maximum is 180 s;
+- fail-closed timeout handling preserved;
+- repository suite: 10/10 PASS.
+
+NEXT_ACTION:
+
+Run the isolated synthetic real-model LAB with
+`--model-timeout-seconds 120`.
