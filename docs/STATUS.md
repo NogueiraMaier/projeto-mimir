@@ -154,3 +154,14 @@ Evidência da rodada: [review/operations/2026-09-24.md](review/operations/2026-0
 - **PRODUÇÃO INTACTA:** PostgreSQL permanece 1..12, sem migration 014 e sem deployment do writer/consolidator.
 - **BLOQUEADOR ATUAL:** tratamento explícito e diagnóstico de latência/timeout do Qwen.
 - **PRÓXIMO P1:** adicionar timeout handling + regression test, medir latência real e somente então repetir o LAB integrado.
+
+
+## Atualização — timeout do protected consolidator — 2026-09-27
+
+- VALIDADO: TimeoutError do modelo local agora é tratado explicitamente.
+- VALIDADO: teste repository-only específico de timeout.
+- VALIDADO: suite 9/9 PASS, VALIDATOR_RC=0.
+- ISOLAMENTO: Qwen real em 127.0.0.1:18782 permaneceu ativo e fora do namespace de teste.
+- COMMIT TÉCNICO: 28be68ea1dcccb74e74d16fe49a4943a1d316947.
+- PRODUÇÃO: permanece inalterada.
+- PRÓXIMO: medir latência do Qwen real antes de qualquer mudança no timeout.

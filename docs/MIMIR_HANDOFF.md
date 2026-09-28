@@ -1596,3 +1596,32 @@ Evidence:
 7. only then repeat the integrated LAB;
 8. preserve synthetic-only content and `synthetic_residue=0`;
 9. keep production and real sessions out of scope.
+
+
+## CHECKPOINT — MODEL TIMEOUT HANDLING VALIDATED
+
+Date: 2026-09-27
+
+State: REPOSITORY_VALIDATED
+
+Technical HEAD:
+
+28be68ea1dcccb74e74d16fe49a4943a1d316947
+
+Result:
+
+- explicit local-model TimeoutError handling implemented;
+- timeout fails closed through controlled consolidator error;
+- dedicated timeout regression test added;
+- repository validator: 9/9 PASS;
+- VALIDATOR_RC=0;
+- validation executed in isolated network namespace;
+- real Qwen on 127.0.0.1:18782 remained untouched and active;
+- PostgreSQL production remains unchanged.
+
+NEXT_ACTION:
+
+Measure Qwen 18782 latency with an equivalent fully synthetic request.
+Do not increase the consolidator timeout before obtaining latency evidence.
+After measurement, decide whether the issue is cold start, generation latency,
+context size or model stall.

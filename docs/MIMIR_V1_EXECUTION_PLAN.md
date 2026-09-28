@@ -528,3 +528,20 @@ Próxima atividade:
 5. avaliar tecnicamente o limite atual de 60 s;
 6. repetir o LAB somente após a medição;
 7. manter produção, sessão real e deployment fora de escopo.
+
+
+## Protected consolidator timeout regression — 2026-09-27
+
+State: REPOSITORY_VALIDATED
+
+Technical commit: 28be68ea1dcccb74e74d16fe49a4943a1d316947
+
+- explicit TimeoutError handling: implemented;
+- timeout regression test: PASS;
+- repository suite: 9/9 PASS;
+- validator RC=0;
+- Qwen real remained isolated from the test;
+- production unchanged.
+
+Next: measure real Qwen latency before changing the 60-second upper bound or
+repeating the integrated real-model LAB.
