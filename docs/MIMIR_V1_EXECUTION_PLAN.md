@@ -626,3 +626,35 @@ Next:
 3. do not expose unnecessary synthetic payload content;
 4. do not relax validator;
 5. validate any correction repository-only before another integrated LAB.
+
+## MIMIR-V1-PROTECTED-CONSOLIDATOR-SCHEMA-DIAG-01
+
+Status: `BLOCKED`
+
+Branch: `feat/mimir-operational-foundation`
+
+Source HEAD: `7d79c02efa92597fb1e927f27b9c7715ef0a4fa8`
+
+Completed diagnostic work:
+
+- model timeout split validated;
+- integrated synthetic LAB reached real Qwen;
+- schema mismatch reproduced fail-closed;
+- observed keys: `schema_version,source_bindings`;
+- `synthetic_residue=0`;
+- strict llama.cpp JSON Schema capability independently validated.
+
+Decision:
+
+Use a closed JSON Schema during generation and retain the current Python
+validator unchanged as the second validation layer.
+
+NEXT_ACTION:
+
+1. implement closed JSON Schema in `mimir-consolidate-protected-v1.py`;
+2. remove ambiguous `requested source bindings` wording;
+3. add repository-only request/schema regressions;
+4. run isolated repository validation;
+5. on PASS, commit technical change;
+6. update continuity documents with exact technical commit;
+7. only then repeat integrated synthetic real-model LAB.

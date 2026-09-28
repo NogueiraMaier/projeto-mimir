@@ -212,3 +212,18 @@ Evidência da rodada: [review/operations/2026-09-24.md](review/operations/2026-0
 - **CURRENT BLOCKER:** `REAL_MODEL_OUTPUT_SCHEMA_MISMATCH`.
 - **PRODUCTION:** unchanged.
 - **NEXT P1:** safe structural diagnostic of the Qwen JSON response.
+
+## MIMIR-V1-PROTECTED-CONSOLIDATOR-SCHEMA-DIAG-01 — 2026-09-28
+
+- **STATUS:** BLOCKED.
+- **BRANCH:** `feat/mimir-operational-foundation`.
+- **SOURCE HEAD:** `7d79c02efa92597fb1e927f27b9c7715ef0a4fa8`.
+- **REAL MODEL:** reached successfully with 120 s model timeout.
+- **OBSERVED OUTPUT:** `schema_version,source_bindings`.
+- **REQUIRED OUTPUT:** `schema_version,source_event_id,source_content_sha256,candidates`.
+- **FAIL-CLOSED:** PASS.
+- **CLEANUP:** `synthetic_residue=0`.
+- **JSON SCHEMA CAPABILITY:** validated on the deployed llama.cpp runtime.
+- **DECISION:** constrain generation; do not weaken validator.
+- **PRODUCTION:** unchanged.
+- **NEXT P1:** implement closed JSON Schema + repository-only regressions.

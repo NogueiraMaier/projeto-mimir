@@ -1759,3 +1759,52 @@ NEXT_ACTION:
 
 Inspect safe structural metadata from the synthetic model response only.
 Do not relax the closed schema.
+
+## CHECKPOINT — MIMIR-V1-PROTECTED-CONSOLIDATOR-SCHEMA-DIAG-01
+
+Date: 2026-09-28
+
+Status: `BLOCKED`
+
+Branch:
+
+`feat/mimir-operational-foundation`
+
+Source HEAD:
+
+`7d79c02efa92597fb1e927f27b9c7715ef0a4fa8`
+
+Current blocker:
+
+`REAL_MODEL_OUTPUT_SCHEMA_MISMATCH`
+
+Observed real-model top-level keys:
+
+`schema_version,source_bindings`
+
+Required top-level contract:
+
+`schema_version,source_event_id,source_content_sha256,candidates`
+
+Validated capability:
+
+The deployed `llama-cpp-0_pre9888` endpoint at
+`127.0.0.1:18782` supports strict `response_format=json_schema`
+with `additionalProperties=false`.
+
+Decision:
+
+- do not relax the existing Python validator;
+- replace ambiguous prompt wording;
+- constrain generation with a closed JSON Schema;
+- keep Python validation as an independent second fail-closed barrier.
+
+Production remains unchanged.
+
+VPS CPU Qwen remains fallback. PcIA GPU remains the planned primary inference
+target.
+
+NEXT_ACTION:
+
+Implement the closed JSON Schema and repository-only regression tests.
+Do not repeat the integrated LAB until repository-only validation passes.
