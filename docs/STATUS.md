@@ -165,3 +165,14 @@ Evidência da rodada: [review/operations/2026-09-24.md](review/operations/2026-0
 - COMMIT TÉCNICO: 28be68ea1dcccb74e74d16fe49a4943a1d316947.
 - PRODUÇÃO: permanece inalterada.
 - PRÓXIMO: medir latência do Qwen real antes de qualquer mudança no timeout.
+
+
+## Atualização — timeout do protected consolidator — 2026-09-27
+
+- VALIDADO: TimeoutError do modelo local agora é tratado explicitamente.
+- VALIDADO: teste repository-only específico de timeout.
+- VALIDADO: suite 9/9 PASS, VALIDATOR_RC=0.
+- ISOLAMENTO: Qwen real em 127.0.0.1:18782 permaneceu ativo e fora do namespace de teste.
+- COMMIT TÉCNICO: e62b2eed018fb3c9d5c9b499abce15ce66828667.
+- PRODUÇÃO: permanece inalterada.
+- PRÓXIMO: medir latência do Qwen real antes de qualquer mudança no timeout.

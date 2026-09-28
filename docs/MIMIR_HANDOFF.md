@@ -1625,3 +1625,32 @@ Measure Qwen 18782 latency with an equivalent fully synthetic request.
 Do not increase the consolidator timeout before obtaining latency evidence.
 After measurement, decide whether the issue is cold start, generation latency,
 context size or model stall.
+
+
+## CHECKPOINT — MODEL TIMEOUT HANDLING VALIDATED
+
+Date: 2026-09-27
+
+State: REPOSITORY_VALIDATED
+
+Technical HEAD:
+
+e62b2eed018fb3c9d5c9b499abce15ce66828667
+
+Result:
+
+- explicit local-model TimeoutError handling implemented;
+- timeout fails closed through controlled consolidator error;
+- dedicated timeout regression test added;
+- repository validator: 9/9 PASS;
+- VALIDATOR_RC=0;
+- validation executed in isolated network namespace;
+- real Qwen on 127.0.0.1:18782 remained untouched and active;
+- PostgreSQL production remains unchanged.
+
+NEXT_ACTION:
+
+Measure Qwen 18782 latency with an equivalent fully synthetic request.
+Do not increase the consolidator timeout before obtaining latency evidence.
+After measurement, decide whether the issue is cold start, generation latency,
+context size or model stall.
