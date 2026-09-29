@@ -243,3 +243,16 @@ Evidência da rodada: [review/operations/2026-09-24.md](review/operations/2026-0
 - **REAL-MODEL INTEGRATED LAB:** pending.
 - **NEXT P1:** integrated synthetic LAB with real Qwen on `127.0.0.1:18782`.
 - **REQUIRED CLEANUP RESULT:** `synthetic_residue=0`.
+
+## MIMIR-V1-PROTECTED-CONSOLIDATOR-REALMODEL-JSON-SCHEMA-01 — 2026-09-28
+
+- **STATUS:** `FAIL`.
+- **TECHNICAL COMMIT:** `39b09e92b2355573105d3613ba84dab9267cf0a1`.
+- **REPOSITORY-ONLY:** PASS.
+- **INTEGRATED REAL-MODEL LAB:** FAIL.
+- **FAILURE:** `timeout ao acessar modelo local`.
+- **MODEL TIMEOUT:** 120 s.
+- **SCHEMA VALIDATION REACHED:** no.
+- **SYNTHETIC CLEANUP:** `synthetic_residue=0`.
+- **PRODUCTION:** unchanged.
+- **NEXT P1:** Qwen runtime/latency diagnostics before any LAB retry.

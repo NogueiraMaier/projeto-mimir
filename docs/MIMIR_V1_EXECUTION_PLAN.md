@@ -695,3 +695,40 @@ The run must finish with:
 `synthetic_residue=0`
 
 Only after that result may the real-model LAB state move to PASS.
+
+## MIMIR-V1-PROTECTED-CONSOLIDATOR-REALMODEL-JSON-SCHEMA-01
+
+Status:
+
+`FAIL`
+
+Technical commit:
+
+`39b09e92b2355573105d3613ba84dab9267cf0a1`
+
+Repository-only validation:
+
+`PASS`
+
+Integrated real-model LAB:
+
+`FAIL`
+
+Reason:
+
+`timeout ao acessar modelo local`
+
+Model timeout budget:
+
+`120 seconds`
+
+Cleanup:
+
+`synthetic_residue=0`
+
+The run stopped before output-schema validation.
+
+NEXT_ACTION:
+
+Perform read-only Qwen runtime/latency diagnostics. Do not alter timeout,
+JSON Schema, validator or production before cause characterization.

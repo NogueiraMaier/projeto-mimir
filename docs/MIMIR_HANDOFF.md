@@ -1876,3 +1876,52 @@ Run the disposable integrated synthetic LAB against real Qwen on
 Require `synthetic_residue=0`.
 
 Do not deploy.
+
+## CHECKPOINT — MIMIR-V1-PROTECTED-CONSOLIDATOR-REALMODEL-JSON-SCHEMA-01
+
+Date: 2026-09-28
+
+Status:
+
+`FAIL`
+
+Branch:
+
+`feat/mimir-operational-foundation`
+
+Technical commit under validation:
+
+`39b09e92b2355573105d3613ba84dab9267cf0a1`
+
+Artifact SHA-256:
+
+`05f18e59ff35c8d5dca6f4e206771e59c6df9abca9bafd9b341fcb9129c699bd`
+
+Integrated synthetic LAB reached the real-model stage but failed closed with:
+
+`ERRO[POLICY_REJECT]: timeout ao acessar modelo local`
+
+The model timeout budget was 120 seconds.
+
+All stages before inference passed.
+
+Cleanup:
+
+`synthetic_residue=0`
+
+Important:
+
+This run did NOT reach output-schema validation. Therefore it does not prove
+that the new JSON Schema succeeds or fails against the integrated request.
+
+The repository-only state remains PASS. Integrated real-model validation
+remains FAIL.
+
+Production remains unchanged.
+
+NEXT_ACTION:
+
+Diagnose the Qwen CPU fallback runtime and measure a small strict JSON Schema
+request before authorizing another integrated LAB run.
+
+Do not change the validator, JSON Schema or timeout yet.
