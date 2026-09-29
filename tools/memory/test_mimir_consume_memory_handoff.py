@@ -189,6 +189,36 @@ class ConsumerValidationTests(unittest.TestCase):
         finally:
             temp.cleanup()
 
+    def test_submit_sql_uses_sequential_plpgsql_visibility(self):
+        source = SCRIPT.read_text(encoding="utf-8")
+
+        self.assertIn(
+            "CREATE TEMP TABLE handoff_submission_result",
+            source,
+        )
+        self.assertIn(
+            "DO $handoff$",
+            source,
+        )
+        self.assertIn(
+            "v_memory_id :=\n        mimir.propose_memory(",
+            source,
+        )
+        self.assertIn(
+            "SELECT status\n    INTO v_status",
+            source,
+        )
+        self.assertIn(
+            "mimir.inspect_candidate_conflict(",
+            source,
+        )
+
+        self.assertNotIn(
+            "FROM mimir.pending_memory_review AS pending",
+            source,
+        )
+
+
     def test_unknown_handoff_field_fails(self):
         report = make_report()
         report["memory_handoff"][

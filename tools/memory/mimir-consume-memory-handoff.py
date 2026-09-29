@@ -417,21 +417,33 @@ BEGIN;
 SET LOCAL statement_timeout = '30s';
 SET LOCAL lock_timeout = '5s';
 
-WITH source AS MATERIALIZED (
-    SELECT mimir.ingest_operational_handoff_v1(
-        :'event_id'::uuid,
-        convert_from(
-            decode(:'handoff_b64', 'base64'),
-            'UTF8'
-        ),
-        :'handoff_sha256'
-    ) AS event_id
-),
-candidate AS MATERIALIZED (
-    SELECT
-        source.event_id,
+CREATE TEMP TABLE handoff_submission_result (
+    event_id uuid NOT NULL,
+    memory_id uuid NOT NULL,
+    candidate_state text NOT NULL,
+    conflict_classification text NOT NULL
+) ON COMMIT DROP;
+
+DO $handoff$
+DECLARE
+    v_event_id        uuid;
+    v_memory_id       uuid;
+    v_status          text;
+    v_conflict        text;
+BEGIN
+    v_event_id :=
+        mimir.ingest_operational_handoff_v1(
+            :'event_id'::uuid,
+            convert_from(
+                decode(:'handoff_b64', 'base64'),
+                'UTF8'
+            ),
+            :'handoff_sha256'
+        );
+
+    v_memory_id :=
         mimir.propose_memory(
-            source.event_id,
+            v_event_id,
             :'memory_key',
             'evidence',
             :'title',
@@ -462,46 +474,64 @@ candidate AS MATERIALIZED (
                     false
             ),
             'mimir-memory-handoff-v1'
-        ) AS memory_id
-    FROM source
-),
-state AS MATERIALIZED (
-    SELECT
-        candidate.event_id,
-        candidate.memory_id,
-        EXISTS (
-            SELECT 1
-            FROM mimir.pending_memory_review AS pending
-            WHERE pending.memory_id =
-                candidate.memory_id
-        ) AS is_pending
-    FROM candidate
-)
+        );
+
+    SELECT status
+    INTO v_status
+    FROM mimir.memory_records
+    WHERE memory_id = v_memory_id;
+
+    IF NOT FOUND THEN
+        RAISE EXCEPTION
+            'candidate recém-criada não foi encontrada: %',
+            v_memory_id;
+    END IF;
+
+    IF v_status <> 'candidate' THEN
+        RAISE EXCEPTION
+            'status inesperado após propose_memory: %',
+            v_status;
+    END IF;
+
+    SELECT classification
+    INTO v_conflict
+    FROM mimir.inspect_candidate_conflict(
+        v_memory_id
+    );
+
+    IF NOT FOUND THEN
+        RAISE EXCEPTION
+            'classificação de conflito ausente';
+    END IF;
+
+    INSERT INTO handoff_submission_result (
+        event_id,
+        memory_id,
+        candidate_state,
+        conflict_classification
+    )
+    VALUES (
+        v_event_id,
+        v_memory_id,
+        v_status,
+        v_conflict
+    );
+END
+$handoff$;
+
 SELECT jsonb_build_object(
     'event_id',
-        state.event_id,
+        event_id,
     'memory_id',
-        state.memory_id,
+        memory_id,
     'state',
-        CASE
-            WHEN state.is_pending
-                THEN 'candidate'
-            ELSE 'not_pending'
-        END,
+        candidate_state,
     'conflict_classification',
-        CASE
-            WHEN state.is_pending THEN (
-                SELECT classification
-                FROM mimir.inspect_candidate_conflict(
-                    state.memory_id
-                )
-            )
-            ELSE 'not_applicable'
-        END,
+        conflict_classification,
     'automatic_promotion',
         false
 )::text
-FROM state;
+FROM handoff_submission_result;
 
 COMMIT;
 """
