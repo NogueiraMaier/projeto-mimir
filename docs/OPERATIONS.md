@@ -1,6 +1,6 @@
 # Operações controladas do Mímir
 
-Revisão local: 2026-09-22. **IMPLEMENTADO no repositório; NÃO VALIDADO EM PRODUÇÃO.**
+Revisão local: 2026-09-29. **IMPLEMENTADO no repositório; NÃO VALIDADO EM PRODUÇÃO.**
 Esta camada estende a fundação `eb2e166`; não recria o projeto, não altera as
 migrations 002–008 e não concede ferramentas de execução ao agente OpenClaw.
 
@@ -16,7 +16,7 @@ migrations 002–008 e não concede ferramentas de execução ao agente OpenClaw
 | Snapshot e backup de hostname | IMPLEMENTADO: coleta anterior e cópia do valor necessário para recuperação manual; não é backup completo do Linux. |
 | Rollback | PARCIAL: somente procedimento manual, nunca executado automaticamente. |
 | Extração automática da topologia | PARCIAL: coleta evidências sanitizadas; interfaces/IPs/VLANs normalizados são cadastrados pelo operador. Não infere firmware ou topologia. |
-| Memória permanente | PARCIAL: contrato `memory_handoff` v1 para revisão humana; nenhuma chamada a funções de memória ou promoção automática. |
+| Memória permanente | IMPLEMENTADO e VALIDADO EM LAB: `memory_handoff` v1 entra como fonte confidential, gera somente candidate, passa por deduplicação/contradição e revisão humana; embedding e busca semântica somente após promoção. Sem deploy da migration 016 em produção. |
 | Novos fabricantes, backup completo, rollback automático | PLANEJADO; sem comandos FiberHome/H3C/Intelbras. |
 
 ## Inventário / CMDB
@@ -230,16 +230,36 @@ proibido e failed/interrupted devem ser preservados. Laboratórios totalmente
 sintéticos podem ser removidos depois que as evidências exigidas forem
 versionadas e os checkpoints de recuperação forem concluídos.
 
-## Integração com memória — PARCIAL
+## Integração com memória — VALIDADA EM LABORATÓRIO
 
-`ops_workflow.memory_handoff()` emite contrato v1 com cliente/site/dispositivo,
-projeto, origem `ops:UUID`, data, tipo evidence, classificação confidential,
-nível de confiança descritivo, estado encontrado, alterações e validação.
-`deduplication_key=intervention_id` é estável. O consumidor futuro deve revisar
-segredos, duplicidade, contradições, autorização e versões anteriores.
-Não enviar esse material ao consolidador externo. Não há escrita em
-`memory_records`, `memory_events` ou `session_sources`, nem uso da função de
-revisão humana. A promoção permanente continua no fluxo humano existente.
+`ops_workflow.memory_handoff()` continua emitindo contrato v1 com
+cliente/site/dispositivo, projeto, origem `ops:UUID`, tipo evidence,
+classificação confidential, estado encontrado, alterações e validação.
+`deduplication_key=intervention_id` permanece estável.
+
+O consumidor `tools/memory/mimir-consume-memory-handoff.py` valida o relatório
+e seu SHA-256 em modo fail-closed. A migration 016 fornece ingestão controlada
+do handoff para `memory_events`; a proposição subsequente cria somente um
+registro `candidate`. A classificação de conflito usa a API controlada
+`mimir.inspect_candidate_conflict(uuid)` sem conceder SELECT direto em
+`memory_records` ao `mimir_app`.
+
+Replay do mesmo handoff é idempotente. Conteúdo malformed, mudança para
+`automatic_promotion=true` e contratos fora do schema são rejeitados. Antes da
+revisão humana o candidate não é elegível a embedding e não aparece na busca
+semântica.
+
+A promoção continua exclusivamente no fluxo humano autenticado. Após
+`peer:nogueiramaier` aprovar o candidate, ele passa para `active`, torna-se
+elegível ao EmbeddingGemma 768D e passa a ser recuperável semanticamente.
+Nenhuma relação ou promoção automática é criada.
+
+O campo `integration=PARCIAL` permanece no contrato v1 emitido porque descreve
+o estado daquele handoff específico, ainda `pending_human_review`; ele não
+representa mais o estado de implementação da capacidade.
+
+Não enviar esse material ao consolidador externo. A migration 016 foi validada
+somente no PostgreSQL LAB. Produção permanece no schema de memória 1..12.
 
 ## Validação local e futura
 

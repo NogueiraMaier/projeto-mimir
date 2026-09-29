@@ -2,11 +2,15 @@
 
 ## Próxima etapa
 
-O pipeline local de memória permanente já validou escrita controlada,
-consolidação protegida, deduplicação, contradição, revisão humana,
-`candidate -> active`, embedding local, recuperação semântica e
-auditoria/proveniência. A próxima etapa P1 é integrar `memory_handoff` ao fluxo
-humano de memória, preservando revisão explícita e nenhuma promoção automática.
+A seção P1 de memória permanente está concluída em laboratório: escrita
+controlada, consolidação protegida, deduplicação, contradição, revisão humana,
+`candidate -> active`, embedding local, recuperação semântica,
+auditoria/proveniência e integração operacional de `memory_handoff` foram
+validadas sem promoção automática.
+
+A próxima lacuna P1 está na camada operacional: demonstrar backup/restauração
+real por adapter, mantendo produção e equipamentos reais fora do laboratório
+até autorização específica.
 
 ## Gate de segurança conversacional
 
@@ -50,7 +54,10 @@ Estado P1 validado em 2026-09-29:
 - embedding local controlado após promoção: concluído;
 - recuperação semântica da memória promovida: concluída;
 - auditoria/proveniência ponta a ponta: concluída;
-- próxima etapa: integrar `memory_handoff` ao fluxo humano sem promoção automática.
+- `memory_handoff` operacional -> candidate -> revisão humana -> active: concluído em LAB;
+- embedding e visibilidade semântica somente após promoção humana: confirmado;
+- seção P1 — Memória permanente PostgreSQL: 9/9 concluída;
+- próxima etapa P1: demonstrar backup/restauração real por adapter.
 
 ## Etapas posteriores
 

@@ -2352,3 +2352,112 @@ The integration must preserve:
 - semantic visibility only after promotion;
 - fail-closed behavior on malformed/untrusted handoff content;
 - production unchanged until separately authorized.
+
+
+## MIMIR-V1-P1-MEMORY-HANDOFF-01
+
+Date: 2026-09-29
+
+Status: `PASS`
+
+The operational `memory_handoff` v1 path is implemented and validated end to
+end in the isolated PostgreSQL LAB. This closes the ninth and final item of
+P1 — Permanent PostgreSQL Memory.
+
+Technical commit chain since the previous memory checkpoint:
+
+- `071867e209b537defa81b4409edd19cf599851c1` — feat(memory): integrate operational memory handoff
+- `f53ebc1043f76009c2e0df43ad61254af3b75d5b` — test(memory): validate operational handoff integration
+- `640a77373b4dfe749cc952020098279104e219a9` — fix(memory): use stdin for handoff lab psql vars
+- `3b78044c2290484af864015b2568cae03d836b4d` — fix(memory): observe handoff candidate sequentially
+- `cdbda3a72784ad5f710b8fde80dd8e5f649340b8` — fix(memory): stage handoff params before plpgsql
+- `1df8487475abf67f6a8a1e2cfb5bc6e4e4eedf87` — fix(memory): preserve handoff least privilege boundary
+
+Final LAB topology and guards:
+
+- LAB schema: `1..12,14,15,16`;
+- production schema: `1..12`;
+- migration 016 applied only to LAB;
+- production migrations 014, 015 and 016: absent;
+- `mimir_app|peer:openclaw`: PASS;
+- `mimir_embedder|peer:openclaw`: PASS;
+- `mimir_search|peer:openclaw`: PASS;
+- producer: real `ops_workflow.memory_handoff()`;
+- handoff contract state: `pending_human_review`;
+- handoff classification: `confidential`;
+- `automatic_promotion=false`.
+
+Final integrated evidence:
+
+- real producer contract: PASS;
+- malformed handoff fail-closed: PASS;
+- malformed handoff database writes: 0;
+- consumer dry-run: PASS;
+- confidential event ingestion: PASS;
+- candidate-first semantics: PASS;
+- deterministic contradiction inspection: PASS;
+- replay idempotency: PASS;
+- deduplication: PASS;
+- source/report SHA provenance: PASS;
+- embedding before human review: BLOCKED;
+- semantic visibility before human review: BLOCKED;
+- authenticated human review: PASS;
+- `candidate -> active`: PASS;
+- embedding only after human promotion: PASS;
+- EmbeddingGemma dimensions: 768;
+- semantic visibility after review: PASS;
+- operational handoff semantic retrieval: PASS;
+- end-to-end provenance: PASS;
+- end-to-end audit: PASS;
+- automatic relations: 0;
+- automatic promotion: false;
+- production unchanged;
+- temporary LAB `pg_ident.conf` restored;
+- synthetic residue after cleanup: 0;
+- final LAB RC: 0.
+
+Synthetic evidence hashes:
+
+- report SHA-256:
+  `ae810b4261bc9ba6b269014cbd8bc8ba51a0f9a2b4e79b4d4ef5d619fd3346e1`;
+- canonical handoff SHA-256:
+  `7067940ba04f0ee8da86db6a102d9dac3c12ee1b2cbbf6ea7b6547780438aaab`.
+
+Failure/correction chronology preserved:
+
+1. The first integrated run exposed psql variable substitution inside `-c`.
+   The harness was corrected to feed variable-bearing SQL through stdin.
+   Cleanup restored `pg_ident.conf` and left zero synthetic residue.
+
+2. The next run created the memory but the same SQL statement inferred
+   `not_pending`. Candidate observation was moved to sequential transactional
+   execution rather than relying on same-statement visibility. Cleanup remained
+   complete.
+
+3. The following run exposed that psql variables inside a dollar-quoted
+   `DO $handoff$` block are not substituted. Inputs were staged in a temporary
+   table outside the PL/pgSQL block, preserving one atomic transaction.
+
+4. The next run correctly denied direct SELECT on `mimir.memory_records` to
+   `mimir_app`. No grant was widened. The consumer was corrected to use the
+   existing SECURITY DEFINER API `mimir.inspect_candidate_conflict(uuid)`,
+   which itself requires candidate state.
+
+5. The final retry passed the complete path from operational handoff through
+   authenticated human review, embedding and semantic recovery.
+
+Security boundary retained:
+
+- no direct `mimir_app` SELECT on `memory_records`;
+- no automatic promotion;
+- no automatic memory relation;
+- no semantic visibility while status is candidate;
+- no production migration/deploy;
+- human authenticated review remains mandatory.
+
+P1 — Permanent PostgreSQL Memory: `9/9 COMPLETE`.
+
+NEXT_ACTION:
+
+Advance to the next incomplete P1 operational milestone:
+demonstrate real backup/restore behavior by adapter in an isolated laboratory.

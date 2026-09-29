@@ -90,10 +90,13 @@ alteração. MikroTik permanece em diagnóstico. Rollback é manual.
 
 A finalização associa estado encontrado, ações, validação, observação atualizada
 do inventário, histórico e relatório. Intervenções técnicas `validated` não são
-promovidas à memória automaticamente: `memory_handoff` v1 é interface PARCIAL,
-confidential, para revisão humana, duplicidade, contradições e preservação de
-versões. `closed` permanece false. Nenhuma ferramenta de shell foi adicionada
-ao agente main. Detalhes e limites: [OPERATIONS.md](OPERATIONS.md).
+promovidas à memória automaticamente. O `memory_handoff` v1 foi integrado e
+validado em laboratório como fonte confidential: ingressa como `candidate`,
+passa por deduplicação/contradição e somente uma revisão humana autenticada pode
+promovê-lo para `active`. Embedding e visibilidade semântica permanecem
+posteriores à promoção. `closed` permanece false no relatório operacional.
+Nenhuma ferramenta de shell foi adicionada ao agente main. A migration 016 não
+foi aplicada em produção. Detalhes e limites: [OPERATIONS.md](OPERATIONS.md).
 
 ## Ingestão protegida de sessões
 
