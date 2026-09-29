@@ -2,10 +2,11 @@
 
 ## Próxima etapa
 
-O writer v2 de ingestão protegida já passou no laboratório isolado. A próxima
-etapa é completar o fluxo **local** de consolidação das sessões protegidas,
-usando `mimir.read_consolidation_source(uuid)`, modelo somente local/loopback,
-dry-run, revisão humana e nenhuma promoção automática ou API externa.
+O pipeline local de memória permanente já validou escrita controlada,
+consolidação protegida, deduplicação, contradição, revisão humana,
+`candidate -> active`, embedding local, recuperação semântica e
+auditoria/proveniência. A próxima etapa P1 é integrar `memory_handoff` ao fluxo
+humano de memória, preservando revisão explícita e nenhuma promoção automática.
 
 ## Gate de segurança conversacional
 
@@ -46,7 +47,10 @@ Estado P1 validado em 2026-09-29:
 - detecção determinística de contradições: concluída;
 - revisão humana autenticada: concluída;
 - fluxo `candidate -> active`: concluído;
-- próxima etapa: embedding controlado e recuperação semântica após promoção.
+- embedding local controlado após promoção: concluído;
+- recuperação semântica da memória promovida: concluída;
+- auditoria/proveniência ponta a ponta: concluída;
+- próxima etapa: integrar `memory_handoff` ao fluxo humano sem promoção automática.
 
 ## Etapas posteriores
 

@@ -2240,3 +2240,115 @@ The next LAB must prove:
 - all synthetic records are removed.
 
 Do not apply migrations 014 or 015 to production.
+
+## MIMIR-V1-P1-EMBEDDING-SEMANTIC-AUDIT-01
+
+Date: 2026-09-29
+
+Status: `PASS`
+
+Controlled local embedding generation, semantic retrieval after human
+promotion, and end-to-end provenance/audit were validated in the isolated
+PostgreSQL LAB.
+
+Technical commits:
+
+- initial embedding/semantic LAB:
+  `2bb32d128c430e98a1e88059b8d76ef2c675754a`;
+- private LAB artifact staging:
+  `a7dd91d85788cb93452471b49d605ee277423fd1`;
+- managed embedding service migration:
+  `9e88393a4b83fd9b48e8ca3b43d10402db846332`;
+- exact managed llama-server embedding contract:
+  `11c2fd979c758201d122c4512de3f4b17b94508d`;
+- boolean assertion correction:
+  `41735fe4b1c703fcc21f31f9ab03644daa23bf25`.
+
+Validated runtime contract:
+
+- OpenClaw: `2026.9.5`;
+- managed embedding listener:
+  `127.0.0.1:8601`;
+- embedding runtime model id:
+  `embeddinggemma-300m-qat-q8_0`;
+- canonical PostgreSQL embedding model identity:
+  `hf:ggml-org/embeddinggemma-300m-qat-q8_0-GGUF/embeddinggemma-300m-qat-Q8_0.gguf`;
+- real embedding dimensions: 768;
+- real embedding norm: approximately 1.0.
+
+Final LAB evidence:
+
+- LAB schema: `1..12,14,15`;
+- production schema: `1..12`;
+- `mimir_embedder|peer:openclaw`: PASS;
+- `mimir_search|peer:openclaw`: PASS;
+- human promotion/rejection state: PASS;
+- only `active` memory eligible for embedding: PASS;
+- real embedding dry-run: PASS;
+- real controlled embedding write: PASS;
+- embedding dimensions 768: PASS;
+- embedding L2 normalization: PASS;
+- rejected memory remained unembedded;
+- candidate memory remained unembedded;
+- content SHA guard: PASS;
+- embedding audit: PASS;
+- real query embedding 768D: PASS;
+- promoted memory semantic retrieval: PASS;
+- rejected memory excluded from semantic results;
+- candidate memory excluded from semantic results;
+- semantic source provenance: PASS;
+- end-to-end provenance: PASS;
+- end-to-end audit: PASS;
+- production unchanged;
+- production migration 015 absent;
+- temporary LAB `pg_ident.conf` restored;
+- synthetic residue: 0;
+- LAB RC: 0.
+
+Failure/correction chronology preserved:
+
+1. The initial LAB could not execute repository artifacts as Linux `openclaw`
+   because `/home/jarvisdev` was intentionally not traversable. No host HOME
+   permissions were widened. Required versioned scripts were staged privately
+   under `/var/tmp` for the disposable LAB.
+
+2. The staged generator exposed a legacy dependency on in-process
+   `node-llama-cpp` and failed with `MODULE_NOT_FOUND`. The dependency was not
+   installed. The generator was migrated to the OpenClaw managed llama-server
+   architecture already used by `mimir-memory 0.2.7`.
+
+3. A direct HTTP attempt initially failed because the managed provider lifecycle
+   had not yet been acquired for that runtime moment. Direct
+   `tools.invoke(mimir_memory_search)` successfully acquired the provider and
+   produced a real 768-dimensional embedding.
+
+4. The first manual managed-server request returned HTTP 400 because it used
+   the canonical Hugging Face source URI as the runtime `model` value. Inspection
+   of OpenClaw 2026.9.5 showed that the managed llama-server expects runtime id
+   `embeddinggemma-300m-qat-q8_0`, an input array and 768 dimensions. The
+   canonical HF identity remains the value persisted in PostgreSQL.
+
+5. The first controlled-write retry successfully produced all three expected
+   boolean conditions, but PostgreSQL concatenation rendered them as
+   `true|true|true` while the harness expected `t|t|t`. The assertion was
+   corrected without changing database semantics. The same correction was
+   applied proactively to the final end-to-end provenance assertion.
+
+No migration 014 or 015 was applied to production.
+
+NEXT_ACTION:
+
+Integrate `memory_handoff` operationally with the already validated human memory
+workflow.
+
+The integration must preserve:
+
+- no automatic promotion;
+- candidate-first semantics;
+- human-authenticated review;
+- deduplication and contradiction checks;
+- provenance from handoff source through review;
+- embedding only after human promotion;
+- semantic visibility only after promotion;
+- fail-closed behavior on malformed/untrusted handoff content;
+- production unchanged until separately authorized.

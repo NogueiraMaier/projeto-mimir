@@ -95,8 +95,8 @@ A documentação do Maestro deve ser retomada somente após a estabilização do
 - [x] Validar detecção de contradições.
 - [x] Validar revisão humana.
 - [x] Validar fluxo candidate → active.
-- [ ] Validar geração de embedding e recuperação semântica após promoção.
-- [ ] Validar auditoria/proveniência.
+- [x] Validar geração de embedding e recuperação semântica após promoção.
+- [x] Validar auditoria/proveniência.
 - [ ] Integrar `memory_handoff` operacional com o fluxo humano de memória, sem promoção automática.
 
 ### P1 — Camada operacional

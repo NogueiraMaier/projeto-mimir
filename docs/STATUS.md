@@ -357,3 +357,26 @@ Evidência da rodada: [review/operations/2026-09-24.md](review/operations/2026-0
 - **SYNTHETIC RESIDUE:** 0.
 - **PRODUCTION:** unchanged at memory schema `1..12`.
 - **NEXT:** embedding generation + semantic recovery after human promotion.
+
+## MIMIR-V1-P1-EMBEDDING-SEMANTIC-AUDIT-01
+
+- **STATUS:** PASS / CLOSED.
+- **ACTIVE-ONLY EMBEDDING ELIGIBILITY:** PASS.
+- **OPENCLAW MANAGED LLAMA-SERVER:** PASS.
+- **EMBEDDINGGEMMA:** real 768D vector validated.
+- **CONTROLLED `mimir_embedder` WRITE:** PASS.
+- **CONTENT SHA GUARD:** PASS.
+- **EMBEDDING NORMALIZATION:** PASS.
+- **EMBEDDING AUDIT:** PASS.
+- **QUERY EMBEDDING 768D:** PASS.
+- **`mimir_search` / `peer:openclaw`:** PASS.
+- **PROMOTED MEMORY RETRIEVAL:** PASS.
+- **REJECTED MEMORY EXCLUSION:** PASS.
+- **CANDIDATE MEMORY EXCLUSION:** PASS.
+- **SOURCE PROVENANCE:** PASS.
+- **END-TO-END PROVENANCE/AUDIT:** PASS.
+- **PRODUCTION:** unchanged at schema `1..12`.
+- **PRODUCTION MIGRATION 015:** absent.
+- **LAB PG_IDENT RESTORED:** PASS.
+- **SYNTHETIC RESIDUE:** 0.
+- **NEXT:** integrate `memory_handoff` with the authenticated human memory flow.
