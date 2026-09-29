@@ -1,13 +1,12 @@
 #!/usr/bin/env node
 
 import { spawnSync } from "node:child_process";
-import { createRequire } from "node:module";
-import { pathToFileURL } from "node:url";
-import fs from "node:fs";
 
-const MODEL_PATH =
-    "/var/lib/openclaw/.node-llama-cpp/models/" +
-    "hf_ggml-org_embeddinggemma-300m-qat-Q8_0.gguf";
+const DEFAULT_EMBEDDING_BASE_URL =
+    "http://127.0.0.1:8601/v1";
+
+const EMBEDDING_TIMEOUT_MS = 60_000;
+const MAX_EMBEDDING_RESPONSE_BYTES = 8 * 1024 * 1024;
 
 const MODEL_ID =
     "hf:ggml-org/embeddinggemma-300m-qat-q8_0-GGUF/" +
@@ -88,6 +87,134 @@ function createPsqlEnv() {
             "-c lock_timeout=5000"
         ),
     };
+}
+
+function resolveEmbeddingBaseUrl() {
+    const raw = readEnv(
+        "MIMIR_EMBEDDING_BASE_URL",
+        DEFAULT_EMBEDDING_BASE_URL
+    );
+
+    let url;
+
+    try {
+        url = new URL(raw);
+    } catch {
+        throw new Error(
+            "MIMIR_EMBEDDING_BASE_URL inválida"
+        );
+    }
+
+    if (url.protocol !== "http:") {
+        throw new Error(
+            "provider de embedding deve usar HTTP local"
+        );
+    }
+
+    const hostname = url.hostname.toLowerCase();
+
+    if (
+        hostname !== "127.0.0.1" &&
+        hostname !== "localhost" &&
+        hostname !== "::1" &&
+        hostname !== "[::1]"
+    ) {
+        throw new Error(
+            "provider de embedding deve permanecer em loopback"
+        );
+    }
+
+    url.search = "";
+    url.hash = "";
+    url.pathname = url.pathname.replace(/\/+$/, "");
+
+    return url.toString().replace(/\/$/, "");
+}
+
+async function requestManagedEmbedding(
+    input,
+    baseUrl
+) {
+    const controller = new AbortController();
+
+    const timer = setTimeout(
+        () => controller.abort(),
+        EMBEDDING_TIMEOUT_MS
+    );
+
+    try {
+        const response = await fetch(
+            `${baseUrl}/embeddings`,
+            {
+                method: "POST",
+                headers: {
+                    "content-type": "application/json",
+                },
+                body: JSON.stringify({
+                    model: MODEL_ID,
+                    input,
+                }),
+                signal: controller.signal,
+            }
+        );
+
+        const raw = await response.text();
+
+        if (
+            Buffer.byteLength(raw, "utf8") >
+            MAX_EMBEDDING_RESPONSE_BYTES
+        ) {
+            throw new Error(
+                "resposta do provider excedeu o limite"
+            );
+        }
+
+        if (!response.ok) {
+            throw new Error(
+                "provider de embedding retornou HTTP " +
+                `${response.status}: ` +
+                raw.slice(0, 512)
+            );
+        }
+
+        let document;
+
+        try {
+            document = JSON.parse(raw);
+        } catch {
+            throw new Error(
+                "provider retornou JSON inválido"
+            );
+        }
+
+        const vector =
+            document?.data?.[0]?.embedding;
+
+        if (
+            !Array.isArray(vector) ||
+            vector.length !== 768 ||
+            !vector.every(Number.isFinite)
+        ) {
+            throw new Error(
+                "provider não retornou vetor finito de 768 dimensões"
+            );
+        }
+
+        return vector;
+    } catch (error) {
+        if (
+            error instanceof Error &&
+            error.name === "AbortError"
+        ) {
+            throw new Error(
+                "provider de embedding excedeu 60 segundos"
+            );
+        }
+
+        throw error;
+    } finally {
+        clearTimeout(timer);
+    }
 }
 
 function runPsql(sql, variables = {}) {
@@ -246,10 +373,7 @@ async function main() {
         process.argv.slice(2)
     );
 
-    if (!fs.existsSync(MODEL_PATH)) {
-        fail(`modelo não encontrado: ${MODEL_PATH}`);
-    }
-
+    const baseUrl = resolveEmbeddingBaseUrl();
     const memories = loadPendingEmbeddings(limit);
 
     console.log(
@@ -257,144 +381,125 @@ async function main() {
         write ? "GRAVAÇÃO CONTROLADA" : "VALIDAÇÃO"
     );
     console.log("Modelo:", MODEL_ID);
-    console.log("Backend: CPU");
-    console.log("Pendentes selecionados:", memories.length);
+    console.log(
+        "Provider:",
+        "OpenClaw managed llama-server"
+    );
+    console.log(
+        "Endpoint:",
+        baseUrl
+    );
+    console.log(
+        "Pendentes selecionados:",
+        memories.length
+    );
 
     if (memories.length === 0) {
         console.log("Nenhum embedding pendente.");
         return;
     }
 
-    const requireFromOpenClaw = createRequire(
-        "/opt/openclaw/package.json"
-    );
+    let generated = 0;
+    let stored = 0;
 
-    const modulePath = requireFromOpenClaw.resolve(
-        "node-llama-cpp"
-    );
+    for (
+        const [index, memory] of memories.entries()
+    ) {
+        const position = index + 1;
+        const input = createEmbeddingInput(memory);
 
-    const { getLlama } = await import(
-        pathToFileURL(modulePath).href
-    );
-
-    let llama;
-    let model;
-    let context;
-
-    try {
-        llama = await getLlama({
-            gpu: false,
-        });
-
-        model = await llama.loadModel({
-            modelPath: MODEL_PATH,
-        });
-
-        context = await model.createEmbeddingContext();
-
-        let generated = 0;
-        let stored = 0;
-
-        for (const [index, memory] of memories.entries()) {
-            const position = index + 1;
-            const input = createEmbeddingInput(memory);
-
-            const result = await context.getEmbeddingFor(input);
-            const vector = Array.from(result.vector);
-            const norm = vectorNorm(vector);
-
-            if (vector.length !== 768) {
-                throw new Error(
-                    `memória ${memory.memory_id}: ` +
-                    `dimensão ${vector.length}; esperado 768`
-                );
-            }
-
-            if (!vector.every(Number.isFinite)) {
-                throw new Error(
-                    `memória ${memory.memory_id}: ` +
-                    "vetor contém valores inválidos"
-                );
-            }
-
-            if (!Number.isFinite(norm) || norm <= 0) {
-                throw new Error(
-                    `memória ${memory.memory_id}: norma inválida`
-                );
-            }
-
-            generated += 1;
-
-            console.log();
-            console.log(
-                `[${position}/${memories.length}]`,
-                memory.memory_id
-            );
-            console.log(
-                "Título:",
-                normalizeText(memory.title) || "(sem título)"
-            );
-            console.log("Dimensões:", vector.length);
-            console.log("Norma original:", norm.toFixed(8));
-
-            if (!write) {
-                console.log("Banco: não alterado");
-                continue;
-            }
-
-            const databaseResult = storeEmbedding(
-                memory,
-                vector
+        const vector =
+            await requestManagedEmbedding(
+                input,
+                baseUrl
             );
 
-            const normalizedDatabaseResult =
-                databaseResult.trim().toLowerCase();
+        const norm = vectorNorm(vector);
 
-            if (
-                normalizedDatabaseResult === "t" ||
-                normalizedDatabaseResult === "true" ||
-                normalizedDatabaseResult === "1"
-            ) {
-                stored += 1;
-                console.log("Banco: embedding gravado");
-            } else if (
-                normalizedDatabaseResult === "f" ||
-                normalizedDatabaseResult === "false" ||
-                normalizedDatabaseResult === "0"
-            ) {
-                console.log(
-                    "Banco: embedding já existente; nenhuma alteração"
-                );
-            } else {
-                throw new Error(
-                    `resposta inesperada do banco: ` +
-                    `${databaseResult}`
-                );
-            }
+        if (
+            !Number.isFinite(norm) ||
+            norm <= 0
+        ) {
+            throw new Error(
+                `memória ${memory.memory_id}: norma inválida`
+            );
         }
 
+        generated += 1;
+
         console.log();
-        console.log("Embeddings gerados:", generated);
-        console.log("Embeddings gravados:", stored);
         console.log(
-            "Resultado:",
-            write
-                ? "GRAVAÇÃO CONCLUÍDA"
-                : "VALIDAÇÃO CONCLUÍDA SEM GRAVAÇÃO"
+            `[${position}/${memories.length}]`,
+            memory.memory_id
         );
-    } finally {
-        try {
-            await context?.dispose?.();
-        } catch {}
+        console.log(
+            "Título:",
+            normalizeText(memory.title) ||
+                "(sem título)"
+        );
+        console.log(
+            "Dimensões:",
+            vector.length
+        );
+        console.log(
+            "Norma original:",
+            norm.toFixed(8)
+        );
 
-        try {
-            await model?.dispose?.();
-        } catch {}
+        if (!write) {
+            console.log("Banco: não alterado");
+            continue;
+        }
 
-        try {
-            await llama?.dispose?.();
-        } catch {}
+        const databaseResult =
+            storeEmbedding(memory, vector);
+
+        const normalizedDatabaseResult =
+            databaseResult
+                .trim()
+                .toLowerCase();
+
+        if (
+            normalizedDatabaseResult === "t" ||
+            normalizedDatabaseResult === "true" ||
+            normalizedDatabaseResult === "1"
+        ) {
+            stored += 1;
+            console.log(
+                "Banco: embedding gravado"
+            );
+        } else if (
+            normalizedDatabaseResult === "f" ||
+            normalizedDatabaseResult === "false" ||
+            normalizedDatabaseResult === "0"
+        ) {
+            console.log(
+                "Banco: embedding já existente; " +
+                "nenhuma alteração"
+            );
+        } else {
+            throw new Error(
+                "resposta inesperada do banco: " +
+                databaseResult
+            );
+        }
     }
+
+    console.log();
+    console.log(
+        "Embeddings gerados:",
+        generated
+    );
+    console.log(
+        "Embeddings gravados:",
+        stored
+    );
+    console.log(
+        "Resultado:",
+        write
+            ? "GRAVAÇÃO CONCLUÍDA"
+            : "VALIDAÇÃO CONCLUÍDA SEM GRAVAÇÃO"
+    );
 }
 
 main().catch((error) => {

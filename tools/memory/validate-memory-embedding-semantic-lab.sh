@@ -17,7 +17,7 @@ SEARCH="$ROOT_DIR/tools/memory/mimir-semantic-search.mjs"
 PSQL="${PSQL:-/usr/lib64/postgresql-17/bin/psql}"
 NODE="${NODE:-/usr/bin/node}"
 
-MODEL_PATH="/var/lib/openclaw/.node-llama-cpp/models/hf_ggml-org_embeddinggemma-300m-qat-Q8_0.gguf"
+MANAGED_EMBEDDING_BASE_URL="${MIMIR_EMBEDDING_BASE_URL:-http://127.0.0.1:8601/v1}"
 MODEL_ID="hf:ggml-org/embeddinggemma-300m-qat-q8_0-GGUF/embeddinggemma-300m-qat-Q8_0.gguf"
 
 HUMAN_OS_USER="nogueiramaier"
@@ -286,8 +286,6 @@ trap cleanup EXIT INT TERM
     || fail "gerador de embeddings ausente"
 [[ -s "$SEARCH" ]] \
     || fail "semantic search ausente"
-[[ -s "$MODEL_PATH" ]] \
-    || fail "EmbeddingGemma ausente"
 
 echo "=== MIMIR EMBEDDING + SEMANTIC RECOVERY / LAB ==="
 
@@ -631,6 +629,7 @@ EMBED_DRY="$(
         PGDATABASE="$DB" \
         PGUSER=mimir_embedder \
         PGAPPNAME=mimir-embedding-lab-dry \
+        MIMIR_EMBEDDING_BASE_URL="$MANAGED_EMBEDDING_BASE_URL" \
         "$NODE" "$GENERATOR" \
         --limit 10
 )"
@@ -678,6 +677,7 @@ EMBED_WRITE="$(
         PGDATABASE="$DB" \
         PGUSER=mimir_embedder \
         PGAPPNAME=mimir-embedding-lab-write \
+        MIMIR_EMBEDDING_BASE_URL="$MANAGED_EMBEDDING_BASE_URL" \
         "$NODE" "$GENERATOR" \
         --limit 10 \
         --write
@@ -830,75 +830,76 @@ echo "--- 10. GENERATE REAL QUERY EMBEDDING ---"
 QUERY_JS="$TMP/embed-query.mjs"
 
 cat > "$QUERY_JS" <<'JS'
-import { createRequire } from "node:module";
-import { pathToFileURL } from "node:url";
-
-const MODEL_PATH =
-    "/var/lib/openclaw/.node-llama-cpp/models/" +
-    "hf_ggml-org_embeddinggemma-300m-qat-Q8_0.gguf";
-
 const MODEL_ID =
     "hf:ggml-org/embeddinggemma-300m-qat-q8_0-GGUF/" +
     "embeddinggemma-300m-qat-Q8_0.gguf";
 
-const query = process.env.MIMIR_LAB_QUERY;
+const query =
+    process.env.MIMIR_LAB_QUERY;
+
+const baseUrl =
+    process.env.MIMIR_EMBEDDING_BASE_URL;
 
 if (!query) {
-    throw new Error("MIMIR_LAB_QUERY ausente");
+    throw new Error(
+        "MIMIR_LAB_QUERY ausente"
+    );
 }
 
-const requireFromOpenClaw = createRequire(
-    "/opt/openclaw/package.json"
-);
-
-const modulePath = requireFromOpenClaw.resolve(
-    "node-llama-cpp"
-);
-
-const { getLlama } = await import(
-    pathToFileURL(modulePath).href
-);
-
-let llama;
-let model;
-let context;
-
-try {
-    llama = await getLlama({ gpu: false });
-
-    model = await llama.loadModel({
-        modelPath: MODEL_PATH,
-    });
-
-    context = await model.createEmbeddingContext();
-
-    const result = await context.getEmbeddingFor(
-        `query: ${query}`
+if (!baseUrl) {
+    throw new Error(
+        "MIMIR_EMBEDDING_BASE_URL ausente"
     );
+}
 
-    const embedding = Array.from(result.vector);
-
-    if (
-        embedding.length !== 768 ||
-        !embedding.every(Number.isFinite)
-    ) {
-        throw new Error("embedding de consulta invalido");
-    }
-
-    process.stdout.write(
-        JSON.stringify({
-            query,
+const response = await fetch(
+    `${baseUrl.replace(/\/+$/, "")}/embeddings`,
+    {
+        method: "POST",
+        headers: {
+            "content-type": "application/json",
+        },
+        body: JSON.stringify({
             model: MODEL_ID,
-            embedding,
-            limit: 5,
-            min_similarity: 0.2,
-        })
+            input:
+                `task: search result | query: ${query}`,
+        }),
+        signal: AbortSignal.timeout(60_000),
+    }
+);
+
+const raw = await response.text();
+
+if (!response.ok) {
+    throw new Error(
+        `embedding provider HTTP ${response.status}: ` +
+        raw.slice(0, 512)
     );
-} finally {
-    try { await context?.dispose?.(); } catch {}
-    try { await model?.dispose?.(); } catch {}
-    try { await llama?.dispose?.(); } catch {}
 }
+
+const payload = JSON.parse(raw);
+const embedding =
+    payload?.data?.[0]?.embedding;
+
+if (
+    !Array.isArray(embedding) ||
+    embedding.length !== 768 ||
+    !embedding.every(Number.isFinite)
+) {
+    throw new Error(
+        "embedding de consulta invalido"
+    );
+}
+
+process.stdout.write(
+    JSON.stringify({
+        query,
+        model: MODEL_ID,
+        embedding,
+        limit: 5,
+        min_similarity: 0.2,
+    })
+);
 JS
 
 chown openclaw:openclaw "$QUERY_JS"
@@ -911,6 +912,7 @@ REQUEST_JSON="$(
         USER=openclaw \
         LOGNAME=openclaw \
         MIMIR_LAB_QUERY="$QUERY_TEXT" \
+        MIMIR_EMBEDDING_BASE_URL="$MANAGED_EMBEDDING_BASE_URL" \
         "$NODE" "$QUERY_JS"
 )"
 
