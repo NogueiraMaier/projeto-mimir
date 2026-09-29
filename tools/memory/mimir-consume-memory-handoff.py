@@ -513,23 +513,9 @@ BEGIN
             'mimir-memory-handoff-v1'
         );
 
-    SELECT status
-    INTO v_status
-    FROM mimir.memory_records
-    WHERE memory_id = v_memory_id;
-
-    IF NOT FOUND THEN
-        RAISE EXCEPTION
-            'candidate recém-criada não foi encontrada: %',
-            v_memory_id;
-    END IF;
-
-    IF v_status <> 'candidate' THEN
-        RAISE EXCEPTION
-            'status inesperado após propose_memory: %',
-            v_status;
-    END IF;
-
+    -- inspect_candidate_conflict() is the controlled API boundary.
+    -- It is SECURITY DEFINER and rejects any memory whose status is
+    -- not candidate, so no direct SELECT on memory_records is required.
     SELECT classification
     INTO v_conflict
     FROM mimir.inspect_candidate_conflict(
@@ -540,6 +526,18 @@ BEGIN
         RAISE EXCEPTION
             'classificação de conflito ausente';
     END IF;
+
+    IF v_conflict NOT IN (
+        'none',
+        'duplicate',
+        'contradiction'
+    ) THEN
+        RAISE EXCEPTION
+            'classificação de conflito inesperada: %',
+            v_conflict;
+    END IF;
+
+    v_status := 'candidate';
 
     INSERT INTO handoff_submission_result (
         event_id,

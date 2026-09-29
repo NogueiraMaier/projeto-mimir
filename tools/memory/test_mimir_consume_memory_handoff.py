@@ -212,12 +212,16 @@ class ConsumerValidationTests(unittest.TestCase):
             "v_memory_id :=\n        mimir.propose_memory(",
             source,
         )
-        self.assertIn(
-            "SELECT status\n    INTO v_status",
+        self.assertNotIn(
+            "FROM mimir.memory_records",
             source,
         )
         self.assertIn(
             "mimir.inspect_candidate_conflict(",
+            source,
+        )
+        self.assertIn(
+            "v_status := 'candidate';",
             source,
         )
 
