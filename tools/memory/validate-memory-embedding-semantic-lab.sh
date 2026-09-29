@@ -353,6 +353,45 @@ echo "--- 2. TEMPORARY PEER MAPS ---"
 
 TMP="$(mktemp -d /var/tmp/mimir-embedding-semantic.XXXXXX)"
 IDENT_BACKUP="$TMP/pg_ident.conf.orig"
+STAGE="$TMP/stage"
+
+# The Git checkout lives below /home/jarvisdev and is intentionally not
+# traversable by openclaw. Stage only the versioned runtime artifacts needed
+# by this disposable LAB instead of changing HOME permissions.
+chown root:"$LAB_ACCESS_GROUP" "$TMP"
+chmod 0710 "$TMP"
+
+mkdir -p "$STAGE"
+chown root:"$LAB_ACCESS_GROUP" "$STAGE"
+chmod 0710 "$STAGE"
+
+SOURCE_GENERATOR="$GENERATOR"
+SOURCE_SEARCH="$SEARCH"
+
+install \
+    -o openclaw \
+    -g "$LAB_ACCESS_GROUP" \
+    -m 0500 \
+    "$SOURCE_GENERATOR" \
+    "$STAGE/mimir-generate-embeddings.mjs"
+
+install \
+    -o openclaw \
+    -g "$LAB_ACCESS_GROUP" \
+    -m 0500 \
+    "$SOURCE_SEARCH" \
+    "$STAGE/mimir-semantic-search.mjs"
+
+GENERATOR="$STAGE/mimir-generate-embeddings.mjs"
+SEARCH="$STAGE/mimir-semantic-search.mjs"
+
+runuser -u openclaw -- test -x "$GENERATOR" \
+    || fail "openclaw nao acessa gerador staged"
+
+runuser -u openclaw -- test -x "$SEARCH" \
+    || fail "openclaw nao acessa semantic search staged"
+
+echo "artifact_staging=PASS"
 
 cp -a "$PG_IDENT" "$IDENT_BACKUP"
 
