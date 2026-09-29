@@ -664,12 +664,11 @@ grep -Fq \
 
 NEGATIVE_DB="$(
     psql_postgres \
-        -v eid="$INTERVENTION_ID" \
-        -c "
-            SELECT count(*)
-            FROM mimir.memory_events
-            WHERE event_id=:'eid'::uuid;
-        "
+        -v eid="$INTERVENTION_ID" <<'SQL'
+SELECT count(*)
+FROM mimir.memory_events
+WHERE event_id=:'eid'::uuid;
+SQL
 )"
 
 [[ "$NEGATIVE_DB" == "0" ]] \
@@ -705,12 +704,11 @@ grep -Fq "database_write=false" \
 
 DRY_COUNT="$(
     psql_postgres \
-        -v eid="$INTERVENTION_ID" \
-        -c "
-            SELECT count(*)
-            FROM mimir.memory_events
-            WHERE event_id=:'eid'::uuid;
-        "
+        -v eid="$INTERVENTION_ID" <<'SQL'
+SELECT count(*)
+FROM mimir.memory_events
+WHERE event_id=:'eid'::uuid;
+SQL
 )"
 
 [[ "$DRY_COUNT" == "0" ]] \
@@ -923,12 +921,11 @@ SQL
 
 PENDING_BEFORE_REVIEW="$(
     psql_postgres \
-        -v mid="$MEMORY_ID" \
-        -c "
-            SELECT count(*)
-            FROM mimir.pending_embeddings
-            WHERE memory_id=:'mid'::uuid;
-        "
+        -v mid="$MEMORY_ID" <<'SQL'
+SELECT count(*)
+FROM mimir.pending_embeddings
+WHERE memory_id=:'mid'::uuid;
+SQL
 )"
 
 [[ "$PENDING_BEFORE_REVIEW" == "0" ]] \
@@ -1146,12 +1143,11 @@ SQL
 
 ACTIVE_STATE="$(
     psql_postgres \
-        -v mid="$MEMORY_ID" \
-        -c "
-            SELECT status
-            FROM mimir.memory_records
-            WHERE memory_id=:'mid'::uuid;
-        "
+        -v mid="$MEMORY_ID" <<'SQL'
+SELECT status
+FROM mimir.memory_records
+WHERE memory_id=:'mid'::uuid;
+SQL
 )"
 
 [[ "$ACTIVE_STATE" == "active" ]] \
@@ -1165,12 +1161,11 @@ echo "--- 16. EMBEDDING ONLY AFTER PROMOTION ---"
 
 PENDING_AFTER_REVIEW="$(
     psql_postgres \
-        -v mid="$MEMORY_ID" \
-        -c "
-            SELECT count(*)
-            FROM mimir.pending_embeddings
-            WHERE memory_id=:'mid'::uuid;
-        "
+        -v mid="$MEMORY_ID" <<'SQL'
+SELECT count(*)
+FROM mimir.pending_embeddings
+WHERE memory_id=:'mid'::uuid;
+SQL
 )"
 
 [[ "$PENDING_AFTER_REVIEW" == "1" ]] \
@@ -1340,13 +1335,12 @@ SQL
 
 RELATIONS="$(
     psql_postgres \
-        -v mid="$MEMORY_ID" \
-        -c "
-            SELECT count(*)
-            FROM mimir.memory_relations
-            WHERE from_memory_id=:'mid'::uuid
-               OR to_memory_id=:'mid'::uuid;
-        "
+        -v mid="$MEMORY_ID" <<'SQL'
+SELECT count(*)
+FROM mimir.memory_relations
+WHERE from_memory_id=:'mid'::uuid
+   OR to_memory_id=:'mid'::uuid;
+SQL
 )"
 
 [[ "$RELATIONS" == "0" ]] \
