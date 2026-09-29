@@ -46,15 +46,111 @@ KNOWN_HOSTS="$LAB_ROOT/known_hosts"
 CONFIG="$LAB_ROOT/sshd_config"
 LOG="$LAB_ROOT/sshd.log"
 
-SSHD_PID=""
+SSHD_WRAPPER_PID=""
+SSHD_CHILD_PID=""
+
+stop_lab_sshd() {
+    local pid=""
+    local cmdline=""
+    local stopped=0
+
+    if [[ -n "${SSHD_CHILD_PID:-}" ]]; then
+        pid="$SSHD_CHILD_PID"
+
+        if [[ ! "$pid" =~ ^[0-9]+$ ]]; then
+            echo "FAIL: PID filho inválido: $pid" >&2
+            return 1
+        fi
+
+        if kill -0 "$pid" 2>/dev/null; then
+            [[ -r "/proc/$pid/cmdline" ]] || {
+                echo "FAIL: cmdline do sshd LAB indisponível" >&2
+                return 1
+            }
+
+            cmdline="$(
+                tr '\0' ' ' < "/proc/$pid/cmdline"
+            )"
+
+            [[ "$cmdline" == *"$CONFIG"* ]] || {
+                echo "FAIL: PID filho não pertence ao sshd LAB" >&2
+                return 1
+            }
+
+            kill -TERM "$pid"
+
+            for _ in $(seq 1 50); do
+                if ! kill -0 "$pid" 2>/dev/null; then
+                    stopped=1
+                    break
+                fi
+                sleep 0.1
+            done
+
+            if [[ "$stopped" != "1" ]] &&
+               kill -0 "$pid" 2>/dev/null
+            then
+                echo "sshd_term_timeout=OBSERVED"
+                kill -KILL "$pid"
+
+                for _ in $(seq 1 20); do
+                    if ! kill -0 "$pid" 2>/dev/null; then
+                        stopped=1
+                        break
+                    fi
+                    sleep 0.1
+                done
+            fi
+
+            if kill -0 "$pid" 2>/dev/null; then
+                echo "FAIL: sshd LAB não encerrou" >&2
+                return 1
+            fi
+        fi
+    fi
+
+    if [[ -n "${SSHD_WRAPPER_PID:-}" ]]; then
+        pid="$SSHD_WRAPPER_PID"
+
+        if [[ "$pid" =~ ^[0-9]+$ ]] &&
+           kill -0 "$pid" 2>/dev/null
+        then
+            for _ in $(seq 1 20); do
+                if ! kill -0 "$pid" 2>/dev/null; then
+                    break
+                fi
+                sleep 0.1
+            done
+
+            if kill -0 "$pid" 2>/dev/null; then
+                kill -TERM "$pid" 2>/dev/null || true
+
+                for _ in $(seq 1 20); do
+                    if ! kill -0 "$pid" 2>/dev/null; then
+                        break
+                    fi
+                    sleep 0.1
+                done
+            fi
+
+            if kill -0 "$pid" 2>/dev/null; then
+                kill -KILL "$pid" 2>/dev/null || true
+            fi
+        fi
+
+        wait "$pid" 2>/dev/null || true
+    fi
+
+    SSHD_CHILD_PID=""
+    SSHD_WRAPPER_PID=""
+
+    return 0
+}
 
 cleanup() {
     set +e
 
-    if [[ -n "${SSHD_PID:-}" ]]; then
-        kill "$SSHD_PID" >/dev/null 2>&1 || true
-        wait "$SSHD_PID" >/dev/null 2>&1 || true
-    fi
+    stop_lab_sshd >/dev/null 2>&1 || true
 
     if [[ -n "${LAB_ROOT:-}" &&
           "$LAB_ROOT" == /run/mimir-generic-linux-ssh-lab.* ]]
@@ -178,15 +274,15 @@ CONFIG="$CONFIG" \
         exec "$SSHD" -D -e -f "$CONFIG"
     ' >"$LOG" 2>&1 &
 
-SSHD_PID=$!
+SSHD_WRAPPER_PID=$!
 
 READY=0
 
 for _ in $(seq 1 50); do
-    if ! kill -0 "$SSHD_PID" 2>/dev/null; then
+    if ! kill -0 "$SSHD_WRAPPER_PID" 2>/dev/null; then
         echo "--- sshd log ---"
         cat "$LOG" || true
-        fail "sshd LAB encerrou"
+        fail "wrapper unshare/sshd LAB encerrou"
     fi
 
     if timeout 1 \
@@ -206,8 +302,35 @@ done
     fail "sshd LAB não ficou acessível"
 }
 
+[[ -s "$LAB_ROOT/sshd.pid" ]] || {
+    echo "--- sshd log ---"
+    cat "$LOG" || true
+    fail "pidfile do sshd LAB ausente"
+}
+
+SSHD_CHILD_PID="$(
+    cat "$LAB_ROOT/sshd.pid"
+)"
+
+[[ "$SSHD_CHILD_PID" =~ ^[0-9]+$ ]] || {
+    fail "PID filho inválido"
+}
+
+kill -0 "$SSHD_CHILD_PID" 2>/dev/null || {
+    fail "sshd filho não está ativo"
+}
+
+SSHD_CMDLINE="$(
+    tr '\0' ' ' < "/proc/$SSHD_CHILD_PID/cmdline"
+)"
+
+[[ "$SSHD_CMDLINE" == *"$CONFIG"* ]] || {
+    fail "pidfile não referencia o sshd LAB esperado"
+}
+
 echo "uts_namespace=PASS"
 echo "isolated_sshd=PASS"
+echo "sshd_child_pid_guard=PASS"
 
 echo
 echo "--- 5. REAL SSHExecutor / ADAPTER PATH ---"
@@ -489,9 +612,11 @@ PY
 echo
 echo "--- 6. STOP LAB AND REMOVE EPHEMERAL MATERIAL ---"
 
-kill "$SSHD_PID"
-wait "$SSHD_PID" 2>/dev/null || true
-SSHD_PID=""
+stop_lab_sshd || {
+    fail "teardown controlado do sshd LAB falhou"
+}
+
+echo "controlled_sshd_teardown=PASS"
 
 rm -rf -- "$LAB_ROOT"
 
