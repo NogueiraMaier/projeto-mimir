@@ -256,3 +256,13 @@ Evidência da rodada: [review/operations/2026-09-24.md](review/operations/2026-0
 - **SYNTHETIC CLEANUP:** `synthetic_residue=0`.
 - **PRODUCTION:** unchanged.
 - **NEXT P1:** Qwen runtime/latency diagnostics before any LAB retry.
+
+### Real-model timeout diagnostic update
+
+- **SMALL JSON SCHEMA PROBE:** PASS.
+- **HTTP:** 200.
+- **WALL TIME:** 4.392 s.
+- **QWEN BASIC RUNTIME:** healthy.
+- **JSON SCHEMA BASIC SUPPORT:** healthy.
+- **CURRENT BLOCKER:** full integrated request exceeds 120 s.
+- **NEXT P1:** full synthetic request size/latency profiling.

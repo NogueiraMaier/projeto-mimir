@@ -1925,3 +1925,24 @@ Diagnose the Qwen CPU fallback runtime and measure a small strict JSON Schema
 request before authorizing another integrated LAB run.
 
 Do not change the validator, JSON Schema or timeout yet.
+
+### Diagnostic update — real-model timeout characterization
+
+Small strict JSON Schema probe against the same Qwen endpoint:
+
+- HTTP 200;
+- 4.392 s wall time;
+- prompt_tokens=37;
+- completion_tokens=7;
+- finish_reason=stop;
+- valid constrained output.
+
+Conclusion:
+
+The runtime and JSON Schema mechanism are healthy for a small request.
+The remaining blocker is specific to the full integrated consolidator request.
+
+NEXT_ACTION:
+
+Profile the exact synthetic integrated request size and latency before changing
+the 120-second model budget.

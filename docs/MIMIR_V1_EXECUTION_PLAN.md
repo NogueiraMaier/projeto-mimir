@@ -732,3 +732,14 @@ NEXT_ACTION:
 
 Perform read-only Qwen runtime/latency diagnostics. Do not alter timeout,
 JSON Schema, validator or production before cause characterization.
+
+### Real-model timeout diagnostic refinement
+
+Small strict JSON Schema probe: PASS in 4.392 s.
+
+The integrated timeout is no longer treated as a generic Qwen/runtime outage.
+
+NEXT_ACTION:
+
+Profile the full synthetic consolidator request and measure its inference
+latency independently of the current 120-second cutoff.
