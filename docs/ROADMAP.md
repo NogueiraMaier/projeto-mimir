@@ -38,6 +38,14 @@ A validação adversarial canônica será
 14. Testar recuperação semântica.
 15. Conferir eventos e auditoria.
 
+Estado P1 validado em 2026-09-29:
+
+- captura/escrita controlada de sessões: concluída;
+- consolidação local protegida: concluída;
+- deduplicação: concluída;
+- detecção determinística de contradições: concluída;
+- próxima etapa: revisão humana autenticada e fluxo `candidate -> active`.
+
 ## Etapas posteriores
 
 - Agente auditor de memória

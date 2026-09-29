@@ -2101,3 +2101,70 @@ Resume the next incomplete functional milestone from
 `docs/MIMIR_V1_EXECUTION_PLAN.md`.
 
 Do not continue timeout diagnostics unless a regression appears.
+
+## MIMIR-V1-P1-MEMORY-DEDUP-CONTRADICTION-01
+
+Date: 2026-09-29
+
+Status: `PASS`
+
+The first four P1 permanent-memory milestones are now validated:
+
+- controlled session writer: PASS;
+- protected local session consolidation end-to-end: PASS;
+- candidate deduplication: PASS;
+- deterministic candidate contradiction detection: PASS.
+
+Deduplication evidence:
+
+- validator commit: `540f78fac64a75045d09abd5beba8ea2b12198d8`;
+- identical source/key/content replay returned the same `memory_id`;
+- identical record count remained 1;
+- different content remained distinct;
+- different source remained distinct;
+- different `memory_key` remained distinct;
+- propose audit was not duplicated;
+- duplicate groups: 0;
+- automatic promotion: 0;
+- synthetic residue: 0;
+- production unchanged.
+
+Contradiction implementation/evidence:
+
+- implementation commit: `8b47a2161b54f2889f6f3f494fa97486af32ab63`;
+- LAB hardening: `d60137fe74d2469be2c9786e63f9c6b7cc8807a2`;
+- negative-test fix: `10d3995e6d51329ca00a382bd622e2f545cf8132`;
+- migration `015_memory_contradiction_detection.sql`;
+- LAB schema: `1..12,14,15`;
+- production schema: `1..12`;
+- duplicate classification: PASS;
+- contradiction classification: PASS;
+- no-conflict classification: PASS;
+- non-candidate rejection: PASS;
+- detector writes: 0;
+- candidate status preserved;
+- migration 015 absent from production;
+- synthetic residue: 0;
+- LAB RC: 0.
+
+The contradiction detector is intentionally read-only. It classifies a
+candidate against the active memory with the same
+`scope_type + scope_key + memory_key` as:
+
+- `none`;
+- `duplicate`;
+- `contradiction`.
+
+It does not promote, reject, supersede, create relations or expose memory
+content.
+
+NEXT_ACTION:
+
+Validate authenticated human review and the controlled
+`candidate -> active` transition in the isolated PostgreSQL LAB.
+
+The validation must preserve peer-authenticated reviewer provenance, verify
+approve/reject behavior and idempotency, reject unauthorized review, confirm
+audit records, and leave production unchanged.
+
+Do not apply migration 015 to production.

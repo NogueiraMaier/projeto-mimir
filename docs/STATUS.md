@@ -320,3 +320,20 @@ Evidência da rodada: [review/operations/2026-09-24.md](review/operations/2026-0
 - **SYNTHETIC RESIDUE:** 0.
 - **LAB RC:** 0.
 - **NEXT:** advance to next incomplete Mímir v1 functional milestone.
+
+## MIMIR-V1-P1-MEMORY-DEDUP-CONTRADICTION-01
+
+- **STATUS:** PASS / CLOSED.
+- **CONTROLLED SESSION WRITER:** PASS.
+- **PROTECTED LOCAL CONSOLIDATION:** PASS.
+- **DEDUPLICATION:** PASS.
+- **CONTRADICTION DETECTION:** PASS.
+- **DEDUP REPLAY:** same source/key/content returns the existing memory.
+- **CONTRADICTION CONTRACT:** `none | duplicate | contradiction`.
+- **CONTRADICTION DETECTOR WRITES:** 0.
+- **AUTOMATIC PROMOTION:** 0.
+- **LAB SCHEMA:** `1..12,14,15`.
+- **PRODUCTION SCHEMA:** `1..12`.
+- **PRODUCTION MIGRATION 015:** absent.
+- **SYNTHETIC RESIDUE:** 0.
+- **NEXT:** authenticated human review and `candidate -> active`.

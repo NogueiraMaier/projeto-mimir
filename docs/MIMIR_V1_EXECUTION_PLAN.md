@@ -89,10 +89,10 @@ A documentação do Maestro deve ser retomada somente após a estabilização do
 
 ### P1 — Memória permanente PostgreSQL
 
-- [ ] Fechar escrita controlada do cliente de ingestão de sessões, hoje ainda parcial/dry-run.
-- [ ] Validar consolidação local de sessões de ponta a ponta.
-- [ ] Validar deduplicação.
-- [ ] Validar detecção de contradições.
+- [x] Fechar escrita controlada do cliente de ingestão de sessões, hoje ainda parcial/dry-run.
+- [x] Validar consolidação local de sessões de ponta a ponta.
+- [x] Validar deduplicação.
+- [x] Validar detecção de contradições.
 - [ ] Validar revisão humana.
 - [ ] Validar fluxo candidate → active.
 - [ ] Validar geração de embedding e recuperação semântica após promoção.
