@@ -2002,3 +2002,34 @@ relaxed.
 
 Inspect timeout references in the repository and define the scoped CPU
 fallback timeout policy before changing code or deployment configuration.
+
+## CHECKPOINT — MIMIR-V1-PROTECTED-CONSOLIDATOR-TIMEOUT-POLICY-DESIGN-01
+
+Date: 2026-09-28
+
+Status: `DESIGN_COMPLETE`
+
+Source HEAD:
+
+`ad0964d8c94e73de0058a142a9d7482efa45ec3f`
+
+Decision:
+
+- keep generic model timeout default at 120 s;
+- keep maximum at 180 s;
+- use explicit 180 s only for the current VPS CPU fallback real-model LAB.
+
+Repository inspection found no versioned integrated real-model LAB harness and
+no executable versioned timeout override for that LAB.
+
+The existing versioned shell validator is repository-only:
+
+`tools/memory/validate-protected-consolidator-v1-repository.sh`
+
+NEXT_ACTION:
+
+Inspect the repository validator and validated disposable LAB harness, then
+create a reproducible versioned real-model LAB harness with explicit
+`--model-timeout-seconds 180`.
+
+No deploy.

@@ -772,3 +772,25 @@ NEXT_ACTION:
 
 Inspect repository timeout references and implement a scoped timeout policy for
 the VPS CPU fallback without changing schema or validator semantics.
+
+## MIMIR-V1-PROTECTED-CONSOLIDATOR-TIMEOUT-POLICY-DESIGN-01
+
+Status: `DESIGN_COMPLETE`
+
+Policy:
+
+- generic default: 120 s;
+- maximum: 180 s;
+- VPS CPU fallback real-model LAB: explicit 180 s.
+
+Repository inspection:
+
+- repository-only validator exists;
+- protected Python regressions exist;
+- versioned integrated real-model LAB harness does not exist;
+- no versioned real-model timeout override exists.
+
+NEXT_ACTION:
+
+Design and add a versioned integrated real-model LAB harness derived from the
+validated disposable harness. Validate repository-only before executing it.

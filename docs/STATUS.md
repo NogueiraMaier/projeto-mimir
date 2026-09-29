@@ -282,3 +282,16 @@ Evidência da rodada: [review/operations/2026-09-24.md](review/operations/2026-0
 - **VALIDATOR CHANGE REQUIRED:** no.
 - **DEPLOY:** not authorized.
 - **NEXT P1:** scoped VPS CPU fallback timeout policy.
+
+## MIMIR-V1-PROTECTED-CONSOLIDATOR-TIMEOUT-POLICY-DESIGN-01
+
+- **STATUS:** DESIGN_COMPLETE.
+- **DEFAULT MODEL TIMEOUT:** 120 s.
+- **MAX MODEL TIMEOUT:** 180 s.
+- **VPS CPU FALLBACK LAB:** explicit 180 s required.
+- **VERSIONED REAL-MODEL LAB HARNESS:** absent.
+- **GLOBAL DEFAULT CHANGE:** no.
+- **SCHEMA CHANGE:** no.
+- **VALIDATOR CHANGE:** no.
+- **PRODUCTION:** unchanged.
+- **NEXT P1:** design/version integrated real-model LAB harness.
