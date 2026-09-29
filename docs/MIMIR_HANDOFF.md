@@ -2060,3 +2060,44 @@ NEXT_ACTION:
 
 Inspect capture/writer local dependencies before implementing the staged
 real-model LAB harness.
+
+## CHECKPOINT — MIMIR-V1-PROTECTED-CONSOLIDATOR-REALMODEL-PASS-01
+
+Date: 2026-09-29
+
+Status: `PASS`
+
+Validated commit:
+
+`072397bd05a0f5e4a806fed4c403a7aab7a4abdb`
+
+The versioned protected real-model LAB completed successfully end-to-end.
+
+Evidence:
+
+- repository regression suite: 10/10 PASS;
+- JSON Schema contract: PASS;
+- PostgreSQL LAB isolated;
+- Qwen VPS CPU fallback healthy;
+- real consolidator RC=0;
+- output contract PASS;
+- candidate_count=2;
+- all generated candidates require human review;
+- automatic_records=0;
+- synthetic_residue=0;
+- LAB_RC=0.
+
+Timeout policy remains:
+
+- generic default: 120 s;
+- maximum: 180 s;
+- explicit VPS CPU fallback LAB: 180 s.
+
+Protected consolidator blocker: CLOSED.
+
+NEXT_ACTION:
+
+Resume the next incomplete functional milestone from
+`docs/MIMIR_V1_EXECUTION_PLAN.md`.
+
+Do not continue timeout diagnostics unless a regression appears.

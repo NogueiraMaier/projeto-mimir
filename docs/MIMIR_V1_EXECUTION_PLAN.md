@@ -815,3 +815,31 @@ Decision:
 NEXT_ACTION:
 
 Inspect local dependencies of capture and writer before implementation.
+
+## MIMIR-V1-PROTECTED-CONSOLIDATOR-REALMODEL-PASS-01
+
+Status: `PASS`
+
+The protected consolidator real-model workstream is complete.
+
+Validated:
+
+- versioned reproducible LAB harness;
+- protected source read;
+- real Qwen inference;
+- strict JSON Schema;
+- independent Python validation;
+- human-review requirement;
+- zero automatic promotion;
+- cleanup with zero synthetic residue.
+
+Validated implementation:
+
+`072397bd05a0f5e4a806fed4c403a7aab7a4abdb`
+
+This blocker is closed.
+
+Next:
+
+Continue with the next incomplete functional milestone in the v1 execution
+plan. Do not spend additional work on this timeout path without a regression.
