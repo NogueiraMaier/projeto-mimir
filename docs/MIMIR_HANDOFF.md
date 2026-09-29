@@ -2033,3 +2033,30 @@ create a reproducible versioned real-model LAB harness with explicit
 `--model-timeout-seconds 180`.
 
 No deploy.
+
+## CHECKPOINT — MIMIR-V1-PROTECTED-CONSOLIDATOR-LAB-STAGING-DESIGN-01
+
+Status: `DESIGN_COMPLETE`
+
+Source HEAD:
+
+`e236460bc1c9d3def3f3e3412141887765794792`
+
+`openclaw` cannot traverse `/home/jarvisdev` or
+`/home/jarvisdev/projects` because both are private (0700).
+
+Decision:
+
+Do NOT change those permissions.
+
+The versioned real-model LAB harness must run as root and stage only required
+Git-controlled artifacts into a private disposable `/var/tmp` directory with
+minimal permissions for `openclaw`.
+
+The checkout remains the source of truth. `/var/tmp` is execution staging
+only.
+
+NEXT_ACTION:
+
+Inspect capture/writer local dependencies before implementing the staged
+real-model LAB harness.

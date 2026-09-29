@@ -295,3 +295,14 @@ Evidência da rodada: [review/operations/2026-09-24.md](review/operations/2026-0
 - **VALIDATOR CHANGE:** no.
 - **PRODUCTION:** unchanged.
 - **NEXT P1:** design/version integrated real-model LAB harness.
+
+## MIMIR-V1-PROTECTED-CONSOLIDATOR-LAB-STAGING-DESIGN-01
+
+- **STATUS:** DESIGN_COMPLETE.
+- **OPENCLAW DIRECT CHECKOUT ACCESS:** unavailable.
+- **HOME PERMISSIONS CHANGE:** prohibited/unnecessary.
+- **LAB EXECUTION MODEL:** root stages selected Git artifacts to private `/var/tmp`.
+- **SOURCE OF TRUTH:** Git checkout.
+- **VPS CPU FALLBACK TIMEOUT:** explicit 180 s in real-model LAB.
+- **PRODUCTION:** unchanged.
+- **NEXT P1:** inspect capture/writer dependencies before harness implementation.

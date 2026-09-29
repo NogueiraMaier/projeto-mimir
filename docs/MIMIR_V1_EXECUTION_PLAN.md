@@ -794,3 +794,24 @@ NEXT_ACTION:
 
 Design and add a versioned integrated real-model LAB harness derived from the
 validated disposable harness. Validate repository-only before executing it.
+
+## MIMIR-V1-PROTECTED-CONSOLIDATOR-LAB-STAGING-DESIGN-01
+
+Status: `DESIGN_COMPLETE`
+
+Finding:
+
+`openclaw` cannot execute the protected LAB scripts directly from the
+`jarvisdev` checkout because parent home directories are private.
+
+Decision:
+
+- preserve home permissions;
+- version the LAB harness;
+- root stages required repository artifacts into disposable `/var/tmp`;
+- `openclaw` executes only staged artifacts;
+- cleanup remains mandatory.
+
+NEXT_ACTION:
+
+Inspect local dependencies of capture and writer before implementation.
