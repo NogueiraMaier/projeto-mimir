@@ -9,7 +9,16 @@ echo "=== protected consolidator: syntax ==="
 
 "$PYTHON_BIN" -m py_compile \
     "$ROOT/mimir-consolidate-protected-v1.py" \
-    "$ROOT/test_mimir_consolidate_protected_v1.py"
+    "$ROOT/test_mimir_consolidate_protected_v1.py" \
+    "$ROOT/test_mimir_consolidate_protected_json_schema.py"
+
+echo "=== protected consolidator: json schema repository contract ==="
+
+"$PYTHON_BIN"     "$ROOT/test_mimir_consolidate_protected_json_schema.py"
+
+echo "=== protected consolidator: real-model LAB harness syntax ==="
+
+bash -n     "$ROOT/validate-protected-consolidator-real-model-lab.sh"
 
 echo "=== protected consolidator: isolated network namespace ==="
 
