@@ -40,6 +40,7 @@ echo
 echo "--- 2. REAL UTS NAMESPACE LAB ---"
 
 ROOT_DIR_ENV="$ROOT_DIR" \
+PYTHON="$PYTHON" \
 "$UNSHARE" \
     --uts \
     --fork \
