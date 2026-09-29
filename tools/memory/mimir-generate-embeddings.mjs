@@ -8,9 +8,15 @@ const DEFAULT_EMBEDDING_BASE_URL =
 const EMBEDDING_TIMEOUT_MS = 60_000;
 const MAX_EMBEDDING_RESPONSE_BYTES = 8 * 1024 * 1024;
 
+// Canonical model identity persisted in PostgreSQL.
 const MODEL_ID =
     "hf:ggml-org/embeddinggemma-300m-qat-q8_0-GGUF/" +
     "embeddinggemma-300m-qat-Q8_0.gguf";
+
+// Model id exposed by the managed llama-server router.
+// OpenClaw 2026.9.5 maps the canonical HF source to this runtime id.
+const LLAMA_SERVER_MODEL_ID =
+    "embeddinggemma-300m-qat-q8_0";
 
 const PSQL = "/usr/lib64/postgresql-17/bin/psql";
 
@@ -151,8 +157,9 @@ async function requestManagedEmbedding(
                     "content-type": "application/json",
                 },
                 body: JSON.stringify({
-                    model: MODEL_ID,
-                    input,
+                    model: LLAMA_SERVER_MODEL_ID,
+                    input: [input],
+                    dimensions: 768,
                 }),
                 signal: controller.signal,
             }

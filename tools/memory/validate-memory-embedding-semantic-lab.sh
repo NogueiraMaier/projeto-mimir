@@ -834,6 +834,9 @@ const MODEL_ID =
     "hf:ggml-org/embeddinggemma-300m-qat-q8_0-GGUF/" +
     "embeddinggemma-300m-qat-Q8_0.gguf";
 
+const LLAMA_SERVER_MODEL_ID =
+    "embeddinggemma-300m-qat-q8_0";
+
 const query =
     process.env.MIMIR_LAB_QUERY;
 
@@ -860,9 +863,11 @@ const response = await fetch(
             "content-type": "application/json",
         },
         body: JSON.stringify({
-            model: MODEL_ID,
-            input:
-                `task: search result | query: ${query}`,
+            model: LLAMA_SERVER_MODEL_ID,
+            input: [
+                `task: search result | query: ${query}`
+            ],
+            dimensions: 768,
         }),
         signal: AbortSignal.timeout(60_000),
     }
