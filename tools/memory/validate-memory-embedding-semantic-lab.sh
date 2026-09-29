@@ -728,7 +728,7 @@ SELECT
 SQL
 )"
 
-[[ "$EMBED_STATE" == "t|t|t" ]] \
+[[ "$EMBED_STATE" == "true|true|true" ]] \
     || fail "estado de embedding invalido: $EMBED_STATE"
 
 echo "embedding_768d=PASS"
@@ -1047,7 +1047,7 @@ SELECT
 SQL
 )"
 
-[[ "$E2E" == "t|t|t|t|t" ]] \
+[[ "$E2E" == "true|true|true|true|true" ]] \
     || fail "proveniencia ponta a ponta invalida: $E2E"
 
 echo "end_to_end_provenance=PASS"
