@@ -102,7 +102,7 @@ A documentação do Maestro deve ser retomada somente após a estabilização do
 ### P1 — Camada operacional
 
 - [x] Canal secundário Telegram: conversa remota e notificações controladas do Mímir, conforme `docs/TELEGRAM_INTEGRATION.md`.
-- [ ] Demonstrar backup/restauração real por adapter.
+- [x] Demonstrar backup/restauração real por adapter.
 - [x] Definir reconciliação de intervenção interrompida.
 - [x] Definir política de retenção de evidências/relatórios.
 - [ ] Homologar primeiro equipamento de laboratório em READ.

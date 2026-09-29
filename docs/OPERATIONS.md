@@ -13,7 +13,7 @@ migrations 002–008 e não concede ferramentas de execução ao agente OpenClaw
 | SSH | IMPLEMENTADO e testado sem rede, com transporte simulado. |
 | generic-linux | Diagnóstico e `set-hostname` do hostname **em execução**, sem persistência após reboot. Comando `/bin/hostname`; disponibilidade e privilégio precisam ser validados em laboratório. |
 | mikrotik-routeros | Inventário/diagnóstico. EXECUTE e export de configuração bloqueados. Compatibilidade por versão: NÃO VALIDADO EM PRODUÇÃO. |
-| Snapshot e backup de hostname | IMPLEMENTADO: coleta anterior e cópia do valor necessário para recuperação manual; não é backup completo do Linux. |
+| Snapshot e backup de hostname | IMPLEMENTADO e VALIDADO EM LAB UTS: captura real de `/bin/hostname`, alteração transitória, restauração do valor capturado e validação final; não é backup completo do Linux. |
 | Rollback | PARCIAL: somente procedimento manual, nunca executado automaticamente. |
 | Extração automática da topologia | PARCIAL: coleta evidências sanitizadas; interfaces/IPs/VLANs normalizados são cadastrados pelo operador. Não infere firmware ou topologia. |
 | Memória permanente | IMPLEMENTADO e VALIDADO EM LAB: `memory_handoff` v1 entra como fonte confidential, gera somente candidate, passa por deduplicação/contradição e revisão humana; embedding e busca semântica somente após promoção. Sem deploy da migration 016 em produção. |
@@ -186,6 +186,15 @@ O diário persiste intenção e resultado de cada ação antes de seguir. Qualqu
 falha de preparação impede a alteração. O backup Linux guarda o hostname
 anterior; inconsistência entre precheck e backup também bloqueia EXECUTE.
 Validação compara uma nova leitura com o hostname solicitado, além do exit code.
+
+O contrato de backup/restauração do adapter `generic-linux` foi validado em
+2026-09-29 dentro de UTS namespace isolado. O LAB capturou o hostname real do
+namespace, aplicou uma alteração transitória usando a operação catalogada
+`set-hostname`, validou o novo valor e restaurou exatamente o valor previamente
+capturado. O hostname da VPS hospedeira permaneceu inalterado. O teste não usa
+SSH, banco de produção ou equipamento externo e não adiciona rollback
+automático. No adapter `mikrotik-routeros`, backup continua não suportado e
+`backup-save` permanece bloqueado.
 
 A finalização transacional grava relatório JSON/Markdown, evidências/hash,
 validação, histórico e observação do inventário. O banco impede `validated`

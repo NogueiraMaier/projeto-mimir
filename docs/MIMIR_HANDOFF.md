@@ -2461,3 +2461,80 @@ NEXT_ACTION:
 
 Advance to the next incomplete P1 operational milestone:
 demonstrate real backup/restore behavior by adapter in an isolated laboratory.
+
+## MIMIR-V1-P1-OPS-BACKUP-RESTORE-01
+
+Date: 2026-09-29
+
+Status: `PASS`
+
+The supported backup/restore scope of the `generic-linux` adapter was validated
+with real operating-system hostname operations inside an isolated UTS namespace.
+
+Technical commits:
+
+- `59706b58de77117ee31a5a79ea18853222369a6f`
+  — `test(ops): validate adapter backup restore lab`;
+- `00592833d52c1e7f552f74bb6e91374fd957bce3`
+  — `fix(ops): pass python into backup restore namespace`.
+
+Repository regression before LAB:
+
+- operational tests: 55/55 PASS;
+- harness shell syntax: PASS.
+
+Final LAB evidence:
+
+- host before LAB: `gentoo-Dragon_vm`;
+- adapter: `generic-linux`;
+- backup operation: `/bin/hostname`;
+- initial namespace hostname: `mimir-backup-origin`;
+- backup SHA-256:
+  `19fbc334606ac5a0e1006a208c11543585116c069a36127d2a47602201f6210d`;
+- real backup capture: PASS;
+- real transient hostname change: PASS;
+- post-change validation: PASS;
+- real restoration from captured value: PASS;
+- restoration validation: PASS;
+- invalid restore value: BLOCKED;
+- namespace final hostname restored to `mimir-backup-origin`;
+- namespace restore guard: PASS;
+- host after LAB: `gentoo-Dragon_vm`;
+- host unchanged: PASS;
+- SSH used: false;
+- production database touched: false;
+- external equipment touched: false;
+- automatic rollback added: false;
+- MikroTik backup: unsupported by policy;
+- MikroTik `backup-save`: blocked;
+- final LAB RC: 0.
+
+Scope statement:
+
+This closes the P1 requirement to demonstrate real backup/restore behavior for
+the currently supported adapter capability. It does not claim a full Linux
+system backup. The validated artifact is the runtime hostname required by the
+existing `generic-linux` recovery contract.
+
+Failure/correction chronology:
+
+1. The first run entered the isolated UTS namespace but aborted before Python
+   execution because the shell variable `PYTHON` had not been propagated to
+   the child environment under `set -u`.
+2. No real host state was changed.
+3. The harness was corrected to pass `PYTHON` explicitly into the namespace.
+4. The retry passed the complete backup/change/restore/validation path.
+
+Security boundary retained:
+
+- no arbitrary shell API was added;
+- no automatic rollback was added;
+- restore input still passes the adapter hostname validator;
+- MikroTik backup remains unsupported;
+- no SSH or equipment mutation occurred;
+- no production database or memory schema was touched.
+
+NEXT_ACTION:
+
+Homologate the first laboratory equipment in READ mode using the existing
+controlled SSH/catalog path. Do not enable EXECUTE as part of that milestone.

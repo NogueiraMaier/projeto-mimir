@@ -8,9 +8,13 @@ controlada, consolidação protegida, deduplicação, contradição, revisão hu
 auditoria/proveniência e integração operacional de `memory_handoff` foram
 validadas sem promoção automática.
 
-A próxima lacuna P1 está na camada operacional: demonstrar backup/restauração
-real por adapter, mantendo produção e equipamentos reais fora do laboratório
-até autorização específica.
+A camada operacional também validou backup/restauração real no escopo do
+adapter `generic-linux`: o hostname anterior foi capturado, alterado e restaurado
+dentro de UTS namespace isolado, sem alterar o host real. O adapter MikroTik
+permanece explicitamente sem backup no MVP.
+
+A próxima lacuna P1 é homologar o primeiro equipamento de laboratório em READ,
+sem ampliar permissões de escrita.
 
 ## Gate de segurança conversacional
 
@@ -57,7 +61,9 @@ Estado P1 validado em 2026-09-29:
 - `memory_handoff` operacional -> candidate -> revisão humana -> active: concluído em LAB;
 - embedding e visibilidade semântica somente após promoção humana: confirmado;
 - seção P1 — Memória permanente PostgreSQL: 9/9 concluída;
-- próxima etapa P1: demonstrar backup/restauração real por adapter.
+- backup/restauração real do escopo suportado pelo adapter `generic-linux`: concluído em LAB UTS;
+- MikroTik backup: explicitamente não suportado/bloqueado no MVP;
+- próxima etapa P1: homologar o primeiro equipamento de laboratório em READ.
 
 ## Etapas posteriores
 

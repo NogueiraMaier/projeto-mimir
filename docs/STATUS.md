@@ -407,3 +407,26 @@ Evidência da rodada: [review/operations/2026-09-24.md](review/operations/2026-0
 - **SYNTHETIC RESIDUE:** 0.
 - **FINAL LAB RC:** 0.
 - **NEXT:** demonstrate real backup/restore behavior by adapter in an isolated LAB.
+
+## MIMIR-V1-P1-OPS-BACKUP-RESTORE-01
+
+- **STATUS:** PASS / CLOSED.
+- **ADAPTER:** `generic-linux`.
+- **BACKUP SCOPE:** runtime hostname only.
+- **REAL BACKUP CAPTURE:** PASS.
+- **REAL TRANSIENT CHANGE:** PASS.
+- **POST-CHANGE VALIDATION:** PASS.
+- **REAL RESTORE:** PASS.
+- **RESTORE VALIDATION:** PASS.
+- **INVALID RESTORE VALUE:** blocked.
+- **UTS NAMESPACE ISOLATION:** PASS.
+- **REAL VPS HOSTNAME UNCHANGED:** PASS.
+- **MIKROTIK BACKUP:** unsupported by policy.
+- **MIKROTIK `backup-save`:** blocked.
+- **SSH USED:** false.
+- **PRODUCTION DB TOUCHED:** false.
+- **EXTERNAL EQUIPMENT TOUCHED:** false.
+- **AUTOMATIC ROLLBACK ADDED:** false.
+- **OPS REGRESSION:** 55/55 PASS.
+- **FINAL LAB RC:** 0.
+- **NEXT:** homologate first laboratory equipment in READ mode.
