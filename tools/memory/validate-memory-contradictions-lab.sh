@@ -327,7 +327,7 @@ if [[ "$HAS_15" == "0" ]]; then
         -p "$PGPORT" \
         -d "$DB" \
         -v ON_ERROR_STOP=1 \
-        -f "$MIGRATION"
+        < "$MIGRATION"
 
     echo "migration_015_apply=PASS"
 else
@@ -399,10 +399,19 @@ SELECT
         'mimir.inspect_candidate_conflict(uuid)',
         'EXECUTE'
     )
-    AND NOT has_function_privilege(
-        'public',
-        'mimir.inspect_candidate_conflict(uuid)',
-        'EXECUTE'
+    AND NOT EXISTS (
+        SELECT 1
+        FROM pg_proc AS p
+        CROSS JOIN LATERAL aclexplode(
+            coalesce(
+                p.proacl,
+                acldefault('f', p.proowner)
+            )
+        ) AS a
+        WHERE p.oid =
+            'mimir.inspect_candidate_conflict(uuid)'::regprocedure
+          AND a.grantee = 0
+          AND a.privilege_type = 'EXECUTE'
     );
 SQL
 )"

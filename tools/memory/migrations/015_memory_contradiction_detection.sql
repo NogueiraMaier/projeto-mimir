@@ -109,14 +109,14 @@ BEGIN
             v_candidate.status;
     END IF;
 
-    SELECT *
+    SELECT mr.*
     INTO v_active
-    FROM mimir.memory_records
-    WHERE scope_type = v_candidate.scope_type
-      AND scope_key = v_candidate.scope_key
-      AND memory_key = v_candidate.memory_key
-      AND status = 'active'
-      AND memory_id <> v_candidate.memory_id
+    FROM mimir.memory_records AS mr
+    WHERE mr.scope_type = v_candidate.scope_type
+      AND mr.scope_key = v_candidate.scope_key
+      AND mr.memory_key = v_candidate.memory_key
+      AND mr.status = 'active'
+      AND mr.memory_id <> v_candidate.memory_id
     LIMIT 1;
 
     IF NOT FOUND THEN
