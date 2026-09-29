@@ -62,6 +62,34 @@ function parseArguments(argv) {
     return { write, limit };
 }
 
+function readEnv(name, fallback) {
+    const value = process.env[name]?.trim();
+    return value || fallback;
+}
+
+function createPsqlEnv() {
+    return {
+        ...process.env,
+        PGHOST: readEnv("PGHOST", "/run/postgresql"),
+        PGPORT: readEnv("PGPORT", "5432"),
+        PGDATABASE: readEnv("PGDATABASE", "mimir_memory"),
+        PGUSER: readEnv("PGUSER", "mimir_embedder"),
+        PGAPPNAME: readEnv(
+            "PGAPPNAME",
+            "mimir-generate-embeddings"
+        ),
+        PGCONNECT_TIMEOUT: readEnv(
+            "PGCONNECT_TIMEOUT",
+            "5"
+        ),
+        PGOPTIONS: readEnv(
+            "PGOPTIONS",
+            "-c statement_timeout=60000 " +
+            "-c lock_timeout=5000"
+        ),
+    };
+}
+
 function runPsql(sql, variables = {}) {
     const argumentsList = [
         "-X",
@@ -69,12 +97,6 @@ function runPsql(sql, variables = {}) {
         "-q",
         "-A",
         "-t",
-        "-h",
-        "/run/postgresql",
-        "-U",
-        "mimir_embedder",
-        "-d",
-        "mimir_memory",
         "-v",
         "ON_ERROR_STOP=1",
     ];
@@ -89,10 +111,7 @@ function runPsql(sql, variables = {}) {
         {
             input: sql,
             encoding: "utf8",
-            env: {
-                ...process.env,
-                PGCONNECT_TIMEOUT: "5",
-            },
+            env: createPsqlEnv(),
             maxBuffer: 16 * 1024 * 1024,
         }
     );
