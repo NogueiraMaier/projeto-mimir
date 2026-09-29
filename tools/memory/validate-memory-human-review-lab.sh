@@ -14,6 +14,7 @@ PG_IDENT="$DATA/pg_ident.conf"
 HUMAN_OS_USER="nogueiramaier"
 HUMAN_DB_ROLE="mimir_human"
 REVIEW_ROLE="mimir_reviewer"
+LAB_ACCESS_GROUP="$(id -gn openclaw)"
 EXPECTED_SYSTEM_USER="peer:nogueiramaier"
 EXPECTED_REVIEWER="Nogueira Maier"
 
@@ -222,7 +223,7 @@ review() {
     local decision="$2"
     local reason="$3"
 
-    runuser -u "$HUMAN_OS_USER" -- "$PSQL" \
+    runuser -u "$HUMAN_OS_USER" -g "$LAB_ACCESS_GROUP" -- "$PSQL" \
         -X -w \
         -h "$PGHOST" \
         -p "$PGPORT" \
@@ -385,11 +386,24 @@ echo "reviewer_role_contract=PASS"
 echo
 echo "--- 3. TEMPORARY LAB PEER MAP ---"
 
-runuser -u "$HUMAN_OS_USER" -- test -x "$LAB_ROOT" \
+HUMAN_CONTEXT="$(
+    runuser \
+        -u "$HUMAN_OS_USER" \
+        -g "$LAB_ACCESS_GROUP" \
+        -- sh -c 'printf "%s|%s" "$(id -un)" "$(id -gn)"'
+)"
+
+[[ "$HUMAN_CONTEXT" == \
+   "$HUMAN_OS_USER|$LAB_ACCESS_GROUP" ]] \
+    || fail "contexto Unix humano inesperado: $HUMAN_CONTEXT"
+
+runuser -u "$HUMAN_OS_USER" -g "$LAB_ACCESS_GROUP" -- test -x "$LAB_ROOT" \
     || fail "$HUMAN_OS_USER nao atravessa LAB_ROOT"
 
-runuser -u "$HUMAN_OS_USER" -- test -x "$PGHOST" \
+runuser -u "$HUMAN_OS_USER" -g "$LAB_ACCESS_GROUP" -- test -x "$PGHOST" \
     || fail "$HUMAN_OS_USER nao atravessa socket dir"
+
+echo "human_lab_access_context=PASS"
 
 TMP="$(mktemp -d /var/tmp/mimir-human-review-lab.XXXXXX)"
 IDENT_BACKUP="$TMP/pg_ident.conf.orig"
@@ -425,7 +439,7 @@ RELOAD="$(
     || fail "reload do LAB falhou"
 
 PEER_IDENTITY="$(
-    runuser -u "$HUMAN_OS_USER" -- "$PSQL" \
+    runuser -u "$HUMAN_OS_USER" -g "$LAB_ACCESS_GROUP" -- "$PSQL" \
         -X -w \
         -h "$PGHOST" \
         -p "$PGPORT" \
@@ -447,7 +461,7 @@ SQL
     || fail "peer identity inesperada: $PEER_IDENTITY"
 
 ELEVATED_IDENTITY="$(
-    runuser -u "$HUMAN_OS_USER" -- "$PSQL" \
+    runuser -u "$HUMAN_OS_USER" -g "$LAB_ACCESS_GROUP" -- "$PSQL" \
         -X -w \
         -h "$PGHOST" \
         -p "$PGPORT" \
@@ -502,7 +516,7 @@ SQL
 APP_DIRECT_RC=$?
 
 HUMAN_DIRECT_ERROR="$(
-    runuser -u "$HUMAN_OS_USER" -- "$PSQL" \
+    runuser -u "$HUMAN_OS_USER" -g "$LAB_ACCESS_GROUP" -- "$PSQL" \
         -X -w \
         -h "$PGHOST" \
         -p "$PGPORT" \
