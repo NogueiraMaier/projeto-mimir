@@ -266,3 +266,19 @@ Evidência da rodada: [review/operations/2026-09-24.md](review/operations/2026-0
 - **JSON SCHEMA BASIC SUPPORT:** healthy.
 - **CURRENT BLOCKER:** full integrated request exceeds 120 s.
 - **NEXT P1:** full synthetic request size/latency profiling.
+
+## MIMIR-V1-PROTECTED-CONSOLIDATOR-REALMODEL-LATENCY-01 — 2026-09-28
+
+- **STATUS:** BLOCKED on timeout policy.
+- **REAL MODEL CONTRACT:** PASS.
+- **MODEL ELAPSED:** 136.530 s.
+- **120 S BUDGET:** insufficient.
+- **180 S DIAGNOSTIC RUN:** PASS.
+- **OUTPUT CONTRACT:** PASS.
+- **CANDIDATES:** 2.
+- **AUTOMATIC PROMOTION:** 0.
+- **CLEANUP:** `synthetic_residue=0`.
+- **SCHEMA CHANGE REQUIRED:** no.
+- **VALIDATOR CHANGE REQUIRED:** no.
+- **DEPLOY:** not authorized.
+- **NEXT P1:** scoped VPS CPU fallback timeout policy.

@@ -743,3 +743,32 @@ NEXT_ACTION:
 
 Profile the full synthetic consolidator request and measure its inference
 latency independently of the current 120-second cutoff.
+
+## MIMIR-V1-PROTECTED-CONSOLIDATOR-REALMODEL-LATENCY-01
+
+Status: `BLOCKED`
+
+Integrated real-model contract:
+
+`PASS`
+
+Measured model latency:
+
+`136.530 s`
+
+Canonical model budget:
+
+`120 s — insufficient`
+
+Diagnostic budget:
+
+`180 s — PASS`
+
+Cleanup:
+
+`synthetic_residue=0`
+
+NEXT_ACTION:
+
+Inspect repository timeout references and implement a scoped timeout policy for
+the VPS CPU fallback without changing schema or validator semantics.

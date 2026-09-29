@@ -1946,3 +1946,59 @@ NEXT_ACTION:
 
 Profile the exact synthetic integrated request size and latency before changing
 the 120-second model budget.
+
+## CHECKPOINT — MIMIR-V1-PROTECTED-CONSOLIDATOR-REALMODEL-LATENCY-01
+
+Date: 2026-09-28
+
+Status:
+
+`BLOCKED`
+
+Technical commit:
+
+`39b09e92b2355573105d3613ba84dab9267cf0a1`
+
+### Integrated real-model result
+
+With a diagnostic 180-second budget, the exact protected consolidator flow
+completed successfully against real Qwen.
+
+- consolidator: PASS;
+- output contract: PASS;
+- candidates: 2;
+- automatic promotion: 0;
+- cleanup: `synthetic_residue=0`.
+
+Full model elapsed time:
+
+`136.530 seconds`
+
+Request size:
+
+`2928 bytes`
+
+JSON Schema size:
+
+`1227 bytes`
+
+### Root cause
+
+The canonical 120-second model budget is insufficient for the current VPS CPU
+fallback.
+
+JSON Schema itself is validated against the real model and must not be
+relaxed.
+
+### State distinction
+
+- repository-only validation: PASS;
+- integrated schema/contract validation: PASS at diagnostic 180 s;
+- canonical 120 s runtime policy: FAIL;
+- deployment: NOT AUTHORIZED;
+- production validation: NOT DONE.
+
+### NEXT_ACTION
+
+Inspect timeout references in the repository and define the scoped CPU
+fallback timeout policy before changing code or deployment configuration.
