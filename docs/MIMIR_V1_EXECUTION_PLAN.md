@@ -658,3 +658,40 @@ NEXT_ACTION:
 5. on PASS, commit technical change;
 6. update continuity documents with exact technical commit;
 7. only then repeat integrated synthetic real-model LAB.
+
+## MIMIR-V1-PROTECTED-CONSOLIDATOR-JSON-SCHEMA-REPO-01
+
+Status:
+
+`REPOSITORY_ONLY_PASS`
+
+Technical commit:
+
+`39b09e92b2355573105d3613ba84dab9267cf0a1`
+
+Completed:
+
+- closed llama.cpp JSON Schema implemented;
+- ambiguous source-binding prompt removed;
+- Python fail-closed validator retained;
+- repository JSON Schema regression added;
+- syntax validation PASS;
+- JSON Schema contract PASS;
+- protected suite 10/10 PASS under isolated network namespace.
+
+Not completed:
+
+- integrated synthetic real-model LAB;
+- deployment;
+- production validation.
+
+NEXT_ACTION:
+
+Execute the integrated synthetic protected-consolidator LAB against the real
+Qwen fallback at `127.0.0.1:18782`.
+
+The run must finish with:
+
+`synthetic_residue=0`
+
+Only after that result may the real-model LAB state move to PASS.

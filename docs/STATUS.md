@@ -227,3 +227,19 @@ Evidência da rodada: [review/operations/2026-09-24.md](review/operations/2026-0
 - **DECISION:** constrain generation; do not weaken validator.
 - **PRODUCTION:** unchanged.
 - **NEXT P1:** implement closed JSON Schema + repository-only regressions.
+
+## MIMIR-V1-PROTECTED-CONSOLIDATOR-JSON-SCHEMA-REPO-01 — 2026-09-28
+
+- **STATUS:** `REPOSITORY_ONLY_PASS`.
+- **BRANCH:** `feat/mimir-operational-foundation`.
+- **TECHNICAL COMMIT:** `39b09e92b2355573105d3613ba84dab9267cf0a1`.
+- **JSON SCHEMA GENERATION:** implemented.
+- **PYTHON FAIL-CLOSED VALIDATOR:** retained.
+- **JSON SCHEMA CONTRACT TEST:** PASS.
+- **PROTECTED SUITE:** 10/10 PASS.
+- **NETWORK ISOLATION:** PASS.
+- **PRODUCTION:** unchanged.
+- **DEPLOYED:** no.
+- **REAL-MODEL INTEGRATED LAB:** pending.
+- **NEXT P1:** integrated synthetic LAB with real Qwen on `127.0.0.1:18782`.
+- **REQUIRED CLEANUP RESULT:** `synthetic_residue=0`.

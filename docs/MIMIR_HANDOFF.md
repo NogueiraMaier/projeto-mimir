@@ -1808,3 +1808,71 @@ NEXT_ACTION:
 
 Implement the closed JSON Schema and repository-only regression tests.
 Do not repeat the integrated LAB until repository-only validation passes.
+
+## CHECKPOINT — MIMIR-V1-PROTECTED-CONSOLIDATOR-JSON-SCHEMA-REPO-01
+
+Date: 2026-09-28
+
+Status:
+
+`REPOSITORY_ONLY_PASS`
+
+Branch:
+
+`feat/mimir-operational-foundation`
+
+Technical commit:
+
+`39b09e92b2355573105d3613ba84dab9267cf0a1`
+
+### Implemented
+
+Protected Qwen generation now uses a closed JSON Schema.
+
+The model-side schema fixes:
+
+- `schema_version=1`;
+- exact `source_event_id`;
+- exact `source_content_sha256`;
+- closed `candidates`;
+- closed candidate fields;
+- closed evidence fields;
+- trust class fixed to `UNTRUSTED_OBSERVATION`;
+- human review fixed to `true`.
+
+The ambiguous `requested source bindings` wording was removed.
+
+The existing Python validator remains unchanged as the independent second
+fail-closed barrier.
+
+### Repository validation
+
+PASS:
+
+- diff check;
+- Python syntax;
+- JSON Schema repository contract;
+- existing protected suite: 10/10 PASS in isolated network namespace.
+
+### Production
+
+Unchanged.
+
+No deploy, migration, production database change, real content use or memory
+promotion occurred.
+
+### Important state distinction
+
+Repository validation is complete.
+
+Integrated real-model LAB validation is NOT complete yet.
+
+### NEXT_ACTION
+
+Run the disposable integrated synthetic LAB against real Qwen on
+`127.0.0.1:18782` using technical commit
+`39b09e92b2355573105d3613ba84dab9267cf0a1`.
+
+Require `synthetic_residue=0`.
+
+Do not deploy.
