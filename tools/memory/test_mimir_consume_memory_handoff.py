@@ -193,6 +193,14 @@ class ConsumerValidationTests(unittest.TestCase):
         source = SCRIPT.read_text(encoding="utf-8")
 
         self.assertIn(
+            "CREATE TEMP TABLE handoff_submission_input",
+            source,
+        )
+        self.assertIn(
+            "INSERT INTO handoff_submission_input",
+            source,
+        )
+        self.assertIn(
             "CREATE TEMP TABLE handoff_submission_result",
             source,
         )
@@ -216,6 +224,20 @@ class ConsumerValidationTests(unittest.TestCase):
         self.assertNotIn(
             "FROM mimir.pending_memory_review AS pending",
             source,
+        )
+
+        do_body = source.split(
+            "DO $handoff$",
+            1,
+        )[1].split(
+            "$handoff$;",
+            1,
+        )[0]
+
+        self.assertNotIn(
+            ":'",
+            do_body,
+            "variavel psql nao pode aparecer dentro de DO $handoff$",
         )
 
 

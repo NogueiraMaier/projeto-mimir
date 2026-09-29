@@ -417,6 +417,44 @@ BEGIN;
 SET LOCAL statement_timeout = '30s';
 SET LOCAL lock_timeout = '5s';
 
+CREATE TEMP TABLE handoff_submission_input (
+    event_id uuid NOT NULL,
+    handoff_text text NOT NULL,
+    handoff_sha256 text NOT NULL,
+    report_sha256 text NOT NULL,
+    memory_key text NOT NULL,
+    title text NOT NULL,
+    summary text NOT NULL,
+    source_ref text NOT NULL,
+    deduplication_key text NOT NULL
+) ON COMMIT DROP;
+
+INSERT INTO handoff_submission_input (
+    event_id,
+    handoff_text,
+    handoff_sha256,
+    report_sha256,
+    memory_key,
+    title,
+    summary,
+    source_ref,
+    deduplication_key
+)
+VALUES (
+    :'event_id'::uuid,
+    convert_from(
+        decode(:'handoff_b64', 'base64'),
+        'UTF8'
+    ),
+    :'handoff_sha256',
+    :'report_sha256',
+    :'memory_key',
+    :'title',
+    :'summary',
+    :'source_ref',
+    :'deduplication_key'
+);
+
 CREATE TEMP TABLE handoff_submission_result (
     event_id uuid NOT NULL,
     memory_id uuid NOT NULL,
@@ -426,32 +464,31 @@ CREATE TEMP TABLE handoff_submission_result (
 
 DO $handoff$
 DECLARE
+    v_input           record;
     v_event_id        uuid;
     v_memory_id       uuid;
     v_status          text;
     v_conflict        text;
 BEGIN
+    SELECT *
+    INTO STRICT v_input
+    FROM handoff_submission_input;
+
     v_event_id :=
         mimir.ingest_operational_handoff_v1(
-            :'event_id'::uuid,
-            convert_from(
-                decode(:'handoff_b64', 'base64'),
-                'UTF8'
-            ),
-            :'handoff_sha256'
+            v_input.event_id,
+            v_input.handoff_text,
+            v_input.handoff_sha256
         );
 
     v_memory_id :=
         mimir.propose_memory(
             v_event_id,
-            :'memory_key',
+            v_input.memory_key,
             'evidence',
-            :'title',
-            :'summary',
-            convert_from(
-                decode(:'handoff_b64', 'base64'),
-                'UTF8'
-            ),
+            v_input.title,
+            v_input.summary,
+            v_input.handoff_text,
             0.600,
             0.600,
             false,
@@ -459,13 +496,13 @@ BEGIN
                 'submission_type',
                     'ops-memory-handoff-v1',
                 'report_sha256',
-                    :'report_sha256',
+                    v_input.report_sha256,
                 'handoff_sha256',
-                    :'handoff_sha256',
+                    v_input.handoff_sha256,
                 'source_ref',
-                    :'source_ref',
+                    v_input.source_ref,
                 'deduplication_key',
-                    :'deduplication_key',
+                    v_input.deduplication_key,
                 'classification',
                     'confidential',
                 'requires_human_review',
