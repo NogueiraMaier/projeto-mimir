@@ -652,12 +652,12 @@ ACTIVE_ERROR="$(
         -At \
         -v ON_ERROR_STOP=1 \
         -v mid="$ACTIVE_ID" \
-        -c "
-            SELECT *
-            FROM mimir.inspect_candidate_conflict(
-                :'mid'::uuid
-            );
-        " 2>&1
+        2>&1 <<'SQL'
+SELECT *
+FROM mimir.inspect_candidate_conflict(
+    :'mid'::uuid
+);
+SQL
 )"
 ACTIVE_RC=$?
 
