@@ -61,8 +61,13 @@ LAB_VERSIONS="$(
         -c "SELECT string_agg(version::text, ',' ORDER BY version) FROM mimir.schema_version;"
 )"
 
-[[ "$LAB_VERSIONS" == "1,2,3,4,5,6,7,8,9,10,11,12,14" ]] \
-    || fail "lab não está em 1..12,14"
+case "$LAB_VERSIONS" in
+    "1,2,3,4,5,6,7,8,9,10,11,12,14"|"1,2,3,4,5,6,7,8,9,10,11,12,14,15")
+        ;;
+    *)
+        fail "lab não está em 1..12,14[,15]"
+        ;;
+esac
 
 PROD_VERSIONS="$(
     runuser -u postgres -- "$PSQL" \

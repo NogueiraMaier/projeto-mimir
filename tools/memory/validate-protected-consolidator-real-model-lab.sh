@@ -218,9 +218,13 @@ LAB_VERSIONS="$(
             FROM mimir.schema_version;"
 )"
 
-[[ "$LAB_VERSIONS" == \
-   "1,2,3,4,5,6,7,8,9,10,11,12,14" ]] \
-    || fail "schema LAB inesperado: $LAB_VERSIONS"
+case "$LAB_VERSIONS" in
+    "1,2,3,4,5,6,7,8,9,10,11,12,14"|"1,2,3,4,5,6,7,8,9,10,11,12,14,15")
+        ;;
+    *)
+        fail "schema LAB inesperado: $LAB_VERSIONS"
+        ;;
+esac
 
 TCP_55433="$(ss -ltnH | grep -c ':55433' || true)"
 [[ "$TCP_55433" == "0" ]] \
