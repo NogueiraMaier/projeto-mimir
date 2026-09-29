@@ -44,7 +44,9 @@ Estado P1 validado em 2026-09-29:
 - consolidação local protegida: concluída;
 - deduplicação: concluída;
 - detecção determinística de contradições: concluída;
-- próxima etapa: revisão humana autenticada e fluxo `candidate -> active`.
+- revisão humana autenticada: concluída;
+- fluxo `candidate -> active`: concluído;
+- próxima etapa: embedding controlado e recuperação semântica após promoção.
 
 ## Etapas posteriores
 

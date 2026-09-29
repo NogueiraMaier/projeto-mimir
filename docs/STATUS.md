@@ -337,3 +337,23 @@ Evidência da rodada: [review/operations/2026-09-24.md](review/operations/2026-0
 - **PRODUCTION MIGRATION 015:** absent.
 - **SYNTHETIC RESIDUE:** 0.
 - **NEXT:** authenticated human review and `candidate -> active`.
+
+## MIMIR-V1-P1-HUMAN-REVIEW-ACTIVE-01
+
+- **STATUS:** PASS / CLOSED.
+- **AUTHENTICATED HUMAN REVIEW:** PASS.
+- **PEER IDENTITY:** `peer:nogueiramaier`.
+- **LOGIN ROLE:** `mimir_human`.
+- **CONTROLLED ELEVATION:** `mimir_reviewer`.
+- **UNAUTHORIZED REVIEW:** rejected.
+- **CANDIDATE -> ACTIVE:** PASS.
+- **HUMAN REJECT:** PASS.
+- **REVIEW IDEMPOTENCY:** PASS.
+- **ACTIVE-KEY CONFLICT:** rejected.
+- **REVIEWER PROVENANCE:** PASS.
+- **REVIEW AUDIT:** PASS.
+- **AUTOMATIC RELATIONS:** 0.
+- **LAB PG_IDENT RESTORED:** PASS.
+- **SYNTHETIC RESIDUE:** 0.
+- **PRODUCTION:** unchanged at memory schema `1..12`.
+- **NEXT:** embedding generation + semantic recovery after human promotion.

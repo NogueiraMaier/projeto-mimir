@@ -2168,3 +2168,75 @@ approve/reject behavior and idempotency, reject unauthorized review, confirm
 audit records, and leave production unchanged.
 
 Do not apply migration 015 to production.
+
+## MIMIR-V1-P1-HUMAN-REVIEW-ACTIVE-01
+
+Date: 2026-09-29
+
+Status: `PASS`
+
+Authenticated human review and the controlled
+`candidate -> active` transition were validated end-to-end in the isolated
+PostgreSQL LAB.
+
+Implementation/evidence:
+
+- validator implementation:
+  `4f0b51d2346b25981071fdfccc9dce4a305e327c`;
+- LAB socket-context correction:
+  `c2a5d877e315bb25b2fcf63b54828e997b25e297`;
+- LAB schema: `1..12,14,15`;
+- production schema: `1..12`;
+- reviewer identity contract: PASS;
+- reviewer role contract: PASS;
+- Unix LAB access context: PASS;
+- peer identity:
+  `mimir_human|mimir_human|peer:nogueiramaier`;
+- controlled role elevation:
+  `mimir_human|mimir_reviewer|peer:nogueiramaier`;
+- direct review from `mimir_app`: rejected;
+- direct review from `mimir_human` without role elevation: rejected;
+- human approve: PASS;
+- `candidate -> active`: PASS;
+- approve replay idempotency: PASS;
+- human reject: PASS;
+- reject replay idempotency: PASS;
+- opposite-decision replay: rejected;
+- second active memory for the same identity: rejected;
+- conflicting candidate remained `candidate`;
+- reviewer provenance: PASS;
+- review audit: PASS;
+- review-row idempotency: PASS;
+- final synthetic states:
+  `active|rejected|candidate`;
+- automatic relations: 0;
+- production unchanged;
+- production migration 015: absent;
+- temporary LAB `pg_ident.conf` restored;
+- synthetic residue: 0;
+- LAB RC: 0.
+
+No persistent Linux user/group change was required. The existing Linux identity
+`nogueiramaier` was executed with the LAB socket access group only for the
+disposable validation process. PostgreSQL peer authentication still observed
+`peer:nogueiramaier`.
+
+NEXT_ACTION:
+
+Validate controlled embedding generation and semantic retrieval after a
+human-approved promotion.
+
+The next LAB must prove:
+
+- only `active` memory becomes embedding-eligible;
+- 768-dimensional EmbeddingGemma vector is generated locally;
+- controlled write uses `mimir_embedder`;
+- content SHA guard is enforced;
+- embedding audit is persisted;
+- semantic query uses `mimir_search` with `peer:openclaw`;
+- the promoted synthetic memory is retrieved;
+- rejected/candidate memories are not returned;
+- production remains unchanged;
+- all synthetic records are removed.
+
+Do not apply migrations 014 or 015 to production.

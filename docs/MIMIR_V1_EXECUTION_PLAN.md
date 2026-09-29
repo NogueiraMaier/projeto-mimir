@@ -93,8 +93,8 @@ A documentação do Maestro deve ser retomada somente após a estabilização do
 - [x] Validar consolidação local de sessões de ponta a ponta.
 - [x] Validar deduplicação.
 - [x] Validar detecção de contradições.
-- [ ] Validar revisão humana.
-- [ ] Validar fluxo candidate → active.
+- [x] Validar revisão humana.
+- [x] Validar fluxo candidate → active.
 - [ ] Validar geração de embedding e recuperação semântica após promoção.
 - [ ] Validar auditoria/proveniência.
 - [ ] Integrar `memory_handoff` operacional com o fluxo humano de memória, sem promoção automática.
