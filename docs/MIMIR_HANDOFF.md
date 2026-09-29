@@ -2538,3 +2538,49 @@ NEXT_ACTION:
 
 Homologate the first laboratory equipment in READ mode using the existing
 controlled SSH/catalog path. Do not enable EXECUTE as part of that milestone.
+
+## MIMIR-V1-P1-REAL-MIKROTIK-READ-01
+
+Date: 2026-09-29
+
+Status: `PASS`
+
+Technical commit:
+
+- `736e93fced94bb21bc775dc83fe5703d7428330d`
+  — `test(ops): validate real mikrotik read path`.
+
+Final evidence:
+
+- real `SSHExecutor`: PASS;
+- adapter `mikrotik-routeros`: PASS;
+- public-key authentication: PASS;
+- password authentication: not used;
+- dedicated RouterOS READ identity: PASS;
+- catalog READ operations: 6/6 PASS;
+- commands outside catalog: BLOCKED;
+- EXECUTE: BLOCKED;
+- configuration changes: 0;
+- database/inventory writes: 0;
+- raw device output persisted: false;
+- ops regression: 55/55 PASS;
+- final LAB RC: 0;
+- evidence digest:
+  `1df91e1dcd048507573ddd95ab3a5400251d3556ac59e1ccdb3fd11400a7d1bc`.
+
+Host-key provenance:
+
+The initial host-key pin was TOFU. The RouterOS public SSH host key was then
+obtained through a separate administrative channel. Its SSH SHA-256 fingerprint
+matched the pinned key exactly. The host-key provenance gate is therefore
+closed as second-channel verified.
+
+No real target IP, username, password or private key is committed to Git.
+
+Security note:
+
+Absence of post-quantum KEX was observed and remains a separate hardening item.
+
+NEXT_ACTION:
+
+Validate transient `set-hostname` for `generic-linux` in an isolated laboratory.

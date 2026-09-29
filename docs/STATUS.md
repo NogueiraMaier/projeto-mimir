@@ -430,3 +430,23 @@ Evidência da rodada: [review/operations/2026-09-24.md](review/operations/2026-0
 - **OPS REGRESSION:** 55/55 PASS.
 - **FINAL LAB RC:** 0.
 - **NEXT:** homologate first laboratory equipment in READ mode.
+
+## MIMIR-V1-P1-REAL-MIKROTIK-READ-01
+
+- **STATUS:** PASS / CLOSED.
+- **FIRST REAL EQUIPMENT READ:** PASS.
+- **ADAPTER:** `mikrotik-routeros`.
+- **REAL SSHExecutor:** PASS.
+- **CATALOG READ:** 6/6 PASS.
+- **PUBLIC-KEY AUTH:** PASS.
+- **PASSWORD AUTH:** not used.
+- **HOST KEY PIN:** PASS.
+- **SECOND-CHANNEL HOST KEY VERIFICATION:** PASS.
+- **EXECUTE:** blocked.
+- **CONFIGURATION CHANGES:** 0.
+- **DATABASE/INVENTORY WRITES:** 0.
+- **RAW DEVICE OUTPUT PERSISTED:** false.
+- **OPS REGRESSION:** 55/55 PASS.
+- **FINAL LAB RC:** 0.
+- **PQ KEX WARNING:** observed; separate hardening.
+- **NEXT:** generic-linux transient set-hostname LAB.

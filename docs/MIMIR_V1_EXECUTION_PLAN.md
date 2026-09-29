@@ -105,9 +105,9 @@ A documentação do Maestro deve ser retomada somente após a estabilização do
 - [x] Demonstrar backup/restauração real por adapter.
 - [x] Definir reconciliação de intervenção interrompida.
 - [x] Definir política de retenção de evidências/relatórios.
-- [ ] Homologar primeiro equipamento de laboratório em READ.
+- [x] Homologar primeiro equipamento de laboratório em READ.
 - [ ] Homologar `set-hostname` transitório no adapter generic-linux em laboratório.
-- [ ] Manter MikroTik inicialmente em diagnóstico/READ.
+- [x] Manter MikroTik inicialmente em diagnóstico/READ.
 - [ ] Só depois ampliar adapters para MikroTik EXECUTE, FiberHome, H3C, Intelbras e outros.
 
 ### P1 — Reprodutibilidade e release

@@ -13,8 +13,15 @@ adapter `generic-linux`: o hostname anterior foi capturado, alterado e restaurad
 dentro de UTS namespace isolado, sem alterar o host real. O adapter MikroTik
 permanece explicitamente sem backup no MVP.
 
-A próxima lacuna P1 é homologar o primeiro equipamento de laboratório em READ,
-sem ampliar permissões de escrita.
+O primeiro equipamento real foi homologado exclusivamente em READ pelo
+`SSHExecutor` e pelo catálogo `mikrotik-routeros`. As seis operações
+diagnósticas passaram, EXECUTE permaneceu bloqueado e nenhuma configuração foi
+alterada. A host key inicialmente pinada por TOFU foi posteriormente conferida
+por segundo canal administrativo através da chave pública exportada pelo
+RouterOS.
+
+A próxima lacuna P1 é homologar `set-hostname` transitório no adapter
+`generic-linux` em laboratório isolado, sem alterar host de produção.
 
 ## Gate de segurança conversacional
 
@@ -63,7 +70,11 @@ Estado P1 validado em 2026-09-29:
 - seção P1 — Memória permanente PostgreSQL: 9/9 concluída;
 - backup/restauração real do escopo suportado pelo adapter `generic-linux`: concluído em LAB UTS;
 - MikroTik backup: explicitamente não suportado/bloqueado no MVP;
-- próxima etapa P1: homologar o primeiro equipamento de laboratório em READ.
+- primeiro equipamento real em READ: concluído;
+- adapter `mikrotik-routeros` real: 6/6 operações READ concluídas;
+- host key: pinada e verificada por segundo canal administrativo;
+- MikroTik EXECUTE/configuração: não autorizado e não realizado;
+- próxima etapa P1: homologar `set-hostname` transitório no adapter `generic-linux` em laboratório.
 
 ## Etapas posteriores
 

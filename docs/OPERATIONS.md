@@ -10,9 +10,9 @@ migrations 002–008 e não concede ferramentas de execução ao agente OpenClaw
 |---|---|
 | CMDB, API PostgreSQL e CLI | IMPLEMENTADO; validação Python e transporte PostgreSQL testados com mocks. SQL não aplicado nesta revisão. |
 | READ / PLAN / EXECUTE | IMPLEMENTADO por catálogo explícito de operações e parâmetros. |
-| SSH | IMPLEMENTADO e testado sem rede, com transporte simulado. |
+| SSH | IMPLEMENTADO e VALIDADO em equipamento real em READ: chave pública, `StrictHostKeyChecking=yes`, known_hosts explícito e `SSHExecutor` controlado. |
 | generic-linux | Diagnóstico e `set-hostname` do hostname **em execução**, sem persistência após reboot. Comando `/bin/hostname`; disponibilidade e privilégio precisam ser validados em laboratório. |
-| mikrotik-routeros | Inventário/diagnóstico. EXECUTE e export de configuração bloqueados. Compatibilidade por versão: NÃO VALIDADO EM PRODUÇÃO. |
+| mikrotik-routeros | Diagnóstico READ VALIDADO em equipamento real pelo `SSHExecutor`: 6/6 operações catalogadas. EXECUTE, export, backup-save e alterações permanecem bloqueados. |
 | Snapshot e backup de hostname | IMPLEMENTADO e VALIDADO EM LAB UTS: captura real de `/bin/hostname`, alteração transitória, restauração do valor capturado e validação final; não é backup completo do Linux. |
 | Rollback | PARCIAL: somente procedimento manual, nunca executado automaticamente. |
 | Extração automática da topologia | PARCIAL: coleta evidências sanitizadas; interfaces/IPs/VLANs normalizados são cadastrados pelo operador. Não infere firmware ou topologia. |
@@ -173,6 +173,26 @@ chaves identificáveis e blocos PEM. Uma string suspeita é descartada inteira.
 Regex não reconhece todo segredo sem marcação: manter coleta restrita e nunca
 usar exports, scripts livres ou backups completos nesta interface. Dados de
 inventário e relatórios são confidenciais mesmo após sanitização.
+
+## Homologação real MikroTik READ
+
+O primeiro equipamento real foi homologado exclusivamente em READ usando chave
+pública dedicada, identidade RouterOS restrita, `StrictHostKeyChecking=yes`,
+known_hosts explícito e o `SSHExecutor` do Mímir.
+
+O adapter `mikrotik-routeros` executou com sucesso as seis operações
+catalogadas: `system`, `board`, `interfaces`, `addresses`, `routes` e `vlans`.
+
+Comandos fora do catálogo e tentativa de EXECUTE foram bloqueados. Não houve
+alteração de configuração, backup, export, escrita no banco ou persistência do
+output bruto do equipamento.
+
+A host key foi inicialmente capturada por TOFU e posteriormente verificada por
+segundo canal administrativo mediante exportação da chave pública do servidor
+SSH do RouterOS. O fingerprint coincidiu com a chave pinada.
+
+Foi observado aviso do cliente OpenSSH sobre ausência de KEX pós-quântico.
+Esse item permanece como hardening separado.
 
 ## Intervenção, falhas e recuperação
 
