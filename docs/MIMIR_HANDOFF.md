@@ -2668,3 +2668,105 @@ NEXT_ACTION:
 
 Start P1 reproducibility/release. First implementation target: CI for memory,
 operations, validators, plugin build/test and syntax/lint checks.
+
+## MIMIR-V1-CONTINUITY-2026-09-29-01
+
+Date: 2026-09-29
+
+Status: `READY_FOR_CONTINUATION`
+
+Branch:
+
+`feat/mimir-operational-foundation`
+
+Validated/base HEAD:
+
+`28ecec6e00b07bb60f63ff507a9cfae49ee4c3a5`
+— `docs(ops): freeze v1 adapter scope`
+
+### State
+
+P1 permanent PostgreSQL memory:
+
+- 9/9 items complete in LAB;
+- `memory_handoff` integrated through candidate -> human review -> active;
+- production migrations 014/015/016 remain undeployed.
+
+P1 operational layer:
+
+- Telegram secondary channel: validated;
+- generic-linux backup/restore contract: LAB PASS;
+- first real MikroTik READ: PASS;
+- MikroTik real READ catalog: 6/6 PASS;
+- independent SSH host-key verification: PASS;
+- generic-linux transient `set-hostname`: LAB PASS;
+- controlled EXECUTE requires catalog + approval + `ChangePermit`;
+- manual restore path: PASS;
+- transient LAB sshd teardown regression corrected and retry PASS;
+- operational v1 adapter scope: frozen.
+
+V1 adapter boundary:
+
+- `generic-linux`: restricted EXECUTE path retained;
+- MikroTik: READ only;
+- MikroTik EXECUTE: post-v1;
+- FiberHome: post-v1;
+- H3C: post-v1;
+- Intelbras: post-v1;
+- additional multi-vendor EXECUTE: post-v1.
+
+### Validation boundary
+
+`IMPLEMENTED != VALIDATED`
+
+`LAB_PASS != production validated`
+
+`DEPLOYED != VALIDATED`
+
+No production deployment, migration promotion, PR merge, Draft removal or
+stable tag is authorized by this checkpoint.
+
+Production PostgreSQL remains unchanged by the latest operational LABs.
+
+### Relevant recent commits
+
+- `28ecec6` — `docs(ops): freeze v1 adapter scope`
+- `1599950` — `docs(ops): close transient hostname lab milestone`
+- `ce416a9` — `fix(ops): bound transient lab sshd teardown`
+- `2d7e13f` — `test(ops): validate transient generic linux hostname`
+- `6b01958` — `docs(ops): close real mikrotik read milestone`
+- `736e93f` — `test(ops): validate real mikrotik read path`
+- `d94ecf6` — `docs(ops): close adapter backup restore milestone`
+
+### Repository continuity
+
+Trust order for continuation:
+
+1. current Git branch/HEAD;
+2. `docs/MIMIR_HANDOFF.md`;
+3. `docs/MIMIR_V1_EXECUTION_PLAN.md`;
+4. validation/review evidence;
+5. `docs/STATUS.md`;
+6. `docs/ROADMAP.md`;
+7. chat history.
+
+Do not reconstruct project state from chat when Git and handoff are available.
+
+### NEXT_ACTION
+
+Start `P1 — Reprodutibilidade e release`.
+
+First implementation target:
+
+`Adicionar CI para testes de memória, operações, validador, plugin e lint/syntax.`
+
+Before implementation:
+
+1. inspect the current repository tree and existing test entrypoints;
+2. identify exact commands already validated locally;
+3. design CI around existing commands rather than inventing parallel test paths;
+4. do not modify production runtime;
+5. implementation -> repository tests -> technical commit -> CI validation ->
+   continuity checkpoint.
+
+Do not start adapter expansion as part of this workstream.

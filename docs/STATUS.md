@@ -483,3 +483,15 @@ Evidência da rodada: [review/operations/2026-09-24.md](review/operations/2026-0
 - **POST-V1:** MikroTik EXECUTE, FiberHome, H3C, Intelbras e novos adapters.
 - **PRODUCTION CHANGE:** none.
 - **NEXT:** P1 — Reprodutibilidade e release.
+
+## MIMIR-V1-CONTINUITY-2026-09-29-01
+
+- **STATUS:** READY_FOR_CONTINUATION.
+- **BRANCH:** `feat/mimir-operational-foundation`.
+- **VALIDATED/BASE HEAD:** `28ecec6e00b07bb60f63ff507a9cfae49ee4c3a5`.
+- **P1 MEMORY:** LAB complete.
+- **P1 OPERATIONAL:** v1 scope complete/frozen.
+- **GENERIC-LINUX EXECUTE:** restricted path validated in LAB.
+- **MIKROTIK:** READ validated; EXECUTE deferred post-v1.
+- **PRODUCTION DEPLOYMENT:** not authorized by this checkpoint.
+- **NEXT:** P1 reproducibility/release — inspect existing test entrypoints and implement CI.
