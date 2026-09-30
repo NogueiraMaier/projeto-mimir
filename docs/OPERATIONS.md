@@ -348,3 +348,24 @@ segredos. Presença do plugin não comprova carregamento no gateway.
 Aplicação da 013, peer, backup/restauração, integração SQL real e laboratório SSH
 continuam dependentes de autorização e validação posteriores. Não usar o
 resultado dos mocks como evidência de implantação ou de compatibilidade real.
+
+## Validação de recuperação da memória v1
+
+O checkpoint `MIMIR-V1-P1-RESTORE-01` validou recuperação isolada do baseline
+de memória `1..12` por dois caminhos independentes.
+
+O custom-format dump pré-014 foi restaurado com sucesso após provisionamento
+explícito das roles cluster-global. O teste confirmou que `pg_dump` por banco
+não torna essas roles parte do archive; não usar `--no-owner` para mascarar
+essa dependência.
+
+A reconstrução independente pelo Git usando
+`memory_v1_canonical.sql` + migrations `002..012` produziu estrutura, owners,
+ACLs, roles, memberships e role settings equivalentes ao banco restaurado.
+
+Os LABs de restore foram removidos após coleta das evidências. O LAB 014
+separado permaneceu preservado e RUNNING em `55433`, com schema
+`1..12,14,15,16`.
+
+Produção permaneceu `1..12`, sem `mimir_ops`. Este resultado não constitui
+restore ou validação de produção.

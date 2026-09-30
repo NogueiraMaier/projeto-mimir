@@ -530,3 +530,22 @@ Evidência da rodada: [review/operations/2026-09-24.md](review/operations/2026-0
 - **FINAL VERSIONED WORKTREE:** clean.
 - **PRODUCTION VALIDATION:** not claimed.
 - **NEXT:** testar restauração a partir dos artefatos/versionamento disponíveis.
+
+## MIMIR-V1-P1-RESTORE-01
+
+- **STATUS:** PASS / CLOSED.
+- **VALIDATED/BASE HEAD:** `181a859e952a7111da2efe72b9a90d8678d1ef98`.
+- **RESTORE-A / CUSTOM DUMP:** PASS.
+- **DUMP SHA-256:** `82c9ecc10835f47555ee4770bb7f7533e14b32b6876b6bc3a0dcbb92ffd0e2f4`.
+- **GLOBAL ROLE DEPENDENCY:** confirmed and documented.
+- **RESTORE-B / GIT BOOTSTRAP + 002..012:** PASS.
+- **RESTORE-A x RESTORE-B:** equivalent.
+- **SCHEMA / OWNER / ACL:** PASS.
+- **SCHEMA VERSION SEMANTICS:** PASS.
+- **GLOBAL ROLES / MEMBERSHIP:** PASS.
+- **DATABASE ROLE SETTINGS:** PASS.
+- **RESTORE LAB CLEANUP:** PASS.
+- **PG14 LAB:** preserved, RUNNING on isolated port 55433, schema `1..12,14,15,16`.
+- **PRODUCTION:** unchanged at schema `1..12`, `mimir_ops=false`.
+- **PRODUCTION RESTORE:** not performed.
+- **NEXT:** criar checklist final de segurança.

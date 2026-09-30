@@ -115,7 +115,7 @@ A documentação do Maestro deve ser retomada somente após a estabilização do
 - [ ] Atualizar STATUS/ROADMAP/OPERATIONS/RUNBOOK conforme cada marco concluído.
 - [x] Adicionar CI para testes de memória, operações, validador, plugin e lint/syntax.
 - [x] Executar suíte completa em checkout limpo.
-- [ ] Testar restauração a partir dos artefatos/versionamento disponíveis.
+- [x] Testar restauração a partir dos artefatos/versionamento disponíveis.
 - [ ] Criar checklist final de segurança.
 - [ ] Revisar PR #1.
 - [ ] Retirar Draft somente após validação final.
@@ -125,18 +125,19 @@ A documentação do Maestro deve ser retomada somente após a estabilização do
 
 ## Checkpoint atual
 
-**MIMIR-V1-P1-CI-01 — VALIDADO em 2026-09-30.**
+**MIMIR-V1-P1-RESTORE-01 — VALIDADO em 2026-09-30.**
 
-- technical HEAD validado: `32fa5ad75faabc118d79bbc96faa9fcac82a67b5`;
-- workflow: `.github/workflows/repository-ci.yml`;
-- push run `36679922583`: PASS;
-- pull_request run `36679925906`: PASS;
-- Python repository tests: PASS;
-- Shell/Node repository checks: PASS;
-- plugin test/build/mutation guard: PASS;
+- validated/base HEAD: `181a859e952a7111da2efe72b9a90d8678d1ef98`;
+- custom-format dump restore: PASS;
+- Git bootstrap + migrations 002..012: PASS;
+- RESTORE-A x RESTORE-B equivalence: PASS;
+- schema/owners/ACLs/roles/memberships/settings: equivalent;
+- restore LAB cleanup: PASS;
+- produção permaneceu `1..12`, sem `mimir_ops`;
+- LAB 014 separado foi preservado e permanece RUNNING em `55433`;
 - nenhuma validação de produção é inferida desse resultado.
 
-**NEXT_ACTION atual:** executar a suíte completa em checkout limpo.
+**NEXT_ACTION atual:** criar checklist final de segurança.
 
 Os checkpoints históricos abaixo são preservados por rastreabilidade. Referências
 antigas a "Próxima atividade" não substituem o `NEXT_ACTION` mais recente de

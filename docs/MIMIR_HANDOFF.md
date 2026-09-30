@@ -2937,3 +2937,87 @@ Current state:
 NEXT_ACTION:
 
 `Testar restauração a partir dos artefatos/versionamento disponíveis.`
+
+## MIMIR-V1-P1-RESTORE-01
+
+Date: 2026-09-30
+
+Status: `PASS / CLOSED`
+
+Validated/base HEAD:
+
+`181a859e952a7111da2efe72b9a90d8678d1ef98`
+
+Evidence:
+
+- custom-format dump SHA-256 verified;
+- direct restore without cluster-global roles failed closed as expected;
+- missing `mimir_owner` and `mimir_reviewer` dependencies were preserved;
+- complete versioned role contract provisioned only in isolated LAB;
+- RESTORE-A custom dump: PASS;
+- RESTORE-B canonical Git bootstrap + migrations 002..012: PASS;
+- both ended at schema versions 1..12;
+- full schema / owner / ACL comparison: PASS;
+- schema-version semantics: PASS;
+- seeded data contract: PASS;
+- global role contract and membership: PASS;
+- database owner / role settings: PASS;
+- restore LAB cleanup: PASS.
+
+Failure/correction history:
+
+1. custom dump without global roles failed on `mimir_owner`;
+2. partial provisioning exposed missing `mimir_reviewer`;
+3. Git source guard under the wrong Linux identity was blocked by dubious
+   ownership; Git was rerun as `jarvisdev`, without `safe.directory`;
+4. `psql -f` under postgres could not traverse the protected checkout;
+   permissions were not widened and SQL was supplied through stdin instead.
+
+Preserved separate LAB:
+
+- `/var/tmp/mimir-pg14-lab`;
+- port 55433;
+- state: RUNNING;
+- schema versions: `1..12,14,15,16`;
+- not modified by RESTORE-01.
+
+Production final guard:
+
+- schema versions: `1..12`;
+- `mimir_ops=false`;
+- no restore, migration or deployment performed.
+
+NEXT_ACTION:
+
+Create the final v1 security checklist.
+
+
+## MIMIR-V1-CONTINUITY-2026-09-30-04
+
+Status: `READY_FOR_CONTINUATION`
+
+Branch:
+
+`feat/mimir-operational-foundation`
+
+Validated/base HEAD:
+
+`181a859e952a7111da2efe72b9a90d8678d1ef98`
+
+Current state:
+
+- P1 permanent memory: LAB complete;
+- P1 operational scope: complete/frozen;
+- repository CI: PASS;
+- clean-checkout full suite: PASS;
+- artifact/version restore validation: PASS;
+- RESTORE-A and RESTORE-B disposable LABs: cleaned up;
+- separate PG14 LAB: preserved and RUNNING at schema `1..12,14,15,16`;
+- production: unchanged at `1..12`, without `mimir_ops`;
+- PR #1 remains Draft;
+- production migrations 014/015/016 remain undeployed;
+- no merge, Draft removal, production deployment or stable tag is authorized.
+
+NEXT_ACTION:
+
+`Criar checklist final de segurança da v1.`

@@ -199,3 +199,29 @@ Nenhuma migration pode ser aplicada a um ambiente persistente antes de
 existir como arquivo versionado no repositório.
 
 Recuperação histórica: [migrations 009–012](recovery/MEMORY_MIGRATIONS_009_012_RECOVERY.md).
+
+## Recuperação da memória v1
+
+A recuperação validada do baseline `1..12` possui dois caminhos:
+
+1. custom-format dump PostgreSQL, desde que as roles cluster-global necessárias
+   sejam previamente provisionadas com o contrato versionado;
+2. reconstrução pelo Git usando `memory_v1_canonical.sql` e migrations
+   `002..012`.
+
+Antes de qualquer restore:
+
+- usar cluster PostgreSQL descartável e porta diferente de 5432;
+- confirmar `data_directory` antes de executar SQL;
+- manter produção somente leitura;
+- validar o SHA-256 do dump quando houver;
+- não usar `--no-owner` para ocultar ausência de roles;
+- executar Git pela identidade proprietária do checkout;
+- não relaxar permissões do checkout para `postgres`; quando necessário,
+  fornecer SQL ao `psql` via stdin;
+- comparar versões, schema, owners, ACLs, roles e memberships;
+- remover apenas os LABs criados especificamente para o restore após preservar
+  as evidências.
+
+O checkpoint `MIMIR-V1-P1-RESTORE-01` validou equivalência entre dump e
+reconstrução Git. Ele não autoriza restore de produção.

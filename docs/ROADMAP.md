@@ -37,7 +37,13 @@ plugin sem declarar validação de produção.
 A suíte completa foi executada com PASS em checkout novo criado diretamente
 da branch remota no HEAD `fd8e6d9a7a7dd9e9d5a8be7fb6d7ad289fc88644`.
 
-A próxima etapa é testar restauração a partir dos artefatos/versionamento disponíveis.
+A restauração do baseline de memória v1 `1..12` foi validada por dois
+caminhos independentes: custom-format dump PostgreSQL e reconstrução pelo Git
+com bootstrap canônico + migrations 002..012. Estrutura, owners, ACLs, roles,
+memberships e configurações por banco foram equivalentes. Produção permaneceu
+inalterada.
+
+A próxima etapa é criar o checklist final de segurança da v1.
 
 ## Gate de segurança conversacional
 
@@ -100,7 +106,7 @@ Estado P1 validado em 2026-09-29:
 - Agente auditor de memória
 - Controle de proveniência
 - Política de expiração e substituição
-- Backup e restauração testados
+- Backup completo de produção e recuperação com dados reais
 - Agente desenvolvedor isolado
 - Observabilidade com Grafana e Zabbix
 - Navegador e OSINT isolados
