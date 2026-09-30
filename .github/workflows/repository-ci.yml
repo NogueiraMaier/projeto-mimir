@@ -73,13 +73,21 @@ jobs:
             -p 'test_*.py' \
             -v
 
-      - name: Validator unit tests
+      - name: Validator repository tests
         shell: bash
+        working-directory: tools/validation
         run: |
-          python -B -m unittest discover \
-            -s tools/validation \
-            -p 'test_*.py' \
-            -v
+          python -B -m unittest -v \
+            test_validate_vps_readonly.ValidatorTests.test_syntax \
+            test_validate_vps_readonly.ValidatorTests.test_help_and_rejected_arguments_do_not_probe \
+            test_validate_vps_readonly.ValidatorTests.test_plugin_build_artifact_and_structure \
+            test_validate_vps_readonly.ValidatorTests.test_schema_history_with_simulated_privileges \
+            test_validate_vps_readonly.ValidatorTests.test_no_deployment_mutations
+
+      # test_local_inspection_explicitly_skips_database_and_hides_environment
+      # is intentionally host-specific. validate-vps-readonly.sh sanitizes PATH
+      # to the Gentoo/VPS system paths and must not be made to impersonate that
+      # environment on a generic GitHub Ubuntu runner.
 
   repository-syntax:
     name: Shell and Node repository checks
@@ -150,6 +158,7 @@ jobs:
             --no-fund \
             --no-package-lock \
             --no-save \
+            --legacy-peer-deps \
             openclaw@2026.9.5 \
             typebox@1.1.38 \
             typescript@5.9.0 \
