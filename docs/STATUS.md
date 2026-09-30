@@ -450,3 +450,26 @@ Evidência da rodada: [review/operations/2026-09-24.md](review/operations/2026-0
 - **FINAL LAB RC:** 0.
 - **PQ KEX WARNING:** observed; separate hardening.
 - **NEXT:** generic-linux transient set-hostname LAB.
+
+
+## MIMIR-V1-P1-GENERIC-LINUX-TRANSIENT-HOSTNAME-01
+
+- **STATUS:** PASS / CLOSED.
+- **ADAPTER:** `generic-linux`.
+- **REAL SSHExecutor:** PASS.
+- **UTS ISOLATION:** PASS.
+- **PRECHECK / SNAPSHOT / BACKUP:** PASS.
+- **EXECUTE WITHOUT ChangePermit:** blocked.
+- **INVALID HOSTNAME:** blocked.
+- **CONTROLLED EXECUTE:** PASS.
+- **POST-CHANGE VALIDATION:** PASS.
+- **MANUAL RESTORE:** PASS.
+- **FINAL VALIDATION:** PASS.
+- **CONTROLLED SSHD TEARDOWN:** PASS after corrective commit `ce416a9`.
+- **REAL VPS HOSTNAME UNCHANGED:** PASS.
+- **PRODUCTION DB TOUCHED:** false.
+- **EXTERNAL EQUIPMENT TOUCHED:** false.
+- **AUTOMATIC ROLLBACK:** false.
+- **SYNTHETIC RESIDUE:** 0.
+- **FINAL LAB RC:** 0.
+- **EVIDENCE DIGEST:** `8d025d5cfe6729910f1c43d29e19833a09b4fcca04c32c2f65b1e2a7af4dce5c`.

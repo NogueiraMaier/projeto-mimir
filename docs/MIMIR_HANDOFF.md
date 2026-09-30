@@ -2584,3 +2584,56 @@ Absence of post-quantum KEX was observed and remains a separate hardening item.
 NEXT_ACTION:
 
 Validate transient `set-hostname` for `generic-linux` in an isolated laboratory.
+
+
+## MIMIR-V1-P1-GENERIC-LINUX-TRANSIENT-HOSTNAME-01
+
+Date: 2026-09-29
+
+Status: `PASS`
+
+Technical commits:
+
+- `2d7e13fc346a454469908613aa75666ab3168811`
+  — `test(ops): validate transient generic linux hostname`;
+- `ce416a9447f36156a5ca110df33ecbd262206137`
+  — `fix(ops): bound transient lab sshd teardown`.
+
+Final retry:
+
+- real `SSHExecutor`: PASS;
+- UTS namespace: PASS;
+- PRECHECK / SNAPSHOT / BACKUP: PASS;
+- EXECUTE without `ChangePermit`: BLOCKED;
+- invalid hostname: BLOCKED;
+- controlled EXECUTE: PASS;
+- post-change validation: PASS;
+- manual restore: PASS;
+- final validation: PASS;
+- controlled sshd teardown: PASS;
+- real VPS hostname unchanged: PASS;
+- production database touched: false;
+- external equipment touched: false;
+- automatic rollback: false;
+- synthetic residue: 0;
+- final LAB RC: 0.
+
+Evidence digest:
+
+`8d025d5cfe6729910f1c43d29e19833a09b4fcca04c32c2f65b1e2a7af4dce5c`
+
+Failure/correction chronology:
+
+1. First run passed change, validation and manual restore.
+2. Teardown blocked because the tracked PID belonged to the `unshare` wrapper,
+   not the actual `sshd` child.
+3. The ephemeral sshd was terminated through a controlled second session.
+4. The real VPS hostname remained unchanged.
+5. Commit `ce416a9` corrected child-PID tracking and bounded teardown.
+6. The complete LAB was repeated from a clean state.
+7. Retry completed with RC 0, no manual intervention and zero residue.
+
+NEXT_ACTION:
+
+Do not expand adapters yet. Decide separately whether MikroTik EXECUTE,
+FiberHome, H3C, Intelbras and other adapters belong to v1 or post-v1.

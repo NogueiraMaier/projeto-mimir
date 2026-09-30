@@ -11,7 +11,7 @@ migrations 002–008 e não concede ferramentas de execução ao agente OpenClaw
 | CMDB, API PostgreSQL e CLI | IMPLEMENTADO; validação Python e transporte PostgreSQL testados com mocks. SQL não aplicado nesta revisão. |
 | READ / PLAN / EXECUTE | IMPLEMENTADO por catálogo explícito de operações e parâmetros. |
 | SSH | IMPLEMENTADO e VALIDADO em equipamento real em READ: chave pública, `StrictHostKeyChecking=yes`, known_hosts explícito e `SSHExecutor` controlado. |
-| generic-linux | Diagnóstico e `set-hostname` do hostname **em execução**, sem persistência após reboot. Comando `/bin/hostname`; disponibilidade e privilégio precisam ser validados em laboratório. |
+| generic-linux | Diagnóstico e `set-hostname` transitório VALIDADO em LAB UTS pelo `SSHExecutor` real; alteração, validação e restauração manual passaram. Não implica persistência após reboot nem autorização para produção. |
 | mikrotik-routeros | Diagnóstico READ VALIDADO em equipamento real pelo `SSHExecutor`: 6/6 operações catalogadas. EXECUTE, export, backup-save e alterações permanecem bloqueados. |
 | Snapshot e backup de hostname | IMPLEMENTADO e VALIDADO EM LAB UTS: captura real de `/bin/hostname`, alteração transitória, restauração do valor capturado e validação final; não é backup completo do Linux. |
 | Rollback | PARCIAL: somente procedimento manual, nunca executado automaticamente. |
