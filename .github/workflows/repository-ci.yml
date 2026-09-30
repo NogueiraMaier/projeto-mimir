@@ -161,7 +161,7 @@ jobs:
             --legacy-peer-deps \
             openclaw@2026.9.5 \
             typebox@1.1.38 \
-            typescript@5.9.0 \
+            typescript@5.9.3 \
             vitest@4.1.9 \
             @types/node@24.13.3 \
             undici-types@7.18.2
