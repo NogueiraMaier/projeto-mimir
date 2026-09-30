@@ -44,8 +44,8 @@ Não converter documentação proposta em controle implementado.
 - [x] RESTORE-A x RESTORE-B estruturalmente equivalentes.
   Estado: `PASS`.
 
-- [ ] Confirmar novamente branch/HEAD/worktree antes da decisão final.
-  Estado: `PENDING`.
+- [x] Confirmar novamente branch/HEAD/worktree antes da decisão final.
+  Estado: `PASS`.
 
 ## 2. PostgreSQL e memória permanente
 
@@ -138,9 +138,11 @@ produção.
 - [x] Histórico failed/interrupted deve ser preservado.
   Estado: `PASS`.
 
-- [ ] Executar verificação final do conteúdo versionado para padrões óbvios de
+- [x] Executar verificação final do conteúdo versionado para padrões óbvios de
   segredo antes do fechamento.
-  Estado: `PENDING`.
+  Estado: `PASS`.
+  Evidência: 142 arquivos versionados; nenhum achado real; 1 fixture
+  sintético conhecido validado por caminho e conteúdo.
 
 A redaction atual é heurística e não deve ser descrita como DLP geral.
 
@@ -154,9 +156,11 @@ A redaction atual é heurística e não deve ser descrita como DLP geral.
   Estado: `PASS`.
   Limite: sustentado pela evidência versionada do marco correspondente.
 
-- [ ] Revalidar de forma read-only o baseline atual do VPS antes da decisão
+- [x] Revalidar de forma read-only o baseline atual do VPS antes da decisão
   final de release.
-  Estado: `PENDING`.
+  Estado: `PASS`.
+  Evidência: validator RC 0; PostgreSQL administrativo com
+  `transaction_read_only=on`, versões 1..12 e `mimir_ops=false`.
 
 - [x] WhatsApp permanece fora do runtime v1 atual.
   Estado: `DEFERRED`.
@@ -313,7 +317,7 @@ Para marcar este checklist `PASS / CLOSED`, executar no mínimo:
 
 `SECURITY_CHECKLIST_CREATED`
 
-`FINAL_SECURITY_DECISION = PENDING`
+`FINAL_SECURITY_DECISION = BLOCKED_FOR_RELEASE`
 
 Não autorizado por este documento:
 
@@ -346,3 +350,41 @@ O shell interativo continuou após os guards falharem e criou o commit
 
 A correção mantém o secret scan fail-closed e permite somente esse fixture
 sintético conhecido, por caminho e conteúdo exatos.
+
+## Validação final de 2026-09-30
+
+Validated technical HEAD antes desta atualização:
+
+`cbc90513ee4d1a0978e079bc7d012bafbf77c574`
+
+Resultados:
+
+- classification guard: PASS;
+- secret scan: PASS;
+- synthetic private-key fixture: exatamente 1, conhecido e controlado;
+- VPS/host read-only validator: RC 0;
+- PostgreSQL production transaction: read-only;
+- production schema: `1..12`;
+- production 14/15/16: false;
+- production `mimir_ops`: false;
+- `pgcrypto`: true;
+- `vector`: true;
+- `mimir_app` direct session source SELECT: false;
+- `mimir_app` legacy ingest EXECUTE: true.
+
+Reconciliação formal:
+
+`docs/review/security/2026-09-30-v1-security-reconciliation.md`
+
+Resultado do gate:
+
+`REVIEWED / BLOCKED_FOR_RELEASE`
+
+PR #1 pode ser revisado enquanto permanece Draft.
+
+Continuam bloqueados:
+
+- Draft removal;
+- merge;
+- stable tag;
+- production deployment.

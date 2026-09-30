@@ -152,3 +152,19 @@ histórica da migration 001 ou por um bootstrap canônico equivalente sustentado
 por evidência. Depois corrigir metadata drift do plugin e definir
 `plugins.allow` explicitamente. A documentação do Maestro deve ser retomada
 depois da estabilização dos marcos P0/P1 do Mímir.
+
+## Gate final de segurança v1 — 2026-09-30
+
+O checklist final de segurança foi criado e revisado.
+
+Resultado:
+
+`REVIEWED / BLOCKED_FOR_RELEASE`
+
+A revisão técnica do PR pode continuar mantendo Draft. Remoção de Draft,
+merge, tag estável e deployment permanecem bloqueados enquanto os blockers
+documentados na reconciliação final estiverem abertos.
+
+Próxima etapa:
+
+revisar PR #1 mantendo Draft.

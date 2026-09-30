@@ -116,7 +116,7 @@ A documentação do Maestro deve ser retomada somente após a estabilização do
 - [x] Adicionar CI para testes de memória, operações, validador, plugin e lint/syntax.
 - [x] Executar suíte completa em checkout limpo.
 - [x] Testar restauração a partir dos artefatos/versionamento disponíveis.
-- [ ] Criar checklist final de segurança.
+- [x] Criar checklist final de segurança.
 - [ ] Revisar PR #1.
 - [ ] Retirar Draft somente após validação final.
 - [ ] Merge somente com autorização explícita.
@@ -137,7 +137,7 @@ A documentação do Maestro deve ser retomada somente após a estabilização do
 - LAB 014 separado foi preservado e permanece RUNNING em `55433`;
 - nenhuma validação de produção é inferida desse resultado.
 
-**NEXT_ACTION atual:** criar checklist final de segurança.
+**NEXT_ACTION atual:** revisar PR #1 mantendo-o Draft; blockers de release permanecem abertos.
 
 Os checkpoints históricos abaixo são preservados por rastreabilidade. Referências
 antigas a "Próxima atividade" não substituem o `NEXT_ACTION` mais recente de

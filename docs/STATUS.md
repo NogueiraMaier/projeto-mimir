@@ -549,3 +549,20 @@ Evidência da rodada: [review/operations/2026-09-24.md](review/operations/2026-0
 - **PRODUCTION:** unchanged at schema `1..12`, `mimir_ops=false`.
 - **PRODUCTION RESTORE:** not performed.
 - **NEXT:** criar checklist final de segurança.
+
+## MIMIR-V1-P1-SECURITY-CHECKLIST-01
+
+- **STATUS:** REVIEWED / BLOCKED_FOR_RELEASE.
+- **BASE VALIDADA:** `cbc90513ee4d1a0978e079bc7d012bafbf77c574`.
+- **CLASSIFICATION GUARD:** PASS.
+- **SECRET SCAN:** PASS.
+- **HOST/VPS READ-ONLY VALIDATOR:** RC 0.
+- **PRODUCTION:** `1..12`, 14/15/16 ausentes, `mimir_ops=false`.
+- **RSK-P0-001:** tratado tecnicamente por evidência posterior.
+- **RSK-P0-002:** incerteza histórica preservada; não usada como evidência.
+- **RSK-P0-003:** OPEN / BLOCKER.
+- **RSK-P0-004:** PARTIALLY_TREATED / BLOCKER para release produtiva.
+- **RSK-P0-005:** OPEN / BLOCKER.
+- **PR REVIEW:** permitido mantendo Draft.
+- **DRAFT REMOVAL / MERGE / TAG / DEPLOY:** bloqueados.
+- **NEXT:** revisar PR #1 mantendo Draft.

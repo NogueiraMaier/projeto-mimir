@@ -3021,3 +3021,70 @@ Current state:
 NEXT_ACTION:
 
 `Criar checklist final de segurança da v1.`
+
+## MIMIR-V1-P1-SECURITY-CHECKLIST-01
+
+Date: 2026-09-30
+
+Status:
+
+`REVIEWED / BLOCKED_FOR_RELEASE`
+
+Validated technical HEAD:
+
+`cbc90513ee4d1a0978e079bc7d012bafbf77c574`
+
+Final technical gates:
+
+- checklist classification guard: PASS;
+- repository secret scan: PASS;
+- known synthetic redaction fixture: isolated/allowed exactly;
+- final host read-only validator: RC 0;
+- PostgreSQL production inspection: read-only;
+- production versions: 1..12;
+- production versions 14/15/16: absent;
+- production `mimir_ops`: absent.
+
+Risk reconciliation:
+
+- RSK-P0-001: technically treated by later reproducibility/restore evidence;
+- RSK-P0-002: historical uncertainty preserved and not relied upon;
+- RSK-P0-003: OPEN / BLOCKER;
+- RSK-P0-004: PARTIALLY_TREATED / production-release blocker;
+- RSK-P0-005: OPEN / BLOCKER.
+
+No risk acceptance was inferred or recorded.
+
+Allowed next activity:
+
+Review PR #1 while it remains Draft.
+
+Still prohibited:
+
+- Draft removal;
+- merge;
+- stable tag;
+- production deployment;
+- production migrations 014/015/016;
+- production `mimir_ops`.
+
+## MIMIR-V1-CONTINUITY-2026-09-30-05
+
+Status:
+
+`READY_FOR_CONTINUATION_WITH_RELEASE_BLOCKERS`
+
+Branch:
+
+`feat/mimir-operational-foundation`
+
+Current local validated chain includes:
+
+- `70a8819` — initial checklist candidate, NOT_VALIDATED;
+- `cbc9051` — corrected checklist validation gates, validated locally.
+
+Release blockers remain explicitly open.
+
+NEXT_ACTION:
+
+`Revisar PR #1 mantendo Draft.`
