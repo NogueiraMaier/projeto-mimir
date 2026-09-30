@@ -256,7 +256,7 @@ observado.
 
 Estado:
 
-`BLOCKER_GOVERNANCE_REVIEW`
+`BLOCKER`
 
 Nenhuma conclusão jurídica é produzida por este checklist.
 
@@ -277,7 +277,7 @@ resposta a incidentes e exercício correspondente não estão comprovados.
 
 Estado:
 
-`BLOCKER_GOVERNANCE_REVIEW`
+`BLOCKER`
 
 ## 9. Restrições obrigatórias da v1
 
@@ -321,3 +321,28 @@ Não autorizado por este documento:
 - Draft removal;
 - merge;
 - stable tag.
+
+## Histórico de validação do checklist
+
+### Candidato `70a8819`
+
+Resultado:
+
+`NOT_VALIDATED`
+
+A primeira validação após a criação do checklist encontrou dois problemas:
+
+1. `classification_guard` recusou o estado não canônico
+   `BLOCKER`;
+2. o secret scan sinalizou `tools/ops/test_mimir_ops.py` porque o teste de
+   redaction contém deliberadamente o fixture sintético
+   `fixture sintético de cabeçalho OpenSSH private-key com conteúdo fictício`.
+
+O segundo achado é um fixture sintético usado para testar redaction e não uma
+chave privada real.
+
+O shell interativo continuou após os guards falharem e criou o commit
+`70a8819`. Esse commit fica preservado como candidato não validado.
+
+A correção mantém o secret scan fail-closed e permite somente esse fixture
+sintético conhecido, por caminho e conteúdo exatos.
