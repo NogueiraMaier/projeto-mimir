@@ -495,3 +495,19 @@ Evidência da rodada: [review/operations/2026-09-24.md](review/operations/2026-0
 - **MIKROTIK:** READ validated; EXECUTE deferred post-v1.
 - **PRODUCTION DEPLOYMENT:** not authorized by this checkpoint.
 - **NEXT:** P1 reproducibility/release — inspect existing test entrypoints and implement CI.
+
+
+## MIMIR-V1-P1-CI-01
+
+- **STATUS:** PASS / CLOSED.
+- **VALIDATED TECHNICAL HEAD:** `32fa5ad75faabc118d79bbc96faa9fcac82a67b5`.
+- **WORKFLOW:** `.github/workflows/repository-ci.yml`.
+- **PUSH RUN:** `36679922583` — PASS.
+- **PULL_REQUEST RUN:** `36679925906` — PASS.
+- **PYTHON REPOSITORY TESTS:** PASS.
+- **SHELL/NODE REPOSITORY CHECKS:** PASS.
+- **PLUGIN TEST/BUILD:** PASS.
+- **REPOSITORY MUTATION GUARD:** PASS.
+- **PRODUCTION VALIDATION:** not claimed.
+- **FAILURE HISTORY:** preserved in GitHub Actions and handoff.
+- **NEXT:** execute complete suite in a clean checkout.

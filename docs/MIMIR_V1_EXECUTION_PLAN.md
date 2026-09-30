@@ -113,7 +113,7 @@ A documentação do Maestro deve ser retomada somente após a estabilização do
 ### P1 — Reprodutibilidade e release
 
 - [ ] Atualizar STATUS/ROADMAP/OPERATIONS/RUNBOOK conforme cada marco concluído.
-- [ ] Adicionar CI para testes de memória, operações, validador, plugin e lint/syntax.
+- [x] Adicionar CI para testes de memória, operações, validador, plugin e lint/syntax.
 - [ ] Executar suíte completa em checkout limpo.
 - [ ] Testar restauração a partir dos artefatos/versionamento disponíveis.
 - [ ] Criar checklist final de segurança.
@@ -124,6 +124,24 @@ A documentação do Maestro deve ser retomada somente após a estabilização do
 - [ ] Retomar e concluir a documentação do Maestro usando o estado final validado do Mímir.
 
 ## Checkpoint atual
+
+**MIMIR-V1-P1-CI-01 — VALIDADO em 2026-09-30.**
+
+- technical HEAD validado: `32fa5ad75faabc118d79bbc96faa9fcac82a67b5`;
+- workflow: `.github/workflows/repository-ci.yml`;
+- push run `36679922583`: PASS;
+- pull_request run `36679925906`: PASS;
+- Python repository tests: PASS;
+- Shell/Node repository checks: PASS;
+- plugin test/build/mutation guard: PASS;
+- nenhuma validação de produção é inferida desse resultado.
+
+**NEXT_ACTION atual:** executar a suíte completa em checkout limpo.
+
+Os checkpoints históricos abaixo são preservados por rastreabilidade. Referências
+antigas a "Próxima atividade" não substituem o `NEXT_ACTION` mais recente de
+`docs/MIMIR_HANDOFF.md`.
+
 
 **Checkpoint MIMIR-V1-TELEGRAM-01 — concluído.**
 

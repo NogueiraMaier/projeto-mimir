@@ -306,6 +306,29 @@ O plugin usa dependências instaladas localmente ou em `/opt/openclaw`, sem baix
 pacotes pelos scripts de teste/build. Testes operacionais usam dublês de SSH e
 PostgreSQL; testes de subprocesso usam somente Python local e dados sintéticos.
 
+
+### CI repository-only
+
+O workflow `.github/workflows/repository-ci.yml` foi validado no technical HEAD
+`32fa5ad75faabc118d79bbc96faa9fcac82a67b5`.
+
+Validação final:
+
+- push run `36679922583`: PASS;
+- pull_request run `36679925906`: PASS;
+- Python repository tests: PASS;
+- Shell/Node repository checks: PASS;
+- plugin dependency install/test/build: PASS;
+- repository mutation guard: PASS.
+
+O teste
+`test_local_inspection_explicitly_skips_database_and_hides_environment`
+permanece específico do host Gentoo/VPS e não é executado como se o runner
+Ubuntu fosse esse ambiente.
+
+Esse CI valida o repositório. Não comprova PostgreSQL de produção, runtime
+OpenClaw real, serviço OpenRC, equipamento externo ou deployment.
+
 Posteriormente, **no VPS**, a primeira ação deve ser somente leitura:
 
 ```bash

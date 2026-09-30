@@ -68,6 +68,28 @@ Comparar os hashes local e remoto:
     test "$local_commit" = "$remote_commit"
 
 
+## CI do repositório
+
+Workflow canônico:
+
+`.github/workflows/repository-ci.yml`
+
+Antes de fechar um marco de CI, exigir PASS do workflow no commit técnico
+correspondente. Para branches com PR aberta, conferir tanto o evento `push`
+quanto o evento `pull_request`.
+
+Jobs esperados:
+
+- Python repository tests;
+- Shell and Node repository checks;
+- Mimir memory plugin.
+
+O CI repository-only não substitui validação específica do VPS/Gentoo,
+PostgreSQL persistente, OpenRC, runtime OpenClaw ou equipamento externo.
+
+Falha de CI deve preservar evidência, ser corrigida em novo commit e ser
+retestada antes de atualizar o milestone para PASS.
+
 ## Validar ingestão protegida
 
 Produção permanece em `schema_version 1..12`; a migration 014 e o writer v2

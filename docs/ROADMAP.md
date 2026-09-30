@@ -29,7 +29,12 @@ O escopo operacional da v1 fica congelado em `generic-linux` EXECUTE restrito
 e MikroTik em READ. MikroTik EXECUTE, FiberHome, H3C, Intelbras e novos adapters
 multi-vendor passam para pós-v1.
 
-A próxima workstream da v1 é P1 — Reprodutibilidade e release.
+A workstream P1 — Reprodutibilidade e release já possui CI repository-only
+validado em push e pull request no GitHub Actions. O workflow cobre testes
+Python de memória/operações/validador, sintaxe Shell/Node e teste/build do
+plugin sem declarar validação de produção.
+
+A próxima etapa é executar a suíte completa em checkout limpo.
 
 ## Gate de segurança conversacional
 

@@ -2770,3 +2770,93 @@ Before implementation:
    continuity checkpoint.
 
 Do not start adapter expansion as part of this workstream.
+
+
+## MIMIR-V1-P1-CI-01
+
+Date: 2026-09-30
+
+Status: `PASS`
+
+Validated technical HEAD:
+
+`32fa5ad75faabc118d79bbc96faa9fcac82a67b5`
+— `fix(ci): use published typescript version`
+
+Workflow:
+
+`.github/workflows/repository-ci.yml`
+
+Final GitHub Actions evidence:
+
+- push run `36679922583`: PASS;
+- pull_request run `36679925906`: PASS;
+- Python repository tests: PASS;
+- Shell and Node repository checks: PASS;
+- Mimir memory plugin: PASS;
+- plugin dependency install: PASS;
+- plugin tests: PASS;
+- plugin build: PASS;
+- repository mutation guard: PASS.
+
+Failure/correction chronology:
+
+1. Commit `8211ebf` introduced the first repository CI.
+2. Run `36678758326` failed:
+   - generic Ubuntu runner executed a host-specific Gentoo/VPS validator case;
+   - plugin dependency installation failed in npm peer resolution.
+3. Commit `5e23e3c` isolated the host-specific validator case and adjusted npm
+   peer handling.
+4. Runs `36679449947` and `36679454330` confirmed Python and Shell/Node PASS,
+   but plugin install failed because `typescript@5.9.0` was not published.
+5. Registry precheck confirmed `typescript@5.9.3` and the other pinned package
+   versions.
+6. Commit `32fa5ad` changed only the CI TypeScript pin to `5.9.3`.
+7. Final push and pull_request runs completed successfully.
+
+Validation boundary:
+
+- this proves repository CI behavior only;
+- it does not validate production PostgreSQL;
+- it does not validate OpenClaw production runtime;
+- it does not validate OpenRC service state;
+- it does not validate external equipment;
+- no deployment, migration, service restart or equipment change occurred.
+
+NEXT_ACTION:
+
+Execute the complete v1 repository suite from a fresh clean checkout of
+`feat/mimir-operational-foundation`.
+
+The clean-checkout validation must start from the remote branch, preserve the
+current production runtime, and produce a separate checkpoint before moving to
+artifact/version restoration testing.
+
+
+## MIMIR-V1-CONTINUITY-2026-09-30-02
+
+Status: `READY_FOR_CONTINUATION`
+
+Branch:
+
+`feat/mimir-operational-foundation`
+
+Validated/base HEAD:
+
+`32fa5ad75faabc118d79bbc96faa9fcac82a67b5`
+
+Current state:
+
+- P1 permanent memory: LAB complete;
+- P1 operational layer: v1 scope frozen/complete;
+- repository CI: VALIDATED on push and pull_request;
+- PR #1 remains Draft;
+- production migrations 014/015/016 remain undeployed;
+- no merge, Draft removal, production deploy or stable tag is authorized.
+
+NEXT_ACTION:
+
+`Executar suíte completa em checkout limpo.`
+
+Do not begin restoration testing until the clean-checkout suite has its own
+PASS/FAIL evidence and continuity checkpoint.
