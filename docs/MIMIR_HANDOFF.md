@@ -2637,3 +2637,34 @@ NEXT_ACTION:
 
 Do not expand adapters yet. Decide separately whether MikroTik EXECUTE,
 FiberHome, H3C, Intelbras and other adapters belong to v1 or post-v1.
+
+
+## MIMIR-V1-P1-OPS-SCOPE-FREEZE-01
+
+Date: 2026-09-29
+
+Status: `PASS`
+
+Decision:
+
+The operational scope of v1 is frozen with:
+
+- `generic-linux` EXECUTE restricted to the catalogued and approved path;
+- MikroTik validated and retained in READ;
+- explicit catalog, `ChangePermit`, audit and manual recovery controls retained.
+
+Deferred to post-v1:
+
+- MikroTik EXECUTE;
+- FiberHome adapters;
+- H3C adapters;
+- Intelbras adapters;
+- additional multi-vendor EXECUTE capabilities.
+
+This is a scope decision only. No equipment, PostgreSQL schema, service or
+production runtime was changed.
+
+NEXT_ACTION:
+
+Start P1 reproducibility/release. First implementation target: CI for memory,
+operations, validators, plugin build/test and syntax/lint checks.

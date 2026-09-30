@@ -473,3 +473,13 @@ Evidência da rodada: [review/operations/2026-09-24.md](review/operations/2026-0
 - **SYNTHETIC RESIDUE:** 0.
 - **FINAL LAB RC:** 0.
 - **EVIDENCE DIGEST:** `8d025d5cfe6729910f1c43d29e19833a09b4fcca04c32c2f65b1e2a7af4dce5c`.
+
+
+## MIMIR-V1-P1-OPS-SCOPE-FREEZE-01
+
+- **STATUS:** PASS / DECIDED.
+- **V1 GENERIC-LINUX:** EXECUTE restrito e homologado em LAB.
+- **V1 MIKROTIK:** READ homologado; EXECUTE permanece bloqueado.
+- **POST-V1:** MikroTik EXECUTE, FiberHome, H3C, Intelbras e novos adapters.
+- **PRODUCTION CHANGE:** none.
+- **NEXT:** P1 — Reprodutibilidade e release.

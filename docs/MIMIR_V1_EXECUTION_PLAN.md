@@ -108,7 +108,7 @@ A documentação do Maestro deve ser retomada somente após a estabilização do
 - [x] Homologar primeiro equipamento de laboratório em READ.
 - [x] Homologar `set-hostname` transitório no adapter generic-linux em laboratório.
 - [x] Manter MikroTik inicialmente em diagnóstico/READ.
-- [ ] Só depois ampliar adapters para MikroTik EXECUTE, FiberHome, H3C, Intelbras e outros.
+- [x] Delimitar a v1: MikroTik permanece READ e `generic-linux` EXECUTE restrito; MikroTik EXECUTE, FiberHome, H3C, Intelbras e outros ficam para pós-v1.
 
 ### P1 — Reprodutibilidade e release
 

@@ -20,8 +20,16 @@ alterada. A host key inicialmente pinada por TOFU foi posteriormente conferida
 por segundo canal administrativo através da chave pública exportada pelo
 RouterOS.
 
-A próxima lacuna P1 é homologar `set-hostname` transitório no adapter
-`generic-linux` em laboratório isolado, sem alterar host de produção.
+O `set-hostname` transitório do adapter `generic-linux` foi homologado em
+laboratório UTS isolado com `SSHExecutor` real. A alteração controlada,
+validação, restauração manual e teardown final passaram sem alterar o hostname
+real da VPS.
+
+O escopo operacional da v1 fica congelado em `generic-linux` EXECUTE restrito
+e MikroTik em READ. MikroTik EXECUTE, FiberHome, H3C, Intelbras e novos adapters
+multi-vendor passam para pós-v1.
+
+A próxima workstream da v1 é P1 — Reprodutibilidade e release.
 
 ## Gate de segurança conversacional
 
@@ -74,7 +82,10 @@ Estado P1 validado em 2026-09-29:
 - adapter `mikrotik-routeros` real: 6/6 operações READ concluídas;
 - host key: pinada e verificada por segundo canal administrativo;
 - MikroTik EXECUTE/configuração: não autorizado e não realizado;
-- próxima etapa P1: homologar `set-hostname` transitório no adapter `generic-linux` em laboratório.
+- `generic-linux` `set-hostname` transitório: concluído em LAB UTS;
+- escopo operacional da v1: congelado;
+- expansão multi-vendor e MikroTik EXECUTE: pós-v1;
+- próxima etapa: P1 — Reprodutibilidade e release.
 
 ## Etapas posteriores
 
