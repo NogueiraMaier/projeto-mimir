@@ -511,3 +511,22 @@ Evidência da rodada: [review/operations/2026-09-24.md](review/operations/2026-0
 - **PRODUCTION VALIDATION:** not claimed.
 - **FAILURE HISTORY:** preserved in GitHub Actions and handoff.
 - **NEXT:** execute complete suite in a clean checkout.
+
+
+## MIMIR-V1-P1-CLEAN-CHECKOUT-01
+
+- **STATUS:** PASS / CLOSED.
+- **VALIDATED HEAD:** `fd8e6d9a7a7dd9e9d5a8be7fb6d7ad289fc88644`.
+- **SOURCE:** fresh clone da branch remota.
+- **BASELINE CLEAN:** PASS.
+- **PYTHON SYNTAX:** 23 files PASS.
+- **MEMORY REPOSITORY TESTS:** 44 PASS.
+- **OPS TESTS:** 55 PASS.
+- **VALIDATOR TESTS:** 6 PASS.
+- **SHELL/NODE SYNTAX:** PASS.
+- **CLASSIFIER SELF-TEST:** PASS.
+- **PLUGIN TESTS:** 9 PASS.
+- **PLUGIN BUILD:** PASS.
+- **FINAL VERSIONED WORKTREE:** clean.
+- **PRODUCTION VALIDATION:** not claimed.
+- **NEXT:** testar restauração a partir dos artefatos/versionamento disponíveis.

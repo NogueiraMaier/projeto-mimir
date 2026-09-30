@@ -114,7 +114,7 @@ A documentação do Maestro deve ser retomada somente após a estabilização do
 
 - [ ] Atualizar STATUS/ROADMAP/OPERATIONS/RUNBOOK conforme cada marco concluído.
 - [x] Adicionar CI para testes de memória, operações, validador, plugin e lint/syntax.
-- [ ] Executar suíte completa em checkout limpo.
+- [x] Executar suíte completa em checkout limpo.
 - [ ] Testar restauração a partir dos artefatos/versionamento disponíveis.
 - [ ] Criar checklist final de segurança.
 - [ ] Revisar PR #1.

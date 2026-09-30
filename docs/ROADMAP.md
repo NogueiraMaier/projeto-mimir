@@ -34,7 +34,10 @@ validado em push e pull request no GitHub Actions. O workflow cobre testes
 Python de memória/operações/validador, sintaxe Shell/Node e teste/build do
 plugin sem declarar validação de produção.
 
-A próxima etapa é executar a suíte completa em checkout limpo.
+A suíte completa foi executada com PASS em checkout novo criado diretamente
+da branch remota no HEAD `fd8e6d9a7a7dd9e9d5a8be7fb6d7ad289fc88644`.
+
+A próxima etapa é testar restauração a partir dos artefatos/versionamento disponíveis.
 
 ## Gate de segurança conversacional
 

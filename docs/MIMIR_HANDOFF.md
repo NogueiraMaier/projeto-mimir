@@ -2860,3 +2860,80 @@ NEXT_ACTION:
 
 Do not begin restoration testing until the clean-checkout suite has its own
 PASS/FAIL evidence and continuity checkpoint.
+
+
+## MIMIR-V1-P1-CLEAN-CHECKOUT-01
+
+Date: 2026-09-30
+
+Status: `PASS`
+
+Validated HEAD:
+
+`fd8e6d9a7a7dd9e9d5a8be7fb6d7ad289fc88644`
+
+Validation source:
+
+Fresh clone of `feat/mimir-operational-foundation` created directly from the
+remote repository under `/var/tmp`.
+
+Evidence:
+
+- clean checkout baseline: PASS;
+- Python syntax: 23 versioned files PASS;
+- memory repository tests: 44 PASS;
+- protected consolidator repository validation: PASS;
+- protected consolidator executed inside isolated network namespace;
+- isolated `127.0.0.1:18782`: free;
+- ops tests: 55 PASS;
+- validator tests: 6 PASS;
+- Shell syntax: PASS;
+- Node syntax: PASS;
+- classifier self-test: PASS;
+- plugin pinned CI toolchain installation: PASS;
+- plugin Vitest: 9 PASS;
+- plugin TypeScript build: PASS;
+- final versioned worktree guard: clean.
+
+Validation boundary:
+
+- no production PostgreSQL migration was executed;
+- no OpenClaw production service was restarted;
+- no external equipment was accessed;
+- ignored build/dependency artifacts do not constitute repository mutation;
+- this checkpoint validates reproducibility from a fresh repository checkout,
+  not production deployment.
+
+NEXT_ACTION:
+
+Test restoration from the artifacts/versioning currently available.
+
+Do not advance to final security checklist until restoration has separate
+PASS/FAIL evidence.
+
+
+## MIMIR-V1-CONTINUITY-2026-09-30-03
+
+Status: `READY_FOR_CONTINUATION`
+
+Branch:
+
+`feat/mimir-operational-foundation`
+
+Validated/base HEAD:
+
+`fd8e6d9a7a7dd9e9d5a8be7fb6d7ad289fc88644`
+
+Current state:
+
+- P1 permanent memory: LAB complete;
+- P1 operational scope: complete/frozen;
+- repository CI: PASS;
+- complete suite from fresh checkout: PASS;
+- PR #1 remains Draft;
+- production migrations 014/015/016 remain undeployed;
+- no merge, Draft removal, production deployment or stable tag is authorized.
+
+NEXT_ACTION:
+
+`Testar restauração a partir dos artefatos/versionamento disponíveis.`
