@@ -220,3 +220,54 @@ avaliar vLLM como engine local alternativa dentro do futuro Engine Registry, com
 A avaliação deve preservar o `llama.cpp` atual e a porta `18781`.
 
 Não promover vLLM a default sem `MIMIR-ENGINE-EVAL` reproduzível no PcIA real.
+
+
+## Fila futura — Mímir Real Estate Agent / WhatsApp
+
+Queue ID:
+
+`MIMIR-REAL-ESTATE-01`
+
+Roadmap do Mímir:
+
+- [MIMIR_REAL_ESTATE_AGENT_ROADMAP.md](MIMIR_REAL_ESTATE_AGENT_ROADMAP.md)
+
+Implementação separada do site:
+
+- [integrations/COSTA_ITAPEMA_SITE_AI_API_SPEC.md](integrations/COSTA_ITAPEMA_SITE_AI_API_SPEC.md)
+
+Contrato compartilhado:
+
+- [integrations/COSTA_ITAPEMA_MIMIR_API_CONTRACT.md](integrations/COSTA_ITAPEMA_MIMIR_API_CONTRACT.md)
+
+Status:
+
+**DOCUMENTADO / FILA / NÃO IMPLEMENTADO**.
+
+Objetivo do Mímir:
+
+- agente imobiliário especialista;
+- WhatsApp texto;
+- áudio assíncrono com STT/TTS;
+- consulta de produto/lotes/preço/disponibilidade;
+- lookup/cadastro de cliente;
+- interesse;
+- documentos via referência;
+- reserva controlada;
+- human handoff;
+- memória somente de contexto permitido;
+- chamada WhatsApp em fase posterior.
+
+Work ID do lado do site:
+
+`SITE-COSTA-ITAPEMA-AI-API-01`
+
+Esse trabalho é separado e foi especificado para implementação pelo OpenCode.
+
+Regra:
+
+**o Mímir não acessará JSONs diretamente.**
+
+O site expõe API versionada; o Mímir consome tools baseadas nesse contrato.
+
+Esta fila não altera o `NEXT_ACTION` atual.
