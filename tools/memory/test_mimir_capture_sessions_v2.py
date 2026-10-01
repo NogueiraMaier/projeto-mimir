@@ -453,6 +453,156 @@ class CaptureSessionsV2Test(unittest.TestCase):
             ):
                 self.assertNotIn(forbidden, stdout)
 
+    def test_rejects_incomplete_total_messages(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            key = "agent:main:hud:incomplete"
+            session_id = (
+                "88888888-8888-4888-8888-888888888888"
+            )
+
+            fixture = {
+                "sessions": {
+                    "path": "/state/openclaw-agent.sqlite",
+                    "sessions": [
+                        {
+                            "key": key,
+                            "sessionId": session_id,
+                            "status": "done",
+                            "updatedAt": 1790400000000,
+                        }
+                    ],
+                },
+                "history": {
+                    key: {
+                        "0": {
+                            "sessionKey": key,
+                            "sessionId": session_id,
+                            "messages": [
+                                user_message("Pergunta segura."),
+                                assistant_message("Resposta segura."),
+                            ],
+                            "hasMore": False,
+                            "totalMessages": 3,
+                        }
+                    }
+                },
+            }
+
+            fake, fixture_path = self.prepare_fake(
+                root,
+                fixture,
+            )
+            code, stdout, stderr = self.run_capture(
+                fake,
+                fixture_path,
+            )
+
+            self.assertEqual(code, 1, stderr)
+
+            result = json.loads(stdout)
+
+            self.assertEqual(result["errors"], 1)
+            self.assertEqual(
+                result["sessions"][0]["capture_status"],
+                "error",
+            )
+            self.assertIn(
+                "totalMessages",
+                result["sessions"][0]["reason"],
+            )
+
+    def test_blocks_missing_eligible_provenance(self) -> None:
+        cases = {
+            "id": "proveniencia id ausente",
+            "seq": "proveniencia seq ausente",
+            "timestamp": "proveniencia timestamp ausente",
+        }
+
+        for field, reason in cases.items():
+            with self.subTest(field=field):
+                with tempfile.TemporaryDirectory() as temporary:
+                    root = Path(temporary)
+
+                    key = (
+                        "agent:main:hud:missing-"
+                        + field
+                    )
+                    session_id = (
+                        "99999999-9999-4999-8999-999999999999"
+                    )
+
+                    user = user_message("Pergunta segura.")
+
+                    if field == "id":
+                        del user["__openclaw"]["id"]
+                    elif field == "seq":
+                        del user["__openclaw"]["seq"]
+                    else:
+                        del user["timestamp"]
+                        del user["__openclaw"][
+                            "recordTimestampMs"
+                        ]
+
+                    fixture = {
+                        "sessions": {
+                            "path":
+                                "/state/openclaw-agent.sqlite",
+                            "sessions": [
+                                {
+                                    "key": key,
+                                    "sessionId": session_id,
+                                    "status": "done",
+                                    "updatedAt":
+                                        1790400000000,
+                                }
+                            ],
+                        },
+                        "history": {
+                            key: {
+                                "0": {
+                                    "sessionKey": key,
+                                    "sessionId": session_id,
+                                    "messages": [
+                                        user,
+                                        assistant_message(
+                                            "Resposta segura."
+                                        ),
+                                    ],
+                                    "hasMore": False,
+                                    "totalMessages": 2,
+                                }
+                            }
+                        },
+                    }
+
+                    fake, fixture_path = self.prepare_fake(
+                        root,
+                        fixture,
+                    )
+                    code, stdout, stderr = self.run_capture(
+                        fake,
+                        fixture_path,
+                    )
+
+                    self.assertEqual(code, 0, stderr)
+
+                    result = json.loads(stdout)
+
+                    self.assertEqual(result["blocked"], 1)
+                    self.assertEqual(result["errors"], 0)
+                    self.assertEqual(
+                        result["sessions"][0][
+                            "capture_status"
+                        ],
+                        "blocked",
+                    )
+                    self.assertIn(
+                        reason,
+                        result["sessions"][0]["reason"],
+                    )
+
+
     def test_blocks_truncated_history(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)

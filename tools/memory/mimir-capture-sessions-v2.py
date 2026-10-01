@@ -349,9 +349,12 @@ def read_history(
             raise CaptureError("nextOffset invalido")
         offset = next_offset
 
-    if expected_total is not None and len(messages) > expected_total:
+    if (
+        expected_total is not None
+        and len(messages) != expected_total
+    ):
         raise CaptureError(
-            "mais mensagens retornadas que totalMessages"
+            "quantidade de mensagens diverge de totalMessages"
         )
 
     return messages, {
@@ -380,6 +383,9 @@ def analyze(
     excluded_system = excluded_results = 0
     excluded_calls = excluded_thinking = 0
     with_id = with_seq = with_timestamp = 0
+    eligible_with_id = 0
+    eligible_with_seq = 0
+    eligible_with_timestamp = 0
     truncation = False
 
     for message in messages:
@@ -415,6 +421,24 @@ def analyze(
             continue
         if role not in ALLOWED_ROLES:
             continue
+
+        eligible_with_id += int(
+            isinstance(meta, dict)
+            and isinstance(meta.get("id"), str)
+            and bool(meta.get("id"))
+        )
+        eligible_with_seq += int(
+            isinstance(meta, dict)
+            and isinstance(meta.get("seq"), int)
+            and not isinstance(meta.get("seq"), bool)
+        )
+        eligible_with_timestamp += int(
+            message.get("timestamp") is not None
+            or (
+                isinstance(meta, dict)
+                and meta.get("recordTimestampMs") is not None
+            )
+        )
 
         if role == "user":
             user += 1
@@ -488,6 +512,22 @@ def analyze(
         return block("proveniencia owner inconsistente")
     if assistant < 1:
         return block("sessao sem mensagem assistant elegivel")
+
+    eligible_messages = user + assistant
+
+    if eligible_with_id != eligible_messages:
+        return block(
+            "proveniencia id ausente em mensagem elegivel"
+        )
+    if eligible_with_seq != eligible_messages:
+        return block(
+            "proveniencia seq ausente em mensagem elegivel"
+        )
+    if eligible_with_timestamp != eligible_messages:
+        return block(
+            "proveniencia timestamp ausente em mensagem elegivel"
+        )
+
     if truncation:
         return block("historico contem sinal de truncamento/omissao")
 
