@@ -912,3 +912,33 @@ Intervenções futuras deverão ocorrer exclusivamente por catálogo fechado, co
 O projeto inclui diagnóstico técnico de host e rede, inclusive Windows Event Logs, integridade, saúde de hardware e análise TCP/NIC.
 
 Controle gráfico genérico de desktop continua fora do escopo inicial.
+
+
+---
+
+# Future consumer — Real Estate Agent / Costa de Itapema
+
+Queue ID:
+
+`MIMIR-REAL-ESTATE-01`
+
+The future Real Estate Agent must reuse this roadmap's security principles, especially:
+
+- least privilege;
+- service identity;
+- data minimization;
+- evidence/audit;
+- contextual authorization;
+- secret isolation;
+- controlled WRITE operations;
+- explicit human handoff for high-impact business decisions.
+
+Customer PII and documents must remain in the site/customer system as the source of truth.
+
+Mímir Memory may keep approved conversational preferences and references, but must not become permanent storage for full CPF/RG/CNH/document images or credentials.
+
+The site/API contract is documented separately in:
+
+- `integrations/COSTA_ITAPEMA_MIMIR_API_CONTRACT.md`
+
+Status: **PLANNED / NOT IMPLEMENTED**.
