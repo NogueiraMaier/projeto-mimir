@@ -137,3 +137,31 @@ Status: **WATCHLIST / CHALLENGER / NÃO IMPLEMENTADO**.
 Regra de continuidade:
 
 não substituir `llama.cpp`, não alterar `18781` e não promover vLLM antes do benchmark `MIMIR-ENGINE-EVAL`.
+
+
+### Agente imobiliário / Costa de Itapema
+
+Documentos separados por responsabilidade:
+
+- `MIMIR_REAL_ESTATE_AGENT_ROADMAP.md` — implementação futura no Mímir.
+- `integrations/COSTA_ITAPEMA_SITE_AI_API_SPEC.md` — handoff para OpenCode implementar no site.
+- `integrations/COSTA_ITAPEMA_MIMIR_API_CONTRACT.md` — contrato entre os dois lados.
+
+Queue ID Mímir: `MIMIR-REAL-ESTATE-01`
+
+Work ID site: `SITE-COSTA-ITAPEMA-AI-API-01`
+
+Status: **DOCUMENTADO / NÃO IMPLEMENTADO**.
+
+Regra arquitetural:
+
+```text
+Site/API = fonte de verdade
+Mímir = inteligência/orquestração
+Real Estate Agent = especialista
+WhatsApp = canal
+Memory = contexto permitido
+Human = fechamento/exceção
+```
+
+O Mímir não deve ler/escrever diretamente os JSONs internos do site.
