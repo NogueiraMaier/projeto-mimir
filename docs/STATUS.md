@@ -209,3 +209,42 @@ A porta `18781` permanece reservada ao `llama.cpp` atual.
 Nenhum provider/modelo foi trocado.
 
 O `NEXT_ACTION` operacional atual permanece inalterado.
+
+
+## Atualização documental — agente imobiliário / Costa de Itapema, 2026-10-01
+
+Foram adicionados:
+
+- [MIMIR_REAL_ESTATE_AGENT_ROADMAP.md](MIMIR_REAL_ESTATE_AGENT_ROADMAP.md)
+- [integrations/COSTA_ITAPEMA_SITE_AI_API_SPEC.md](integrations/COSTA_ITAPEMA_SITE_AI_API_SPEC.md)
+- [integrations/COSTA_ITAPEMA_MIMIR_API_CONTRACT.md](integrations/COSTA_ITAPEMA_MIMIR_API_CONTRACT.md)
+
+Queue ID do Mímir:
+
+`MIMIR-REAL-ESTATE-01`
+
+Work ID do site:
+
+`SITE-COSTA-ITAPEMA-AI-API-01`
+
+Estado:
+
+**DOCUMENTADO / NÃO IMPLEMENTADO**.
+
+O site e o Mímir foram deliberadamente separados:
+
+- OpenCode deve implementar a camada de API/serviço no site;
+- o Mímir deve implementar o agente, tools, WhatsApp, STT/TTS, memória e policies em fila própria;
+- a fronteira entre os dois lados está no contrato V1.
+
+Nenhum JSON foi alterado.
+
+Nenhum endpoint foi criado.
+
+Nenhuma credencial foi criada.
+
+Nenhum WhatsApp foi integrado.
+
+Nenhuma permissão do Mímir foi ampliada.
+
+O `NEXT_ACTION` operacional atual permanece inalterado.
