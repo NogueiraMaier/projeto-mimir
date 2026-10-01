@@ -386,6 +386,8 @@ def analyze(
     eligible_with_id = 0
     eligible_with_seq = 0
     eligible_with_timestamp = 0
+    eligible_ids: list[str] = []
+    eligible_seqs: list[int] = []
     truncation = False
 
     for message in messages:
@@ -439,6 +441,21 @@ def analyze(
                 and meta.get("recordTimestampMs") is not None
             )
         )
+
+        if isinstance(meta, dict):
+            message_id = meta.get("id")
+            if (
+                isinstance(message_id, str)
+                and bool(message_id)
+            ):
+                eligible_ids.append(message_id)
+
+            sequence = meta.get("seq")
+            if (
+                isinstance(sequence, int)
+                and not isinstance(sequence, bool)
+            ):
+                eligible_seqs.append(sequence)
 
         if role == "user":
             user += 1
@@ -526,6 +543,27 @@ def analyze(
     if eligible_with_timestamp != eligible_messages:
         return block(
             "proveniencia timestamp ausente em mensagem elegivel"
+        )
+
+    if len(set(eligible_ids)) != eligible_messages:
+        return block(
+            "proveniencia id duplicada em mensagem elegivel"
+        )
+
+    if len(set(eligible_seqs)) != eligible_messages:
+        return block(
+            "proveniencia seq duplicada em mensagem elegivel"
+        )
+
+    if any(
+        current <= previous
+        for previous, current in zip(
+            eligible_seqs,
+            eligible_seqs[1:],
+        )
+    ):
+        return block(
+            "proveniencia seq fora de ordem em mensagem elegivel"
         )
 
     if truncation:

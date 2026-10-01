@@ -603,6 +603,115 @@ class CaptureSessionsV2Test(unittest.TestCase):
                     )
 
 
+    def test_blocks_duplicate_or_out_of_order_provenance(self) -> None:
+        cases = (
+            (
+                "duplicate-id",
+                user_message(
+                    "Pergunta segura.",
+                    seq=1,
+                    message_id="same-id",
+                ),
+                assistant_message(
+                    "Resposta segura.",
+                    seq=2,
+                    message_id="same-id",
+                ),
+                "proveniencia id duplicada",
+            ),
+            (
+                "duplicate-seq",
+                user_message(
+                    "Pergunta segura.",
+                    seq=1,
+                    message_id="u-unique",
+                ),
+                assistant_message(
+                    "Resposta segura.",
+                    seq=1,
+                    message_id="a-unique",
+                ),
+                "proveniencia seq duplicada",
+            ),
+            (
+                "reversed-seq",
+                user_message(
+                    "Pergunta segura.",
+                    seq=2,
+                    message_id="u-order",
+                ),
+                assistant_message(
+                    "Resposta segura.",
+                    seq=1,
+                    message_id="a-order",
+                ),
+                "proveniencia seq fora de ordem",
+            ),
+        )
+
+        for suffix, user, assistant, reason in cases:
+            with self.subTest(case=suffix):
+                with tempfile.TemporaryDirectory() as temporary:
+                    root = Path(temporary)
+
+                    key = "agent:main:hud:" + suffix
+                    session_id = (
+                        "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"
+                    )
+
+                    fixture = {
+                        "sessions": {
+                            "path":
+                                "/state/openclaw-agent.sqlite",
+                            "sessions": [
+                                {
+                                    "key": key,
+                                    "sessionId": session_id,
+                                    "status": "done",
+                                    "updatedAt":
+                                        1790400000000,
+                                }
+                            ],
+                        },
+                        "history": {
+                            key: {
+                                "0": {
+                                    "sessionKey": key,
+                                    "sessionId": session_id,
+                                    "messages": [
+                                        user,
+                                        assistant,
+                                    ],
+                                    "hasMore": False,
+                                    "totalMessages": 2,
+                                }
+                            }
+                        },
+                    }
+
+                    fake, fixture_path = self.prepare_fake(
+                        root,
+                        fixture,
+                    )
+
+                    code, stdout, stderr = self.run_capture(
+                        fake,
+                        fixture_path,
+                    )
+
+                    self.assertEqual(code, 0, stderr)
+
+                    result = json.loads(stdout)
+
+                    self.assertEqual(result["ready"], 0)
+                    self.assertEqual(result["blocked"], 1)
+                    self.assertEqual(result["errors"], 0)
+                    self.assertIn(
+                        reason,
+                        result["sessions"][0]["reason"],
+                    )
+
+
     def test_blocks_truncated_history(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
