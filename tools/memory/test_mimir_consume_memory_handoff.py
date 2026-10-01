@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import base64
 import hashlib
 import importlib.util
 import json
@@ -9,6 +10,8 @@ import os
 import tempfile
 import unittest
 from pathlib import Path
+from types import SimpleNamespace
+from unittest.mock import patch
 
 
 SCRIPT = (
@@ -242,6 +245,92 @@ class ConsumerValidationTests(unittest.TestCase):
             ":'",
             do_body,
             "variavel psql nao pode aparecer dentro de DO $handoff$",
+        )
+
+
+    def test_confidential_handoff_stays_off_process_argv(self):
+        report = make_report()
+        handoff_text = MODULE.canonical_json(
+            report["memory_handoff"]
+        )
+        handoff_sha256 = MODULE.sha256_bytes(
+            handoff_text.encode("utf-8")
+        )
+        encoded_handoff = base64.b64encode(
+            handoff_text.encode("utf-8")
+        ).decode("ascii")
+
+        validated = {
+            "intervention_id": INTERVENTION_ID,
+            "device_id": DEVICE_ID,
+            "status": "collected",
+            "completed_at": report["completed_at"],
+            "handoff_text": handoff_text,
+            "handoff_sha256": handoff_sha256,
+            "report_sha256": "a" * 64,
+            "source_ref": f"ops:{INTERVENTION_ID}",
+            "deduplication_key": INTERVENTION_ID,
+        }
+
+        pg_result = {
+            "event_id": INTERVENTION_ID,
+            "memory_id":
+                "98888888-8888-4888-8888-888888888883",
+            "state": "candidate",
+            "conflict_classification": "none",
+            "automatic_promotion": False,
+        }
+
+        completed = SimpleNamespace(
+            returncode=0,
+            stdout=json.dumps(pg_result),
+            stderr="",
+        )
+
+        identity = SimpleNamespace(pw_name="openclaw")
+
+        with patch.object(
+            MODULE.pwd,
+            "getpwuid",
+            return_value=identity,
+        ), patch.object(
+            MODULE.subprocess,
+            "run",
+            return_value=completed,
+        ) as mocked:
+            result = MODULE.submit_handoff(validated)
+
+        self.assertFalse(result["automatic_promotion"])
+
+        argv = mocked.call_args.args[0]
+        stdin = mocked.call_args.kwargs["input"]
+
+        command_line = "\n".join(argv)
+
+        self.assertNotIn(
+            encoded_handoff,
+            command_line,
+        )
+        self.assertNotIn(
+            handoff_text,
+            command_line,
+        )
+        self.assertNotIn(
+            "handoff_b64=",
+            command_line,
+        )
+
+        self.assertIn(
+            "\\set handoff_b64 '",
+            stdin,
+        )
+        self.assertIn(
+            encoded_handoff,
+            stdin,
+        )
+        self.assertIn(
+            "decode(:'handoff_b64', 'base64')",
+            stdin,
         )
 
 

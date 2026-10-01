@@ -352,6 +352,8 @@ def create_psql_env() -> dict[str, str]:
 def run_psql(
     sql: str,
     variables: dict[str, str],
+    *,
+    stdin_b64_variables: dict[str, str] | None = None,
 ) -> str:
     args = [
         PSQL,
@@ -367,9 +369,36 @@ def run_psql(
     for key, value in variables.items():
         args.extend(["-v", f"{key}={value}"])
 
+    prefix: list[str] = []
+
+    for key, value in (stdin_b64_variables or {}).items():
+        if key != "handoff_b64":
+            fail("variável sensível PostgreSQL não autorizada")
+
+        try:
+            decoded = base64.b64decode(
+                value,
+                validate=True,
+            )
+        except ValueError:
+            fail("valor Base64 sensível inválido")
+
+        if base64.b64encode(decoded).decode("ascii") != value:
+            fail("valor Base64 sensível não canônico")
+
+        prefix.append(
+            "\\set " + key + " '" + value + "'"
+        )
+
+    psql_input = (
+        "\n".join(prefix) + "\n" + sql
+        if prefix
+        else sql
+    )
+
     process = subprocess.run(
         args,
-        input=sql,
+        input=psql_input,
         text=True,
         capture_output=True,
         env=create_psql_env(),
@@ -575,7 +604,6 @@ COMMIT;
         sql,
         {
             "event_id": intervention_id,
-            "handoff_b64": encoded_handoff,
             "handoff_sha256":
                 validated["handoff_sha256"],
             "report_sha256":
@@ -587,6 +615,9 @@ COMMIT;
                 validated["source_ref"],
             "deduplication_key":
                 validated["deduplication_key"],
+        },
+        stdin_b64_variables={
+            "handoff_b64": encoded_handoff,
         },
     )
 
