@@ -108,15 +108,28 @@ def validate_endpoint(raw: str) -> str:
 def validate_pg_socket(raw: str, port: int, allow_production: bool) -> str:
     if not 1 <= port <= 65535:
         raise ConsolidatorError("porta PostgreSQL inválida")
+
     path = Path(raw)
+
     if not path.is_absolute():
-        raise ConsolidatorError("PostgreSQL exige socket Unix absoluto")
-    normalized = str(path)
-    if normalized == DB_SOCKET and not allow_production:
+        raise ConsolidatorError(
+            "PostgreSQL exige socket Unix absoluto"
+        )
+
+    try:
+        resolved = path.resolve(strict=False)
+        production = Path(DB_SOCKET).resolve(strict=False)
+    except (OSError, RuntimeError) as exc:
+        raise ConsolidatorError(
+            "falha ao resolver diretório de socket PostgreSQL"
+        ) from exc
+
+    if resolved == production and not allow_production:
         raise ConsolidatorError(
             "socket de produção exige --allow-production explícito"
         )
-    return normalized
+
+    return str(resolved)
 
 
 def build_source_sql(event_id: uuid.UUID) -> str:

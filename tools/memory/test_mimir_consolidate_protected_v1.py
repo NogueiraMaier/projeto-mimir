@@ -366,6 +366,52 @@ class ProtectedConsolidatorV1Tests(unittest.TestCase):
         self.assertNotEqual(run.returncode, 0)
         self.assertIn("tentou remover revisão humana", run.stderr)
 
+    def test_production_socket_aliases_require_explicit_allow(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            fake_psql, stdin_log = self.make_fake_psql(root)
+
+            symlink_alias = root / "postgres-production-alias"
+            symlink_alias.symlink_to(
+                "/run/postgresql",
+                target_is_directory=True,
+            )
+
+            aliases = (
+                str(symlink_alias),
+                "/run/postgresql/../postgresql",
+            )
+
+            for pg_host in aliases:
+                with self.subTest(pg_host=pg_host):
+                    if stdin_log.exists():
+                        stdin_log.unlink()
+
+                    run = self.run_cli(
+                        fake_psql,
+                        extra_args=[
+                            "--pg-host",
+                            pg_host,
+                        ],
+                    )
+
+                    self.assertEqual(
+                        run.returncode,
+                        1,
+                        run.stderr,
+                    )
+                    self.assertIn(
+                        "socket de produção exige "
+                        "--allow-production explícito",
+                        run.stderr,
+                    )
+                    self.assertFalse(
+                        stdin_log.exists(),
+                        "psql não pode executar após "
+                        "alias de produção bloqueado",
+                    )
+
+
     def test_t_ai_034_remote_endpoint_is_rejected_before_source_read(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
