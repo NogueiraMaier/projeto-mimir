@@ -50,15 +50,14 @@ def main() -> int:
 
     assert response_format["type"] == "json_schema"
 
-    json_schema = response_format["json_schema"]
+    assert set(response_format) == {
+        "type",
+        "schema",
+    }
 
-    assert (
-        json_schema["name"]
-        == "mimir_protected_consolidator_v1"
-    )
-    assert json_schema["strict"] is True
+    assert "json_schema" not in response_format
 
-    schema = json_schema["schema"]
+    schema = response_format["schema"]
 
     assert schema["additionalProperties"] is False
 

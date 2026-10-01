@@ -405,15 +405,11 @@ def build_request(
         "stream": False,
         "response_format": {
             "type": "json_schema",
-            "json_schema": {
-                "name": "mimir_protected_consolidator_v1",
-                "strict": True,
-                "schema": build_response_schema(
-                    event_id=event_id,
-                    content_sha256=content_sha256,
-                    max_candidates=max_candidates,
-                ),
-            },
+            "schema": build_response_schema(
+                event_id=event_id,
+                content_sha256=content_sha256,
+                max_candidates=max_candidates,
+            ),
         },
         "chat_template_kwargs": {"enable_thinking": False},
     }
