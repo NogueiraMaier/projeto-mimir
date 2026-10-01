@@ -45,9 +45,9 @@ Estados:
 | Direct prompt injection | PROPOSED | política documental | falta teste/enforcement externo específico |
 | Indirect prompt injection | PARTIAL | sessão/documento não é automaticamente promoção de memória; source protegida | consolidator/context builder ainda precisa preservar taint/instrução como dado |
 | Jailbreak / obfuscação | PROPOSED | política documental | sem camada externa validada para Base64/Unicode/multilingual bypass |
-| Memory poisoning | PARTIAL | candidate/active não são automáticos; revisão humana; writer não promove | falta classe explícita untrusted observation e policy de trust na consolidação |
+| Memory poisoning | PARTIAL | candidate/active não são automáticos; revisão humana; writer não promove; protected consolidator força `UNTRUSTED_OBSERVATION` e evidence binding externo ao LLM | falta policy de trust transversal para outras fontes/canais e etapas fora do consolidator |
 | Promoção de memória | EXISTING_VALIDATED | writer e ingestão não criam `memory_records`; fluxo exige revisão/promoção separadas | consolidator futuro deve preservar a mesma invariável |
-| Proveniência de sessão | EXISTING_VALIDATED | session id/key, fingerprints, content hash, source ref, updatedAt, collector version | ampliar provenance/trust para outras fontes externas |
+| Proveniência de sessão | EXISTING_VALIDATED | session id/key, fingerprints, content hash, source ref, updatedAt, collector version, IDs únicos, seq único/estritamente crescente e contagem `totalMessages` exata | ampliar provenance/trust para outras fontes externas |
 | Context minimization | PARTIAL | captura remove system/toolResult/thinking/toolCall e não expõe transcript em dry-run | não há context builder universal por classification/scope |
 | Dados `CONFIDENTIAL` para modelo externo | PARTIAL | política atual proíbe sessão protected em NVIDIA; fluxo P1 exige loopback | falta policy gate geral de model routing por classificação |
 | Modelo local / remoto como autoridade | PROPOSED | arquitetura declara modelo sem autoridade | falta enforcement central que preserve capabilities ao trocar modelo |

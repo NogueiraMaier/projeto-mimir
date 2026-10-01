@@ -1,6 +1,6 @@
 # Mímir — Contrato do Consolidator Local de Sessões Protegidas v1
 
-Status: **IMPLEMENTED_NOT_VALIDATED**
+Status: **REPOSITORY_VALIDATED / REAL_MODEL_REVALIDATION_PENDING / NOT_DEPLOYED**
 
 Escopo: exclusivo do Projeto Mímir.
 
@@ -10,6 +10,17 @@ Referências:
 - `docs/AI_SECURITY_GAP_INVENTORY.md`
 - `docs/AI_SECURITY_TEST_MATRIX.md`
 - `docs/SESSION_INGESTION_V2.md`
+
+Estado de revisão em 2026-10-01:
+
+- enforcement repository-only revalidado após os hardenings do PR;
+- evidence binding agora é verificado fora do LLM;
+- o modelo fornece trecho textual de evidência;
+- o consolidator confirma que o trecho pertence literalmente à fonte;
+- somente então calcula e emite `source_excerpt_hash`;
+- o trecho confidencial não é emitido no resultado canônico;
+- revalidação integrada com Qwen real permanece necessária;
+- nenhum deployment de produção é inferido.
 
 ## 1. Objetivo
 
@@ -156,8 +167,8 @@ Schema conceitual v1:
       "confidence": 0.0,
       "evidence": [
         {
-          "kind": "source_excerpt_hash",
-          "sha256": "<sha256>"
+          "kind": "source_excerpt",
+          "excerpt": "<trecho contíguo exato de source.content>"
         }
       ],
       "trust_class": "UNTRUSTED_OBSERVATION",
@@ -169,6 +180,13 @@ Schema conceitual v1:
 
 Regras:
 
+- `evidence.excerpt` deve ser substring contígua exata de `source.content`;
+- excerpt inventado pelo modelo deve ser rejeitado;
+- o LLM não calcula nem fornece o hash final da evidência;
+- o consolidator calcula SHA-256 somente após validar o vínculo com a fonte;
+- a saída canônica troca o excerpt por
+  `kind=source_excerpt_hash` + `sha256`;
+- o excerpt confidencial não deve aparecer em stdout;
 - campos desconhecidos: rejeitar;
 - `schema_version` diferente de 1: rejeitar;
 - `source_event_id` deve corresponder ao evento solicitado;
@@ -220,9 +238,12 @@ tool_use=false
 ```
 
 Saída de dry-run deve conter somente metadados seguros e candidatos
-estruturados já filtrados.
+estruturados já filtrados. Evidências aceitas saem somente como
+`source_excerpt_hash`; o trecho textual usado na verificação permanece
+interno ao consolidator.
 
-Nenhuma transcrição completa deve ser impressa em stdout.
+Nenhuma transcrição completa nem excerpt textual de evidência deve ser
+impresso em stdout.
 
 ## 11. Auditoria mínima
 

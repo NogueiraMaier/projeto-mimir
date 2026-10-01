@@ -59,6 +59,10 @@ Para cada sessão elegível, a proveniência deve registrar:
 - \`source_fingerprint_sha256\`: fingerprint estável da estrutura capturada;
 - \`content_sha256\`: SHA-256 da transcrição normalizada user/assistant;
 - \`collector_version=openclaw-chat-history-v2\`;
+- \`id\` não vazio em toda mensagem user/assistant elegível;
+- \`seq\` inteiro, único e estritamente crescente nas mensagens elegíveis;
+- timestamp presente em toda mensagem elegível;
+- \`totalMessages\` exatamente igual ao histórico reconstruído;
 - contagens de mensagens e exclusões;
 - \`classification=confidential\`;
 - \`protected_source=true\`;
@@ -91,7 +95,11 @@ A sessão é bloqueada se houver:
 - segredo/credencial detectável;
 - truncamento/omissão de histórico;
 - divergência de session key/id;
+- \`id\`, \`seq\` ou timestamp ausente em mensagem elegível;
+- \`id\` ou \`seq\` duplicado;
+- \`seq\` fora de ordem;
 - paginação inconsistente;
+- divergência entre mensagens reconstruídas e \`totalMessages\`;
 - hash divergente;
 - conteúdo acima dos limites.
 

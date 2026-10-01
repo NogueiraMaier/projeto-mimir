@@ -64,10 +64,14 @@ Não liberar ao agente main:
 - Não acessar diretamente o schema SQLite privado do OpenClaw
 - Aceitar somente sessões concluídas de classes explicitamente validadas
 - Exigir `senderIsOwner=true` em toda mensagem user; ausência ou false bloqueia
+- Exigir `id`, `seq` e timestamp em toda mensagem user/assistant elegível
+- Exigir IDs únicos nas mensagens elegíveis
+- Exigir `seq` único e estritamente crescente nas mensagens elegíveis
 - Aceitar somente texto user/assistant
 - Excluir system, toolResult, thinking e toolCall
 - Bloquear padrões de segredos e credenciais
 - Bloquear histórico truncado/omitido e paginação inconsistente
+- Exigir que a quantidade final corresponda exatamente a `totalMessages`
 - Não exibir mensagens durante inventário ou dry run
 - Não versionar sessões, transcrições ou arquivos de staging
 - Manter qualquer staging futuro fora do workspace Git
