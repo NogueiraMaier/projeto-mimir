@@ -449,3 +449,27 @@ Preserve the current `llama.cpp` endpoint on port `18781`.
 Do not change model/provider/tool policy as part of `LAB-VLLM-01`.
 
 The current Telegram/tool-surface `NEXT_ACTION` remains authoritative.
+
+
+## Future queue note — Real Estate Agent / Costa de Itapema
+
+A new future product integration has been documented:
+
+- Queue ID: `MIMIR-REAL-ESTATE-01`
+- Mímir roadmap: `docs/MIMIR_REAL_ESTATE_AGENT_ROADMAP.md`
+- Site implementation spec: `docs/integrations/COSTA_ITAPEMA_SITE_AI_API_SPEC.md`
+- Shared contract: `docs/integrations/COSTA_ITAPEMA_MIMIR_API_CONTRACT.md`
+- Site work ID: `SITE-COSTA-ITAPEMA-AI-API-01`
+- Status: **DOCUMENTED / QUEUED / NOT IMPLEMENTED / DOES NOT CHANGE NEXT_ACTION**
+
+The site/API implementation is intentionally separated from the Mímir implementation.
+
+OpenCode is expected to implement the site-side service/API after inspecting the actual JSON files and current code. It must preserve existing data and avoid direct schema assumptions.
+
+Mímir must consume a versioned API/tool contract and must not access or mutate the site's JSON files directly.
+
+The future Mímir scope includes WhatsApp text, asynchronous voice messages through STT/TTS, live lot/price/availability checks, client lookup/create/update, interest, document metadata/upload workflow, controlled reservation requests and human handoff.
+
+WhatsApp live calling remains a later phase and is not an MVP dependency.
+
+The current Telegram/tool-surface `NEXT_ACTION` remains authoritative.
