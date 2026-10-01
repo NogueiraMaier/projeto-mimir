@@ -388,3 +388,39 @@ Continuam bloqueados:
 - merge;
 - stable tag;
 - production deployment.
+
+## Atualização pós-revisão do PR #1 — 2026-10-01
+
+Checkpoint:
+
+`MIMIR-V1-P1-PR-REVIEW-01`
+
+Validated/base HEAD:
+
+`115e39a3650ca5150e27c2326b3c6f7a569df62d`
+
+A revisão técnica do PR #1 foi concluída nesta rodada com sete findings
+tratados e versionados.
+
+Isso não altera a decisão deste checklist:
+
+`FINAL_SECURITY_DECISION = BLOCKED_FOR_RELEASE`
+
+O PR permanece Draft.
+
+O protected consolidator exige revalidação integrada com o Qwen real após a
+mudança de evidence binding do FINDING-05.
+
+Continuam bloqueados:
+
+- Draft removal;
+- merge;
+- stable tag;
+- production deployment.
+
+Os blockers históricos/residuais permanecem conforme a reconciliação formal,
+incluindo RSK-P0-003, RSK-P0-004 e RSK-P0-005.
+
+Evidência detalhada:
+
+`docs/review/security/2026-10-01-pr1-review-reconciliation.md`

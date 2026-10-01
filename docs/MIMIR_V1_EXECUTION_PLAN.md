@@ -117,13 +117,34 @@ A documentação do Maestro deve ser retomada somente após a estabilização do
 - [x] Executar suíte completa em checkout limpo.
 - [x] Testar restauração a partir dos artefatos/versionamento disponíveis.
 - [x] Criar checklist final de segurança.
-- [ ] Revisar PR #1.
+- [x] Revisar PR #1.
 - [ ] Retirar Draft somente após validação final.
 - [ ] Merge somente com autorização explícita.
 - [ ] Criar tag estável da v1.
 - [ ] Retomar e concluir a documentação do Maestro usando o estado final validado do Mímir.
 
 ## Checkpoint atual
+
+**MIMIR-V1-P1-PR-REVIEW-01 — REVIEWED / RELEASE_BLOCKED em 2026-10-01.**
+
+- validated/base HEAD:
+  `115e39a3650ca5150e27c2326b3c6f7a569df62d`;
+- PR #1 permaneceu OPEN / DRAFT;
+- sete findings desta rodada foram corrigidos em commits isolados;
+- full memory regression mais recente: 50/50 PASS;
+- GitHub checks do validated/base HEAD: 6/6 success;
+- nenhum merge, Draft removal, tag ou deployment foi autorizado;
+- protected consolidator permanece
+  `REAL_MODEL_REVALIDATION_PENDING`;
+- `RSK-P0-003`, `RSK-P0-004` e `RSK-P0-005` continuam blockers.
+
+**NEXT_ACTION atual:** revalidar o protected consolidator em LAB integrado
+sintético com Qwen real após o FINDING-05, mantendo PR Draft e produção
+intacta.
+
+A conclusão da revisão do PR não equivale a aprovação da release.
+
+## Checkpoint histórico — RESTORE-01
 
 **MIMIR-V1-P1-RESTORE-01 — VALIDADO em 2026-09-30.**
 
@@ -137,7 +158,8 @@ A documentação do Maestro deve ser retomada somente após a estabilização do
 - LAB 014 separado foi preservado e permanece RUNNING em `55433`;
 - nenhuma validação de produção é inferida desse resultado.
 
-**NEXT_ACTION atual:** revisar PR #1 mantendo-o Draft; blockers de release permanecem abertos.
+**NEXT_ACTION histórico deste checkpoint:** revisar PR #1 mantendo-o Draft;
+blockers de release permaneciam abertos.
 
 Os checkpoints históricos abaixo são preservados por rastreabilidade. Referências
 antigas a "Próxima atividade" não substituem o `NEXT_ACTION` mais recente de

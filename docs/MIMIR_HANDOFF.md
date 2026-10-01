@@ -3088,3 +3088,206 @@ Release blockers remain explicitly open.
 NEXT_ACTION:
 
 `Revisar PR #1 mantendo Draft.`
+
+
+## GIT-FIRST OPERATIONAL CONTINUITY CHECKPOINT — CHAT_HANDOFF / PR_REVIEW_CONTINUATION
+
+Historical source checkpoint from the previous chat.
+
+Status in the source checkpoint:
+
+`READY_FOR_CONTINUATION`
+
+Continuity model:
+
+`Git-First Operational Continuity + Checkpoints`
+
+Branch:
+
+`feat/mimir-operational-foundation`
+
+Validated/current HEAD:
+
+`115e39a3650ca5150e27c2326b3c6f7a569df62d`
+
+HEAD description:
+
+`docs(security): align memory review contracts`
+
+Remote sync:
+
+`CONFIRMED`
+
+Remote HEAD:
+
+`115e39a3650ca5150e27c2326b3c6f7a569df62d`
+
+Worktree state at the last confirmed commit:
+
+`clean after FINDING-07 commit/push`
+
+PR:
+
+`#1 — feat(ops): fundação operacional do Mímir`
+
+PR state:
+
+`OPEN / DRAFT / NOT MERGED`
+
+Implemented at that checkpoint:
+
+- FINDING-01 through FINDING-07 corrected and versioned;
+- protected-memory hardenings versioned;
+- session provenance hardening versioned;
+- protected evidence binding versioned;
+- current security/memory contracts synchronized with enforcement.
+
+Validated at that checkpoint:
+
+- latest code regression before documentation-only FINDING-07:
+  `50/50 memory tests PASS`;
+- FINDING-07 documentation guards PASS;
+- FINDING-07 push/local-remote SHA equality PASS.
+
+Not yet confirmed at that checkpoint:
+
+- GitHub CI/check-runs for HEAD
+  `115e39a3650ca5150e27c2326b3c6f7a569df62d`.
+
+Not production validated:
+
+- protected consolidator changes remained NOT DEPLOYED;
+- migrations 014/015/016 remained absent from production;
+- production remained schema 1..12;
+- `mimir_ops` remained absent.
+
+Release state:
+
+`BLOCKED_FOR_RELEASE`
+
+Release blockers preserved:
+
+- RSK-P0-003 — OPEN / BLOCKER;
+- RSK-P0-004 — PARTIALLY_TREATED / production-release blocker;
+- RSK-P0-005 — OPEN / BLOCKER.
+
+Restrictions:
+
+- keep PR Draft;
+- no merge;
+- no stable tag;
+- no production deployment;
+- no migration 014/015/016 in production;
+- no `mimir_ops` creation in production;
+- no implicit risk acceptance.
+
+NEXT_ACTION recorded at that historical checkpoint:
+
+1. verify local Git branch, HEAD and worktree;
+2. verify PR #1 OPEN / DRAFT and exact remote HEAD;
+3. verify check-runs for that exact HEAD;
+4. if consistent, perform FINAL PR REVIEW RECONCILIATION;
+5. during reconciliation, record FINDING-01..07, separate corrected
+   findings from residual release blockers, inspect remaining concrete
+   technical defects, update continuity documents and keep the PR Draft.
+
+Checkpoint invariant:
+
+`PR_REVIEW_CLOSED does NOT imply RELEASE_AUTHORIZED`
+
+Allowed final state recorded there:
+
+`PR_REVIEW = PASS / CLOSED`
+
+`PR = OPEN / DRAFT`
+
+`RELEASE = BLOCKED_FOR_RELEASE`
+
+`PRODUCTION = UNCHANGED`
+
+This historical NEXT_ACTION has since advanced. Git/GitHub verification and
+the PR review reconciliation are represented by the following current
+checkpoint.
+
+## MIMIR-V1-P1-PR-REVIEW-01
+
+Date: 2026-10-01
+
+Status:
+
+`REVIEWED / RELEASE_BLOCKED`
+
+Validated/base HEAD:
+
+`115e39a3650ca5150e27c2326b3c6f7a569df62d`
+
+Branch:
+
+`feat/mimir-operational-foundation`
+
+PR state at review reconciliation:
+
+- OPEN;
+- DRAFT;
+- base `e6785bb6166131b52a2096278f59874a14549c06`;
+- 96 changed files;
+- 313 commits;
+- mergeable state `clean`;
+- 6/6 current checks `success`.
+
+Review findings closed:
+
+- FINDING-01: confidential handoff removed from process argv;
+- FINDING-02: incomplete provenance/totalMessages fail-closed;
+- FINDING-03: embedding redirect/error-body hardening;
+- FINDING-04: canonical PostgreSQL production-socket guard;
+- FINDING-05: source-bound evidence derivation outside the LLM;
+- FINDING-06: unique/ordered eligible message provenance;
+- FINDING-07: documentation aligned with current enforcement.
+
+Latest full memory regression before review close:
+
+`50/50 PASS`
+
+State boundary:
+
+`PR_REVIEW_COMPLETE != RELEASE_APPROVED`
+
+`REPOSITORY_VALIDATED != PRODUCTION_VALIDATED`
+
+Protected consolidator:
+
+`REAL_MODEL_REVALIDATION_PENDING`
+
+Release blockers remain:
+
+- RSK-P0-003 OPEN / BLOCKER;
+- RSK-P0-004 PARTIALLY_TREATED / production-release blocker;
+- RSK-P0-005 OPEN / BLOCKER.
+
+Still prohibited:
+
+- Draft removal;
+- merge;
+- stable tag;
+- production deployment;
+- production migrations 014/015/016;
+- production `mimir_ops`.
+
+Evidence:
+
+`docs/review/security/2026-10-01-pr1-review-reconciliation.md`
+
+NEXT_ACTION:
+
+Revalidar o protected consolidator em LAB integrado sintético após o
+FINDING-05 contra o Qwen real `127.0.0.1:18782`.
+
+Requirements:
+
+- synthetic content only;
+- production PostgreSQL excluded;
+- `synthetic_residue=0`;
+- zero automatic promotion;
+- PR remains Draft;
+- no deployment.

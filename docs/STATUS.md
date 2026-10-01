@@ -566,3 +566,18 @@ Evidência da rodada: [review/operations/2026-09-24.md](review/operations/2026-0
 - **PR REVIEW:** permitido mantendo Draft.
 - **DRAFT REMOVAL / MERGE / TAG / DEPLOY:** bloqueados.
 - **NEXT:** revisar PR #1 mantendo Draft.
+
+## MIMIR-V1-P1-PR-REVIEW-01
+
+- **STATUS:** REVIEWED / RELEASE_BLOCKED.
+- **VALIDATED/BASE HEAD:** `115e39a3650ca5150e27c2326b3c6f7a569df62d`.
+- **PR #1:** OPEN / DRAFT.
+- **REVIEW FINDINGS:** 7 tratados em commits isolados.
+- **LATEST MEMORY REGRESSION:** 50/50 PASS.
+- **CURRENT GITHUB CHECKS:** 6/6 success.
+- **PROTECTED CONSOLIDATOR:** repository validated; real-model revalidation
+  pending after evidence-binding hardening.
+- **PRODUCTION:** no deployment or migration authorized by this checkpoint.
+- **RELEASE:** blocked by existing security/risk gates.
+- **NEXT:** integrated synthetic real-model revalidation of the protected
+  consolidator while PR #1 remains Draft.
