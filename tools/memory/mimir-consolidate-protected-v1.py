@@ -26,6 +26,7 @@ MODEL_ID = "/var/lib/openclaw/models/Qwen3-4B-Q4_K_M.gguf"
 MAX_RESPONSE_BYTES = 1_048_576
 MAX_SOURCE_CHARS = 8000
 MAX_SUMMARY_CHARS = 1200
+MAX_EVIDENCE_EXCERPT_CHARS = 2048
 ALLOWED_MEMORY_TYPES = {
     "semantic", "episodic", "procedural", "decision",
     "task", "evidence", "preference", "entity",
@@ -291,18 +292,19 @@ def build_response_schema(
                                     "kind": {
                                         "type": "string",
                                         "enum": [
-                                            "source_excerpt_hash"
+                                            "source_excerpt"
                                         ],
                                     },
-                                    "sha256": {
+                                    "excerpt": {
                                         "type": "string",
-                                        "minLength": 64,
-                                        "maxLength": 64,
+                                        "minLength": 1,
+                                        "maxLength":
+                                            MAX_EVIDENCE_EXCERPT_CHARS,
                                     },
                                 },
                                 "required": [
                                     "kind",
-                                    "sha256",
+                                    "excerpt",
                                 ],
                                 "additionalProperties": False,
                             },
@@ -382,7 +384,11 @@ def build_request(
                     "schema_version, source_event_id, "
                     "source_content_sha256, and candidates. Copy "
                     "source_event_id and source_content_sha256 exactly "
-                    "from the data envelope."
+                    "from the data envelope. For each evidence item, copy "
+                    "an exact contiguous substring from source.content into "
+                    "evidence.excerpt. Do not invent or calculate evidence "
+                    "hashes; the trusted consolidator validates the excerpt "
+                    "and derives its hash outside the model."
                 ),
             },
             {
@@ -509,6 +515,7 @@ def validate_output(
     *,
     event_id: uuid.UUID,
     content_sha256: str,
+    source_content: str,
     max_candidates: int,
 ) -> dict[str, Any]:
     try:
@@ -556,7 +563,12 @@ def validate_output(
         "trust_class",
         "requires_human_review",
     }
-    allowed_evidence = {"kind", "sha256"}
+    if source_hash(source_content) != content_sha256:
+        raise ConsolidatorError(
+            "conteúdo fonte diverge do hash esperado"
+        )
+
+    allowed_evidence = {"kind", "excerpt"}
     validated = []
 
     for idx, item in enumerate(candidates, start=1):
@@ -616,18 +628,32 @@ def validate_output(
                 raise ConsolidatorError(
                     f"candidate {idx} possui evidence inválida"
                 )
-            if evidence_item["kind"] != "source_excerpt_hash":
+            if evidence_item["kind"] != "source_excerpt":
                 raise ConsolidatorError(
                     f"candidate {idx} possui evidence.kind inválido"
                 )
-            evidence_sha = validate_sha(
-                evidence_item["sha256"],
-                "evidence.sha256",
-            )
+
+            excerpt = evidence_item["excerpt"]
+
+            if (
+                not isinstance(excerpt, str)
+                or not excerpt.strip()
+                or len(excerpt) > MAX_EVIDENCE_EXCERPT_CHARS
+            ):
+                raise ConsolidatorError(
+                    f"candidate {idx} possui evidence.excerpt inválido"
+                )
+
+            if excerpt not in source_content:
+                raise ConsolidatorError(
+                    f"candidate {idx} possui evidence não vinculada "
+                    "à fonte protegida"
+                )
+
             clean_evidence.append(
                 {
                     "kind": "source_excerpt_hash",
-                    "sha256": evidence_sha,
+                    "sha256": source_hash(excerpt),
                 }
             )
         validated.append(
@@ -721,6 +747,7 @@ def main() -> int:
             message_content,
             event_id=event_id,
             content_sha256=content_sha256,
+            source_content=source["content"],
             max_candidates=args.max_candidates,
         )
 

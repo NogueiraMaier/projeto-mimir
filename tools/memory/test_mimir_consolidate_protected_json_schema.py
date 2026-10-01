@@ -125,14 +125,21 @@ def main() -> int:
 
     assert set(evidence["required"]) == {
         "kind",
-        "sha256",
+        "excerpt",
     }
 
     assert evidence[
         "properties"
     ]["kind"]["enum"] == [
-        "source_excerpt_hash"
+        "source_excerpt"
     ]
+
+    assert (
+        evidence["properties"]["excerpt"]["maxLength"]
+        == MODULE.MAX_EVIDENCE_EXCERPT_CHARS
+    )
+
+    assert "sha256" not in evidence["properties"]
 
     prompt = request["messages"][0]["content"]
 
