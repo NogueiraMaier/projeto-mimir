@@ -219,7 +219,9 @@ LAB_VERSIONS="$(
 )"
 
 case "$LAB_VERSIONS" in
-    "1,2,3,4,5,6,7,8,9,10,11,12,14"|"1,2,3,4,5,6,7,8,9,10,11,12,14,15")
+    "1,2,3,4,5,6,7,8,9,10,11,12,14" | \
+    "1,2,3,4,5,6,7,8,9,10,11,12,14,15" | \
+    "1,2,3,4,5,6,7,8,9,10,11,12,14,15,16")
         ;;
     *)
         fail "schema LAB inesperado: $LAB_VERSIONS"
@@ -545,11 +547,30 @@ assert d["memory_promotion"] is False
 assert d["source_trust"] == "UNTRUSTED_CONTENT"
 assert d["response_status"] == "accepted"
 assert d["candidate_count"] == len(d["candidates"])
+assert d["candidate_count"] >= 1
 
 for c in d["candidates"]:
     assert c["trust_class"] == "UNTRUSTED_OBSERVATION"
     assert c["requires_human_review"] is True
 
+    evidence = c["evidence"]
+    assert isinstance(evidence, list)
+    assert len(evidence) >= 1
+
+    for item in evidence:
+        assert set(item) == {"kind", "sha256"}
+        assert item["kind"] == "source_excerpt_hash"
+        assert "excerpt" not in item
+
+        digest = item["sha256"]
+        assert isinstance(digest, str)
+        assert len(digest) == 64
+        assert all(
+            ch in "0123456789abcdef"
+            for ch in digest
+        )
+
+print("finding05_evidence_binding=PASS")
 print("output_contract=PASS")
 print("candidate_count=" + str(d["candidate_count"]))
 for i,c in enumerate(d["candidates"],1):
