@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import { spawnSync } from "node:child_process";
+import { pathToFileURL } from "node:url";
 
 const DEFAULT_EMBEDDING_BASE_URL =
     "http://127.0.0.1:8601/v1";
@@ -161,9 +162,23 @@ async function requestManagedEmbedding(
                     input: [input],
                     dimensions: 768,
                 }),
+                redirect: "error",
                 signal: controller.signal,
             }
         );
+
+        if (!response.ok) {
+            try {
+                await response.body?.cancel();
+            } catch {
+                // Corpo de erro nunca entra em log ou diagnóstico.
+            }
+
+            throw new Error(
+                "provider de embedding retornou HTTP " +
+                `${response.status}`
+            );
+        }
 
         const raw = await response.text();
 
@@ -173,14 +188,6 @@ async function requestManagedEmbedding(
         ) {
             throw new Error(
                 "resposta do provider excedeu o limite"
-            );
-        }
-
-        if (!response.ok) {
-            throw new Error(
-                "provider de embedding retornou HTTP " +
-                `${response.status}: ` +
-                raw.slice(0, 512)
             );
         }
 
@@ -215,6 +222,12 @@ async function requestManagedEmbedding(
         ) {
             throw new Error(
                 "provider de embedding excedeu 60 segundos"
+            );
+        }
+
+        if (error instanceof TypeError) {
+            throw new Error(
+                "falha ao acessar provider local de embedding"
             );
         }
 
@@ -509,13 +522,25 @@ async function main() {
     );
 }
 
-main().catch((error) => {
-    console.error();
-    console.error("GERADOR DE EMBEDDINGS: FALHOU");
-    console.error(
-        error instanceof Error
-            ? error.stack
-            : String(error)
-    );
-    process.exitCode = 1;
-});
+export {
+    requestManagedEmbedding,
+    resolveEmbeddingBaseUrl,
+};
+
+if (
+    process.argv[1] !== undefined &&
+    import.meta.url === pathToFileURL(process.argv[1]).href
+) {
+    main().catch((error) => {
+        console.error();
+        console.error(
+            "GERADOR DE EMBEDDINGS: FALHOU"
+        );
+        console.error(
+            error instanceof Error
+                ? error.stack
+                : String(error)
+        );
+        process.exitCode = 1;
+    });
+}

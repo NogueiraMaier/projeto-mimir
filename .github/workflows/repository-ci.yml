@@ -127,6 +127,12 @@ jobs:
 
           echo "NODE_SYNTAX=PASS files=$count"
 
+      - name: Embedding provider transport tests
+        shell: bash
+        run: |
+          node --test \
+            tools/memory/test_mimir_generate_embeddings.mjs
+
       - name: Evidence classifier self-test
         shell: bash
         run: |
