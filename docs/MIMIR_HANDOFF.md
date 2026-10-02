@@ -3691,3 +3691,102 @@ GBNF design documentation validation incident:
 - PostgreSQL was not accessed;
 - production was unchanged;
 - no protected consolidator code was modified.
+
+## MIMIR-V1-PROTECTED-OUTPUT-GBNF-V1-REPOSITORY-VALIDATION-01
+
+Date: 2026-10-02
+
+Status:
+
+`REPOSITORY_VALIDATED_RUNTIME_VALIDATION_PENDING`
+
+Branch:
+
+`feat/mimir-operational-foundation`
+
+Implementation HEAD:
+
+`c3afe5e0dcdbe6f8728a437a002b06c4112bba4a`
+
+Implementation:
+
+- `tools/memory/mimir_protected_output_gbnf_v1.py`
+  SHA-256 `d1c025c49fe14937b3eba2611383baf982a4df2bc542c6c9aa64700a32b1f64f`;
+- `tools/memory/test_mimir_protected_output_gbnf_v1.py`
+  SHA-256 `2ba1129fc7ce5f4218d150e73bffd046d1683efe4879cd1cfa6516a047ac5657`;
+- `tools/memory/validate-protected-output-gbnf-v1-repository.sh`
+  SHA-256 `91504127a5ab5e159602edfaad5ef17238bf5c40a2f0d55ba18c17782e90b764`.
+
+Repository validation:
+
+- 18/18 unit tests PASS;
+- isolated repository validator PASS;
+- generated-grammar contract boundary PASS;
+- builder import policy PASS;
+- Python/shell syntax PASS;
+- text/EOF policy PASS;
+- CLI malformed uppercase SHA rejected with RC=2;
+- CLI max_candidates=11 rejected with RC=2;
+- candidate cardinality 0..max_candidates preserved;
+- evidence cardinality 1..unbounded preserved;
+- source_event_id and source_content_sha256 bindings preserved;
+- source_session_id absent from generated grammar;
+- source_excerpt_hash absent from generated grammar;
+- raw evidence remains source_excerpt + excerpt;
+- trusted validator remains semantic authority.
+
+Runtime boundary:
+
+`LLAMA_GBNF_RUNTIME_VALIDATION=PENDING`
+
+This checkpoint does not claim that the full production-equivalent grammar
+has been accepted by the real llama.cpp parser/runtime.
+
+Protected consolidator:
+
+`UNCHANGED / NOT_DEPLOYED`
+
+FINDING-05:
+
+`REPOSITORY_VALIDATED / REAL_MODEL_REVALIDATION_BLOCKED`
+
+Preserved validation failures:
+
+1. repository validator false positive:
+   - failure: source_session_id found in builder source;
+   - root cause: validator scanned builder source instead of generated grammar;
+   - evidence SHA-256 `6bf562f40a4ca41f48346a243c915cdeac4aa36cb51fbc783d4f996c8c21f9a5`;
+   - implementation builder/test unchanged during fix.
+
+2. first final-review false positive:
+   - failure: `FAIL:max_candidates=3 representation`;
+   - root cause: review counter included `candidate` inside the rule name
+     `candidates`;
+   - failed-review evidence SHA-256 `4f15be4ea3081015e30cde972a9533504206aec6f03318465851fa899d1b5a0e`;
+   - corrected read-only review evidence SHA-256 `dca76997174dc2d748aaf1e64250f1cec6b5978c922cd68e1a510ffb94e5296e`;
+   - corrected RHS count: 6;
+   - implementation change required: NO.
+
+Production impact:
+
+None.
+
+Qwen:
+
+Not accessed during repository implementation/validation.
+
+PostgreSQL:
+
+Not accessed.
+
+PR:
+
+Remains Draft.
+
+Push:
+
+Not performed.
+
+NEXT_ACTION:
+
+Projetar e executar uma validação controlada da grammar protected-output GBNF v1 contra o parser/runtime real do llama.cpp usando apenas dados sintéticos, sem PostgreSQL e sem alterar o protected consolidator. A validação deve usar a grammar produzida pelo builder commitado, preservar source_event_id/source_content_sha256 sintéticos, não usar dados protegidos e distinguir parser/runtime PASS de protected-consolidator real-model validation. Não alterar ainda mimir-consolidate-protected-v1.py.

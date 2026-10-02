@@ -125,6 +125,36 @@ A documentação do Maestro deve ser retomada somente após a estabilização do
 
 ## Checkpoint atual
 
+**MIMIR-V1-PROTECTED-OUTPUT-GBNF-V1-REPOSITORY-VALIDATION-01 — REPOSITORY_VALIDATED_RUNTIME_VALIDATION_PENDING em 2026-10-02.**
+
+- implementation HEAD: `c3afe5e0dcdbe6f8728a437a002b06c4112bba4a`;
+- three new protected-output GBNF v1 artifacts committed;
+- builder SHA-256: `d1c025c49fe14937b3eba2611383baf982a4df2bc542c6c9aa64700a32b1f64f`;
+- test SHA-256: `2ba1129fc7ce5f4218d150e73bffd046d1683efe4879cd1cfa6516a047ac5657`;
+- repository validator SHA-256: `91504127a5ab5e159602edfaad5ef17238bf5c40a2f0d55ba18c17782e90b764`;
+- 18/18 unit tests PASS;
+- isolated repository validator PASS;
+- generated-grammar contract boundary PASS;
+- candidate cardinality 0..max_candidates preserved;
+- evidence cardinality 1..unbounded preserved;
+- raw evidence remains source_excerpt + excerpt;
+- trusted validator remains semantic authority;
+- two validation-script false positives were preserved as failure evidence;
+- llama.cpp full grammar runtime validation remains PENDING;
+- protected consolidator remains UNCHANGED / NOT DEPLOYED;
+- FINDING-05 remains `REPOSITORY_VALIDATED / REAL_MODEL_REVALIDATION_BLOCKED`;
+- Qwen/PostgreSQL/production were not accessed;
+- PR remains Draft;
+- push not performed.
+
+Evidence:
+
+`docs/review/operations/2026-10-02-protected-output-gbnf-v1-repository-validation-01.md`
+
+**NEXT_ACTION atual:** Projetar e executar uma validação controlada da grammar protected-output GBNF v1 contra o parser/runtime real do llama.cpp usando apenas dados sintéticos, sem PostgreSQL e sem alterar o protected consolidator. A validação deve usar a grammar produzida pelo builder commitado, preservar source_event_id/source_content_sha256 sintéticos, não usar dados protegidos e distinguir parser/runtime PASS de protected-consolidator real-model validation. Não alterar ainda mimir-consolidate-protected-v1.py.
+
+## Checkpoint histórico — MIMIR-V1-PROTECTED-CONSOLIDATOR-GBNF-DESIGN-01
+
 **MIMIR-V1-PROTECTED-CONSOLIDATOR-GBNF-DESIGN-01 — PROPOSED em 2026-10-01.**
 
 - base HEAD: `55f668d866557eb2a7736c0d88f2ce2c795bb946`;

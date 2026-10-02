@@ -663,3 +663,31 @@ Evidência da rodada: [review/operations/2026-09-24.md](review/operations/2026-0
 - **PUSH:** not performed.
 - **EVIDENCE:** `docs/review/operations/2026-10-01-protected-consolidator-gbnf-design-01.md`.
 - **NEXT:** Implementar no repositório, sem modificar ainda o protected consolidator, os artefatos versionados `tools/memory/mimir_protected_output_gbnf_v1.py`, `tools/memory/test_mimir_protected_output_gbnf_v1.py` e `tools/memory/validate-protected-output-gbnf-v1-repository.sh`. O builder deve gerar GBNF determinística ligada a source_event_id, source_content_sha256 e max_candidates, preservar a estrutura bruta source_excerpt/excerpt e nunca introduzir source_session_id ou source_excerpt_hash. A validação repository-only deve provar o contrato do builder e suas rejeições, mas deve registrar explicitamente que a aceitação da nova grammar pelo parser llama.cpp permanece RUNTIME_VALIDATION_PENDING. Não executar Qwen ou PostgreSQL.
+
+## MIMIR-V1-PROTECTED-OUTPUT-GBNF-V1-REPOSITORY-VALIDATION-01
+
+- **STATUS:** REPOSITORY_VALIDATED_RUNTIME_VALIDATION_PENDING.
+- **IMPLEMENTATION HEAD:** `c3afe5e0dcdbe6f8728a437a002b06c4112bba4a`.
+- **BUILDER SHA-256:** `d1c025c49fe14937b3eba2611383baf982a4df2bc542c6c9aa64700a32b1f64f`.
+- **TEST SHA-256:** `2ba1129fc7ce5f4218d150e73bffd046d1683efe4879cd1cfa6516a047ac5657`.
+- **VALIDATOR SHA-256:** `91504127a5ab5e159602edfaad5ef17238bf5c40a2f0d55ba18c17782e90b764`.
+- **UNIT TESTS:** 18/18 PASS.
+- **REPOSITORY VALIDATOR:** PASS.
+- **GENERATED GRAMMAR CONTRACT:** PASS.
+- **CLI FAIL-CLOSED:** malformed SHA and max_candidates=11 rejected with RC=2.
+- **CANDIDATES:** 0..max_candidates preserved.
+- **EVIDENCE:** 1..unbounded preserved.
+- **RAW EVIDENCE:** source_excerpt + excerpt.
+- **TRUSTED VALIDATOR:** remains semantic authority.
+- **LLAMA GBNF RUNTIME VALIDATION:** PENDING.
+- **PROTECTED CONSOLIDATOR:** UNCHANGED / NOT DEPLOYED.
+- **FINDING-05:** REPOSITORY_VALIDATED / REAL_MODEL_REVALIDATION_BLOCKED.
+- **QWEN:** NOT ACCESSED.
+- **POSTGRESQL:** NOT ACCESSED.
+- **PRODUCTION:** UNCHANGED.
+- **PR:** remains Draft.
+- **PUSH:** not performed.
+- **FAILURE EVIDENCE 1:** `6bf562f40a4ca41f48346a243c915cdeac4aa36cb51fbc783d4f996c8c21f9a5`.
+- **FAILURE EVIDENCE 2:** `4f15be4ea3081015e30cde972a9533504206aec6f03318465851fa899d1b5a0e`.
+- **CORRECTED REVIEW EVIDENCE:** `dca76997174dc2d748aaf1e64250f1cec6b5978c922cd68e1a510ffb94e5296e`.
+- **NEXT:** Projetar e executar uma validação controlada da grammar protected-output GBNF v1 contra o parser/runtime real do llama.cpp usando apenas dados sintéticos, sem PostgreSQL e sem alterar o protected consolidator. A validação deve usar a grammar produzida pelo builder commitado, preservar source_event_id/source_content_sha256 sintéticos, não usar dados protegidos e distinguir parser/runtime PASS de protected-consolidator real-model validation. Não alterar ainda mimir-consolidate-protected-v1.py.
