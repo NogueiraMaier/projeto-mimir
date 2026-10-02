@@ -4565,3 +4565,168 @@ FINDING-05 remains:
 
 After this checkpoint is synchronized remotely, authorization for the isolated
 CLI/PostgreSQL/Qwen LAB E2E remains a separate decision.
+
+## MIMIR-V1-PROTECTED-CONSOLIDATOR-CLI-POSTGRESQL-E2E-LAB-01
+
+Date: 2026-10-02
+
+Status:
+
+`VALIDATED`
+
+Branch:
+
+`feat/mimir-operational-foundation`
+
+Source HEAD:
+
+`b25b9cf7fb3b4c9c37075793678fe1e95f80a953`
+
+## Result
+
+The protected consolidator completed the full isolated CLI/PostgreSQL/Qwen
+laboratory path successfully.
+
+Validated chain:
+
+`synthetic fixture -> capture -> writer dry-run -> PostgreSQL LAB write -> protected read -> protected consolidator CLI -> real local Qwen -> trusted validate_output() -> zero automatic promotion -> targeted synthetic cleanup`
+
+## PostgreSQL LAB
+
+LAB root:
+
+`/var/tmp/mimir-pg14-lab`
+
+Port:
+
+`55433`
+
+Observed schema versions:
+
+`1,2,3,4,5,6,7,8,9,10,11,12,14,15,16`
+
+The LAB data-directory guard passed.
+
+TCP exposure check:
+
+`OFF`
+
+Synthetic pre-run residue:
+
+`PASS`
+
+Synthetic write:
+
+`VALIDATED`
+
+Protected read:
+
+`VALIDATED`
+
+Post-run synthetic residue:
+
+`0`
+
+## Protected consolidator / model path
+
+Protected consolidator CLI:
+
+`VALIDATED`
+
+Real Qwen path:
+
+`VALIDATED`
+
+Authorized completion requests:
+
+`1`
+
+Automatic retry:
+
+`NO`
+
+Candidate count:
+
+`1`
+
+Observed candidate memory type:
+
+`evidence`
+
+Trust class:
+
+`UNTRUSTED_OBSERVATION`
+
+Human review:
+
+`REQUIRED`
+
+Trusted output validation:
+
+`VALIDATED`
+
+Evidence binding:
+
+`source_excerpt_hash / VALIDATED`
+
+## Promotion boundary
+
+Automatic memory promotion:
+
+`ZERO`
+
+No active memory record was created from the synthetic candidate.
+
+## Artifact identities
+
+Harness SHA-256:
+
+`d0bd88ca46fdf8cc5e09f4d29f87ce33c9c06a217b332aaeb644400dd71c219c`
+
+Protected consolidator SHA-256:
+
+`d699a65b07c58faac5b740492feebc8f0da7c87ab71ea188cb083f1660a046fd`
+
+Execution evidence:
+
+`/var/tmp/mimir-protected-consolidator-cli-pg-e2e-b25b9cf.log`
+
+Evidence SHA-256:
+
+`ad4dfa7c0f544715f333011f2992777cee9fe713fad2985eed67aead9a55c515`
+
+Evidence size:
+
+`1198 bytes / 49 lines`
+
+Preserved restricted run directory:
+
+`/var/tmp/mimir-protected-real.qZRac0`
+
+The run artifacts were intentionally preserved.
+
+## Finding state
+
+FINDING-05 remains:
+
+`CLOSED / REAL_MODEL_REVALIDATED`
+
+This E2E adds integration validation and does not reopen the finding.
+
+## Scope boundary
+
+`CLI_POSTGRESQL_QWEN_E2E_LAB=VALIDATED`
+
+does not imply:
+
+`PRODUCTION_VALIDATED`
+
+Production was unchanged.
+
+No production PostgreSQL access was authorized.
+
+PR remains Draft.
+
+## NEXT_ACTION
+
+`FRESH_FETCH_GUARD_THEN_PUSH_PROTECTED_CONSOLIDATOR_CLI_PG_E2E_CHECKPOINT`

@@ -125,6 +125,38 @@ A documentação do Maestro deve ser retomada somente após a estabilização do
 
 ## Checkpoint atual
 
+**MIMIR-V1-PROTECTED-CONSOLIDATOR-CLI-POSTGRESQL-E2E-LAB-01 — VALIDATED em 2026-10-02.**
+
+- source HEAD: `b25b9cf7fb3b4c9c37075793678fe1e95f80a953`;
+- full isolated protected-consolidator integration path completed;
+- synthetic capture PASS;
+- writer dry-run PASS;
+- synthetic PostgreSQL LAB write PASS;
+- protected read PASS;
+- protected consolidator CLI PASS;
+- exactly one real Qwen completion request;
+- no retry;
+- trusted output validation PASS;
+- one candidate returned;
+- candidate trust remained `UNTRUSTED_OBSERVATION`;
+- mandatory human review retained;
+- `source_excerpt_hash` evidence binding validated;
+- automatic memory promotion remained zero;
+- targeted synthetic cleanup PASS with residue 0;
+- harness SHA-256: `d0bd88ca46fdf8cc5e09f4d29f87ce33c9c06a217b332aaeb644400dd71c219c`;
+- consolidator SHA-256: `d699a65b07c58faac5b740492feebc8f0da7c87ab71ea188cb083f1660a046fd`;
+- evidence SHA-256: `ad4dfa7c0f544715f333011f2992777cee9fe713fad2985eed67aead9a55c515`;
+- restricted run artifacts preserved at `/var/tmp/mimir-protected-real.qZRac0`;
+- FINDING-05 remains `CLOSED / REAL_MODEL_REVALIDATED`;
+- production unchanged and not validated;
+- PR remains Draft.
+
+`CLI_POSTGRESQL_QWEN_E2E_LAB_VALIDATED != PRODUCTION_VALIDATED`
+
+**NEXT_ACTION atual:** `FRESH_FETCH_GUARD_THEN_PUSH_PROTECTED_CONSOLIDATOR_CLI_PG_E2E_CHECKPOINT`.
+
+## Checkpoint histórico — MIMIR-V1-PROTECTED-CONSOLIDATOR-LAB-CLEANUP-HARDENING-REPOSITORY-VALIDATION-01
+
 **MIMIR-V1-PROTECTED-CONSOLIDATOR-LAB-CLEANUP-HARDENING-REPOSITORY-VALIDATION-01 — REPOSITORY_VALIDATED em 2026-10-02.**
 
 - implementation HEAD: `f01eb9126ff4ab5c23157c293e354249f5ae618d`;
