@@ -3566,3 +3566,128 @@ Documentation validation incident:
 - no Qwen runtime re-execution was performed;
 - no code, PostgreSQL, protected consolidator or production state changed as
   part of this correction.
+
+## MIMIR-V1-PROTECTED-CONSOLIDATOR-GBNF-DESIGN-01
+
+Date: 2026-10-01
+
+Status:
+
+`PROPOSED`
+
+Branch:
+
+`feat/mimir-operational-foundation`
+
+Base HEAD:
+
+`55f668d866557eb2a7736c0d88f2ce2c795bb946`
+
+Decision:
+
+The protected-output GBNF layer will be a transport/syntax constraint only.
+
+The existing trusted `validate_output()` remains the semantic authority.
+
+Correct raw model contract:
+
+- top-level field `source_event_id`, not `source_session_id`;
+- raw evidence uses `kind=source_excerpt` plus `excerpt`;
+- `source_excerpt_hash` is generated only after trusted excerpt/source
+  binding succeeds;
+- the model must never be asked to provide the canonical evidence hash.
+
+GBNF responsibilities:
+
+- fixed top-level object shape;
+- canonical key ordering;
+- `schema_version=1`;
+- exact source_event_id binding;
+- exact source_content_sha256 binding;
+- candidates array limited to 0..max_candidates;
+- exact six candidate fields;
+- memory_type restricted to the current allowed enum;
+- trust_class fixed to `UNTRUSTED_OBSERVATION`;
+- requires_human_review fixed to `true`;
+- evidence array contains one or more evidence objects;
+- each raw evidence object has exactly `kind` and `excerpt`;
+- evidence.kind fixed to `source_excerpt`;
+- syntactically valid JSON strings/numbers.
+
+Trusted validator responsibilities remain unchanged:
+
+- source content hash verification;
+- exact top-level/candidate/evidence key-set verification;
+- summary trim and 1..MAX_SUMMARY_CHARS validation;
+- secret/output gate;
+- confidence numeric/type/range validation;
+- evidence excerpt non-empty/size validation;
+- exact contiguous substring binding to protected source;
+- trusted calculation of source_excerpt_hash;
+- canonical-output construction;
+- canonical secret/output gate.
+
+Contract preservation:
+
+- candidates remains allowed to be empty;
+- max_candidates remains explicit and dynamic;
+- evidence remains minItems=1 with no newly invented maximum;
+- no new semantic field is introduced;
+- no existing trusted semantic validation is removed.
+
+Canonical key order is permitted as a transport-level strengthening. JSON
+object order has no semantic meaning, and the trusted validator remains
+order-independent.
+
+Runtime-validation boundary:
+
+The installed host exposes `--grammar` and `--grammar-file` through
+llama-cli/llama-server, but no dedicated GBNF parse/check-only validator was
+found.
+
+Therefore repository-only tests may validate deterministic construction and
+contract mapping, but MUST NOT claim llama.cpp parser acceptance.
+
+New grammar parser/runtime acceptance remains:
+
+`RUNTIME_VALIDATION_PENDING`
+
+FINDING-05 remains:
+
+`REPOSITORY_VALIDATED / REAL_MODEL_REVALIDATION_BLOCKED`
+
+Production impact:
+
+None.
+
+No Qwen request, PostgreSQL access, deployment, migration, production role
+change or protected-consolidator modification is authorized in this design
+checkpoint.
+
+NEXT_ACTION:
+
+Implementar no repositório, sem modificar ainda o protected consolidator, os artefatos versionados `tools/memory/mimir_protected_output_gbnf_v1.py`, `tools/memory/test_mimir_protected_output_gbnf_v1.py` e `tools/memory/validate-protected-output-gbnf-v1-repository.sh`. O builder deve gerar GBNF determinística ligada a source_event_id, source_content_sha256 e max_candidates, preservar a estrutura bruta source_excerpt/excerpt e nunca introduzir source_session_id ou source_excerpt_hash. A validação repository-only deve provar o contrato do builder e suas rejeições, mas deve registrar explicitamente que a aceitação da nova grammar pelo parser llama.cpp permanece RUNTIME_VALIDATION_PENDING. Não executar Qwen ou PostgreSQL.
+
+GBNF design documentation validation incident:
+
+- first structural validation attempt: FAIL;
+- failure marker:
+  `FAIL:REVIEW:source_session_id correction`;
+- root cause: the validator searched for the Markdown-insensitive literal
+  `source_session_id is not part`, while the review correctly contained
+  the Markdown form
+  `` `source_session_id` is not part of this v1 model-output contract. ``;
+- no design-document content was changed to satisfy that brittle check;
+- a read-only revalidation normalized Markdown only inside the validator;
+- root-cause proof:
+  `PREVIOUS_FAILURE_ROOT_CAUSE=MARKDOWN_SENSITIVE_VALIDATOR`;
+- corrected validation result:
+  `STRUCTURAL_VALIDATION=PASS`;
+- semantic contract checks passed for source_event_id, exclusion of
+  source_session_id, raw source_excerpt evidence, trusted canonical hashing
+  and the runtime-validation boundary;
+- `DOCUMENT_CONTENT_CHANGED_FOR_VALIDATOR=NO`;
+- Qwen was not accessed;
+- PostgreSQL was not accessed;
+- production was unchanged;
+- no protected consolidator code was modified.

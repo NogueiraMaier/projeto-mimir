@@ -640,3 +640,26 @@ Evidência da rodada: [review/operations/2026-09-24.md](review/operations/2026-0
 - **PUSH:** not performed.
 - **EVIDENCE:** `docs/review/operations/2026-10-01-gbnf-runtime-compatibility-02.md`.
 - **NEXT:** Inspecionar e projetar no repositório uma grammar GBNF versionada equivalente ao contrato fechado do protected consolidator, derivada do schema/validator atualmente confiável. A nova grammar deve preservar todos os campos obrigatórios, additionalProperties=false, candidate e evidence structure, source_session_id/source_event_id, evidence kind source_excerpt_hash e SHA-256 lowercase de 64 caracteres. Primeiro validar essa grammar somente em testes de repositório positivos e negativos; não alterar ainda o transporte do protected consolidator, não executar PostgreSQL e não fazer nova chamada ao modelo real.
+
+## MIMIR-V1-PROTECTED-CONSOLIDATOR-GBNF-DESIGN-01
+
+- **STATUS:** PROPOSED.
+- **BASE HEAD:** `55f668d866557eb2a7736c0d88f2ce2c795bb946`.
+- **DECISION:** GBNF is a transport/syntax constraint; trusted
+  `validate_output()` remains semantic authority.
+- **RAW EVENT FIELD:** `source_event_id`; no `source_session_id`.
+- **RAW EVIDENCE:** `source_excerpt` + `excerpt`.
+- **CANONICAL EVIDENCE:** `source_excerpt_hash` + trusted SHA-256 only after
+  source binding.
+- **CANDIDATES:** 0..max_candidates.
+- **EVIDENCE:** one or more items; no invented maximum.
+- **RUNTIME PARSER VALIDATION:** PENDING.
+- **PROTECTED CONSOLIDATOR:** NOT MODIFIED / NOT DEPLOYED.
+- **FINDING-05:** REPOSITORY_VALIDATED / REAL_MODEL_REVALIDATION_BLOCKED.
+- **QWEN:** NOT ACCESSED.
+- **POSTGRESQL:** NOT ACCESSED.
+- **PRODUCTION:** UNCHANGED.
+- **PR:** remains Draft.
+- **PUSH:** not performed.
+- **EVIDENCE:** `docs/review/operations/2026-10-01-protected-consolidator-gbnf-design-01.md`.
+- **NEXT:** Implementar no repositório, sem modificar ainda o protected consolidator, os artefatos versionados `tools/memory/mimir_protected_output_gbnf_v1.py`, `tools/memory/test_mimir_protected_output_gbnf_v1.py` e `tools/memory/validate-protected-output-gbnf-v1-repository.sh`. O builder deve gerar GBNF determinística ligada a source_event_id, source_content_sha256 e max_candidates, preservar a estrutura bruta source_excerpt/excerpt e nunca introduzir source_session_id ou source_excerpt_hash. A validação repository-only deve provar o contrato do builder e suas rejeições, mas deve registrar explicitamente que a aceitação da nova grammar pelo parser llama.cpp permanece RUNTIME_VALIDATION_PENDING. Não executar Qwen ou PostgreSQL.

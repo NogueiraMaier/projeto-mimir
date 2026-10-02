@@ -125,6 +125,34 @@ A documentação do Maestro deve ser retomada somente após a estabilização do
 
 ## Checkpoint atual
 
+**MIMIR-V1-PROTECTED-CONSOLIDATOR-GBNF-DESIGN-01 — PROPOSED em 2026-10-01.**
+
+- base HEAD: `55f668d866557eb2a7736c0d88f2ce2c795bb946`;
+- protected-output GBNF design inspected against the trusted schema and
+  validator;
+- raw binding is `source_event_id`, not `source_session_id`;
+- raw evidence remains `source_excerpt` + `excerpt`;
+- canonical `source_excerpt_hash` remains trusted post-validation output;
+- GBNF will constrain transport/syntax only;
+- trusted `validate_output()` remains semantic authority;
+- candidates remains 0..max_candidates;
+- evidence remains one-or-more with no invented maximum;
+- no dedicated llama.cpp GBNF parse/check-only tool was found;
+- repository-only grammar tests must not claim runtime-parser validation;
+- Qwen/PostgreSQL/production: NOT ACCESSED;
+- protected consolidator: NOT MODIFIED / NOT DEPLOYED;
+- FINDING-05 remains `REPOSITORY_VALIDATED / REAL_MODEL_REVALIDATION_BLOCKED`;
+- PR remains Draft;
+- no push, merge, stable tag or production deployment is authorized.
+
+Evidence:
+
+`docs/review/operations/2026-10-01-protected-consolidator-gbnf-design-01.md`
+
+**NEXT_ACTION atual:** Implementar no repositório, sem modificar ainda o protected consolidator, os artefatos versionados `tools/memory/mimir_protected_output_gbnf_v1.py`, `tools/memory/test_mimir_protected_output_gbnf_v1.py` e `tools/memory/validate-protected-output-gbnf-v1-repository.sh`. O builder deve gerar GBNF determinística ligada a source_event_id, source_content_sha256 e max_candidates, preservar a estrutura bruta source_excerpt/excerpt e nunca introduzir source_session_id ou source_excerpt_hash. A validação repository-only deve provar o contrato do builder e suas rejeições, mas deve registrar explicitamente que a aceitação da nova grammar pelo parser llama.cpp permanece RUNTIME_VALIDATION_PENDING. Não executar Qwen ou PostgreSQL.
+
+## Checkpoint histórico — MIMIR-V1-GBNF-RUNTIME-COMPATIBILITY-02
+
 **MIMIR-V1-GBNF-RUNTIME-COMPATIBILITY-02 — VALIDATED em 2026-10-01.**
 
 - base HEAD: `6d238430b95db40e4568ee6c8032b29c2a82a9e8`;
