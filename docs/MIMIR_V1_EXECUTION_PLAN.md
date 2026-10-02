@@ -125,6 +125,29 @@ A documentação do Maestro deve ser retomada somente após a estabilização do
 
 ## Checkpoint atual
 
+**MIMIR-V1-PROTECTED-CONSOLIDATOR-LAB-CLEANUP-HARDENING-REPOSITORY-VALIDATION-01 — REPOSITORY_VALIDATED em 2026-10-02.**
+
+- implementation HEAD: `f01eb9126ff4ab5c23157c293e354249f5ae618d`;
+- design parent: `6d9c44653ba85e72f3ad724b87078fb37377f5fa`;
+- existing LAB harness hardened; no duplicate harness created;
+- recursive filesystem deletion of `$RUN` removed;
+- restricted run artifacts are now preserved for evidence;
+- targeted synthetic PostgreSQL cleanup remains intact;
+- LAB isolation `/var/tmp/mimir-pg14-lab:55433` remains intact;
+- harness SHA-256: `d0bd88ca46fdf8cc5e09f4d29f87ce33c9c06a217b332aaeb644400dd71c219c`;
+- consolidator SHA-256 unchanged: `d699a65b07c58faac5b740492feebc8f0da7c87ab71ea188cb083f1660a046fd`;
+- repository evidence SHA-256: `959160371e1bc2be112cf293b84b360592d44d387bd3b31c07f70f5fa6d0747f`;
+- repository-only validation PASS;
+- LAB harness was not executed;
+- Qwen was not accessed;
+- PostgreSQL was not accessed;
+- production unchanged;
+- FINDING-05 remains `CLOSED / REAL_MODEL_REVALIDATED`.
+
+**NEXT_ACTION atual:** `FRESH_FETCH_GUARD_THEN_PUSH_CLEANUP_HARDENING_CHECKPOINT`.
+
+## Checkpoint histórico — MIMIR-V1-PROTECTED-CONSOLIDATOR-CLI-PG-E2E-DESIGN-01
+
 **MIMIR-V1-PROTECTED-CONSOLIDATOR-CLI-PG-E2E-DESIGN-01 — PROPOSED em 2026-10-02.**
 
 - source HEAD: `c76b443a51aea0c47ae25aa93efd1fae6e0022d4`;

@@ -4447,3 +4447,121 @@ not reopen or redefine FINDING-05.
 ## NEXT_ACTION
 
 `HARDEN_EXISTING_PROTECTED_CONSOLIDATOR_REAL_MODEL_LAB_CLEANUP_REPOSITORY_ONLY`
+
+## MIMIR-V1-PROTECTED-CONSOLIDATOR-LAB-CLEANUP-HARDENING-REPOSITORY-VALIDATION-01
+
+Date: 2026-10-02
+
+Status:
+
+`REPOSITORY_VALIDATED`
+
+Branch:
+
+`feat/mimir-operational-foundation`
+
+Implementation HEAD:
+
+`f01eb9126ff4ab5c23157c293e354249f5ae618d`
+
+Design parent:
+
+`6d9c44653ba85e72f3ad724b87078fb37377f5fa`
+
+## Change
+
+The existing protected-consolidator real-model LAB harness was minimally
+hardened before any CLI/PostgreSQL E2E execution.
+
+Exactly one versioned file changed:
+
+`tools/memory/validate-protected-consolidator-real-model-lab.sh`
+
+The recursive filesystem cleanup:
+
+`rm -rf -- "$RUN"`
+
+was removed.
+
+The harness now preserves the restricted per-run directory and emits:
+
+- `preserved_run_dir=$RUN`
+- `preserved_run_artifacts=YES`
+
+## Safety boundary retained
+
+The targeted SQL cleanup of synthetic LAB rows remains intact:
+
+- synthetic `memory_records`;
+- synthetic `session_sources`;
+- synthetic `memory_events`;
+- post-cleanup synthetic residue query.
+
+The PostgreSQL LAB boundary remains:
+
+- root `/var/tmp/mimir-pg14-lab`;
+- port `55433`;
+- Unix-socket-only validation;
+- LAB data-directory validation.
+
+The protected consolidator was not modified.
+
+## Repository validation
+
+Result:
+
+`PASS`
+
+Validated without executing the LAB harness:
+
+- Bash syntax PASS;
+- targeted DB cleanup retained;
+- recursive filesystem deletion absent;
+- run-artifact preservation present;
+- LAB boundary retained;
+- minimal diff shape exactly 2 insertions / 1 deletion.
+
+Harness SHA-256:
+
+`d0bd88ca46fdf8cc5e09f4d29f87ce33c9c06a217b332aaeb644400dd71c219c`
+
+Protected consolidator SHA-256, unchanged:
+
+`d699a65b07c58faac5b740492feebc8f0da7c87ab71ea188cb083f1660a046fd`
+
+Repository validation evidence SHA-256:
+
+`959160371e1bc2be112cf293b84b360592d44d387bd3b31c07f70f5fa6d0747f`
+
+## Execution boundary
+
+Harness executed:
+
+`NO`
+
+CLI/PostgreSQL E2E executed:
+
+`NO`
+
+Qwen accessed:
+
+`NO`
+
+PostgreSQL accessed:
+
+`NO`
+
+Production:
+
+`UNCHANGED`
+
+FINDING-05 remains:
+
+`CLOSED / REAL_MODEL_REVALIDATED`
+
+## NEXT_ACTION
+
+`FRESH_FETCH_GUARD_THEN_PUSH_CLEANUP_HARDENING_CHECKPOINT`
+
+After this checkpoint is synchronized remotely, authorization for the isolated
+CLI/PostgreSQL/Qwen LAB E2E remains a separate decision.
