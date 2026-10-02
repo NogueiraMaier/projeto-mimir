@@ -4342,3 +4342,108 @@ The evidence file was preserved and no retry was performed.
 ## NEXT_ACTION
 
 `PLAN_PROTECTED_CONSOLIDATOR_CLI_POSTGRESQL_E2E_LAB`
+
+## MIMIR-V1-PROTECTED-CONSOLIDATOR-CLI-PG-E2E-DESIGN-01
+
+Date: 2026-10-02
+
+Status:
+
+`PROPOSED`
+
+Source HEAD:
+
+`c76b443a51aea0c47ae25aa93efd1fae6e0022d4`
+
+## Inspection result
+
+The existing versioned harness
+`tools/memory/validate-protected-consolidator-real-model-lab.sh`
+already covers the required isolated CLI/PostgreSQL/Qwen path.
+
+Its current flow includes:
+
+- synthetic fixture;
+- session capture;
+- writer dry-run;
+- controlled writer into PostgreSQL LAB;
+- protected read through `mimir.read_consolidation_source`;
+- protected consolidator CLI;
+- real local Qwen call;
+- trusted output validation;
+- canonical `source_excerpt_hash`;
+- mandatory human review;
+- zero automatic memory promotion;
+- targeted synthetic database cleanup.
+
+Therefore a second E2E harness must not be introduced.
+
+## Laboratory boundary
+
+PostgreSQL LAB:
+
+`/var/tmp/mimir-pg14-lab`
+
+Port:
+
+`55433`
+
+The harness checks:
+
+- Unix socket exists;
+- PostgreSQL `data_directory` equals the LAB data directory;
+- TCP port 55433 is not listening;
+- expected LAB schema versions;
+- synthetic residue is absent before execution.
+
+Production remains prohibited.
+
+## Required safety hardening before execution
+
+The existing cleanup currently contains:
+
+`rm -rf -- "$RUN"`
+
+This must not be executed.
+
+Decision:
+
+- retain the targeted SQL cleanup of synthetic LAB rows;
+- remove recursive filesystem deletion from the harness;
+- preserve the per-run directory as restricted evidence;
+- print the preserved run directory path;
+- do not weaken database residue verification.
+
+This is a safety-only harness change. It does not modify the protected
+consolidator contract.
+
+## Validation strategy after hardening
+
+First:
+
+`REPOSITORY_ONLY`
+
+No PostgreSQL and no Qwen.
+
+Only after that passes may a controlled E2E LAB run be authorized.
+
+The E2E execution will permit:
+
+- PostgreSQL LAB only;
+- one protected-consolidator Qwen request;
+- synthetic data only;
+- no production;
+- no automatic promotion.
+
+## Existing finding state
+
+FINDING-05 remains:
+
+`CLOSED / REAL_MODEL_REVALIDATED`
+
+The future CLI/PostgreSQL E2E is additional integration validation and must
+not reopen or redefine FINDING-05.
+
+## NEXT_ACTION
+
+`HARDEN_EXISTING_PROTECTED_CONSOLIDATOR_REAL_MODEL_LAB_CLEANUP_REPOSITORY_ONLY`

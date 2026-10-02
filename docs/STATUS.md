@@ -799,3 +799,21 @@ Evidência da rodada: [review/operations/2026-09-24.md](review/operations/2026-0
 - **PRODUCTION:** UNCHANGED.
 - **PR:** remains Draft.
 - **NEXT:** `PLAN_PROTECTED_CONSOLIDATOR_CLI_POSTGRESQL_E2E_LAB`.
+
+## MIMIR-V1-PROTECTED-CONSOLIDATOR-CLI-PG-E2E-DESIGN-01
+
+- **STATUS:** PROPOSED.
+- **SOURCE HEAD:** `c76b443a51aea0c47ae25aa93efd1fae6e0022d4`.
+- **NEW E2E HARNESS:** NO.
+- **EXISTING HARNESS:** reuse `validate-protected-consolidator-real-model-lab.sh`.
+- **POSTGRESQL LAB:** `/var/tmp/mimir-pg14-lab`, port 55433.
+- **PRODUCTION:** forbidden.
+- **E2E CHAIN:** capture -> writer -> LAB -> protected read -> CLI -> Qwen -> trusted validation -> zero auto-promotion.
+- **FINDING-05:** remains CLOSED / REAL_MODEL_REVALIDATED.
+- **BLOCKER BEFORE E2E:** existing harness contains `rm -rf -- "$RUN"`.
+- **DECISION:** remove recursive filesystem cleanup and preserve restricted run artifacts.
+- **DB CLEANUP:** targeted synthetic cleanup remains required.
+- **HARNESS EXECUTED THIS PHASE:** NO.
+- **QWEN:** NOT ACCESSED.
+- **POSTGRESQL:** NOT ACCESSED.
+- **NEXT:** `HARDEN_EXISTING_PROTECTED_CONSOLIDATOR_REAL_MODEL_LAB_CLEANUP_REPOSITORY_ONLY`.

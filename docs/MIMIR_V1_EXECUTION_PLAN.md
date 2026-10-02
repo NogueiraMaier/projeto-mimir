@@ -125,6 +125,26 @@ A documentação do Maestro deve ser retomada somente após a estabilização do
 
 ## Checkpoint atual
 
+**MIMIR-V1-PROTECTED-CONSOLIDATOR-CLI-PG-E2E-DESIGN-01 — PROPOSED em 2026-10-02.**
+
+- source HEAD: `c76b443a51aea0c47ae25aa93efd1fae6e0022d4`;
+- inspection confirms the existing real-model LAB harness already implements
+  the required CLI/PostgreSQL/Qwen E2E chain;
+- no duplicate E2E harness will be created;
+- PostgreSQL target remains isolated LAB `/var/tmp/mimir-pg14-lab:55433`;
+- production access remains prohibited;
+- targeted synthetic DB cleanup remains required;
+- existing filesystem cleanup `rm -rf -- "$RUN"` is not acceptable;
+- before E2E execution, harden the existing versioned harness to preserve
+  restricted per-run artifacts instead of recursively deleting them;
+- hardening must be validated repository-only before any LAB/Qwen execution;
+- FINDING-05 remains `CLOSED / REAL_MODEL_REVALIDATED`;
+- no harness, Qwen, or PostgreSQL execution occurred in this design phase.
+
+**NEXT_ACTION atual:** `HARDEN_EXISTING_PROTECTED_CONSOLIDATOR_REAL_MODEL_LAB_CLEANUP_REPOSITORY_ONLY`.
+
+## Checkpoint histórico — MIMIR-V1-PROTECTED-CONSOLIDATOR-REALMODEL-REVALIDATION-03
+
 **MIMIR-V1-PROTECTED-CONSOLIDATOR-REALMODEL-REVALIDATION-03 — VALIDATED em 2026-10-02.**
 
 - source HEAD: `535d101ce85fcd87d3081788971b21fb35d8df6c`;
