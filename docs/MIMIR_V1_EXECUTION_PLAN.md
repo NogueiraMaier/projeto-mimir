@@ -125,6 +125,30 @@ A documentação do Maestro deve ser retomada somente após a estabilização do
 
 ## Checkpoint atual
 
+**MIMIR-V1-RSK-P0-005-TABLETOP-HARNESS-REPOSITORY-VALIDATION-01 — REPOSITORY_VALIDATED em 2026-10-02.**
+
+- implementation HEAD: `392810da4c1529ca365e8b38cfb78132fb8558d8`;
+- exercise ID: `MIMIR-IR-TTX-001`;
+- fixture SHA-256: `2c93342f96bc6e925e5a15d6b8e8fe85d36a051921a3644050dd31bd36f7ecec`;
+- harness SHA-256: `affc32a869d9a5f97eb2fd1567cf601c8fe6c8e5bfc033551e81cda150bccd94`;
+- repository validator SHA-256: `d8c1218cfd787879c03c81b41f4c24bea00b2e74fb1c047afeb36cbf6a5673a0`;
+- repository-only validation PASS;
+- validation used only `--validate-fixture-only`;
+- tabletop execution path absent from repository validator;
+- validation evidence SHA-256: `7e56f47342b874db48783cd2774758923213ddd3cc1c0e06bcb2554e375a8157`;
+- prior partial-write recovery manifest SHA-256: `80c08c8ca9e113eb1134f11e17ace6700ba8c583608d3b3347775b3d7885dc88`;
+- tabletop NOT executed;
+- execution NOT authorized;
+- no Qwen, PostgreSQL, network, production or real-equipment access;
+- `RSK-P0-005` remains `OPEN / BLOCKER`;
+- Draft removal / merge / tag / deploy remain blocked.
+
+`HARNESS_REPOSITORY_VALIDATED != TABLETOP_EXECUTED`
+
+**NEXT_ACTION atual:** `REQUEST_AUTHORIZATION_EXECUTE_RSK_P0_005_SYNTHETIC_TABLETOP_ONCE`.
+
+## Checkpoint histórico — MIMIR-V1-RSK-P0-005-HUMAN-APPROVAL-AND-EXERCISE-DESIGN-01
+
 **MIMIR-V1-RSK-P0-005-HUMAN-APPROVAL-AND-EXERCISE-DESIGN-01 — PLAN_APPROVED / EXERCISE_DESIGN_PROPOSED em 2026-10-02.**
 
 - source HEAD: `60db0b7ef89963cb95f956a2cf85b473986756fe`;

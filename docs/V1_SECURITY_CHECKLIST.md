@@ -340,6 +340,44 @@ Ainda são necessários implementação repository-only do exercício, validaç�
 harness, autorização explícita de execução, exercício controlado e reconciliação
 final da evidência.
 
+### Atualização 2026-10-02 — harness repository-only RSK-P0-005
+
+Os artefatos do exercício sintético `MIMIR-IR-TTX-001` foram implementados e
+validados no repositório.
+
+Identidades:
+
+- fixture SHA-256: `2c93342f96bc6e925e5a15d6b8e8fe85d36a051921a3644050dd31bd36f7ecec`;
+- harness SHA-256: `affc32a869d9a5f97eb2fd1567cf601c8fe6c8e5bfc033551e81cda150bccd94`;
+- validator SHA-256: `d8c1218cfd787879c03c81b41f4c24bea00b2e74fb1c047afeb36cbf6a5673a0`.
+
+Resultado:
+
+`HARNESS_REPOSITORY_VALIDATED`
+
+O validator foi executado somente em modo:
+
+`--validate-fixture-only`
+
+O tabletop não foi executado e ainda exige autorização humana explícita
+separada.
+
+Evidência repository-only SHA-256:
+
+`7e56f47342b874db48783cd2774758923213ddd3cc1c0e06bcb2554e375a8157`
+
+Estado:
+
+`RSK-P0-005 = OPEN / BLOCKER`
+
+Ainda são necessários:
+
+1. autorização explícita para uma execução controlada do tabletop;
+2. execução única do cenário sintético;
+3. preservação da evidência;
+4. classificação PASS/FAIL;
+5. reconciliação final de RSK-P0-005.
+
 ## 9. Restrições obrigatórias da v1
 
 Enquanto gaps não forem tratados em checkpoints próprios:

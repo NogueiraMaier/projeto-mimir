@@ -4908,3 +4908,117 @@ Risk remains:
 NEXT_ACTION:
 
 `IMPLEMENT_RSK_P0_005_SYNTHETIC_EXERCISE_HARNESS_REPOSITORY_ONLY`
+
+## MIMIR-V1-RSK-P0-005-TABLETOP-HARNESS-REPOSITORY-VALIDATION-01
+
+Date: 2026-10-02
+
+Status:
+
+`REPOSITORY_VALIDATED`
+
+Implementation HEAD:
+
+`392810da4c1529ca365e8b38cfb78132fb8558d8`
+
+Exercise:
+
+`MIMIR-IR-TTX-001`
+
+## Repository artifacts
+
+Fixture SHA-256:
+
+`2c93342f96bc6e925e5a15d6b8e8fe85d36a051921a3644050dd31bd36f7ecec`
+
+Harness SHA-256:
+
+`affc32a869d9a5f97eb2fd1567cf601c8fe6c8e5bfc033551e81cda150bccd94`
+
+Repository validator SHA-256:
+
+`d8c1218cfd787879c03c81b41f4c24bea00b2e74fb1c047afeb36cbf6a5673a0`
+
+## Validation result
+
+Repository-only validation:
+
+`PASS`
+
+Validated mode:
+
+`--validate-fixture-only`
+
+The repository validator does not contain a tabletop execution path.
+
+The tabletop was not executed.
+
+No incident record or tabletop evidence manifest was produced.
+
+No Qwen, PostgreSQL, network, production or real-equipment access occurred.
+
+Validation evidence:
+
+`/var/tmp/mimir-rsk-p0-005-tabletop-harness-repository-validation-392810d.log`
+
+SHA-256:
+
+`7e56f47342b874db48783cd2774758923213ddd3cc1c0e06bcb2554e375a8157`
+
+Size:
+
+`584 bytes / 22 lines`
+
+## Partial-write recovery history
+
+Before implementation commit, two anomalous untracked files containing pager
+`less` help content were identified.
+
+They were preserved outside the checkout before removal.
+
+Recovery manifest:
+
+`/var/tmp/mimir-rsk-p0-005-partial-write-recovery-2738a1f/manifest.txt`
+
+SHA-256:
+
+`80c08c8ca9e113eb1134f11e17ace6700ba8c583608d3b3347775b3d7885dc88`
+
+The three intended repository artifacts remained byte-identical through the
+recovery and commit.
+
+## Current state
+
+Incident-response plan:
+
+`REPOSITORY_VALIDATED / HUMAN_APPROVED`
+
+Synthetic exercise design:
+
+`APPROVED_FOR_DESIGN`
+
+Synthetic fixture/harness:
+
+`REPOSITORY_VALIDATED`
+
+Exercise execution:
+
+`NOT_AUTHORIZED / NOT_EXECUTED`
+
+Risk:
+
+`RSK-P0-005 = OPEN / BLOCKER`
+
+## Release boundary
+
+Not authorized:
+
+- tabletop execution without a new explicit authorization;
+- Draft removal;
+- merge;
+- stable tag;
+- production deployment.
+
+## NEXT_ACTION
+
+`REQUEST_AUTHORIZATION_EXECUTE_RSK_P0_005_SYNTHETIC_TABLETOP_ONCE`
