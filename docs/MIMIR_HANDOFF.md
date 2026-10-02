@@ -4007,3 +4007,89 @@ Push:
 NEXT_ACTION:
 
 `CONTROLLED_RUNTIME_VALIDATE_PROTECTED_OUTPUT_GBNF_V1_SYNTHETIC`
+
+## MIMIR-V1-PROTECTED-OUTPUT-GBNF-RUNTIME-V1-CONTROLLED-VALIDATION-01
+
+Date: 2026-10-02
+
+Status:
+
+`VALIDATED`
+
+Base HEAD:
+
+`2a321ec6b353d86214f20912d223939743183a44`
+
+Controlled runtime result:
+
+`FULL_GBNF_RUNTIME_VALIDATION=PASS`
+
+Execution characteristics:
+
+- exactly one synthetic model request;
+- endpoint `http://127.0.0.1:18782/v1/chat/completions`;
+- model `/var/lib/openclaw/models/Qwen3-4B-Q4_K_M.gguf`;
+- timeout 120 seconds;
+- HTTP 200;
+- finish_reason `stop`;
+- harness status PASS;
+- no retry;
+- no second request.
+
+Runtime evidence SHA-256:
+
+`40b6fd7dabc5bf9174f2c469f37678f014fc668553aea245de3d1624b16cbdfb`
+
+Runtime harness SHA-256:
+
+`da6e0f0e7bdcbd6e5ca0237df29c5e47feb171bdcb703bca8228a95b85676498`
+
+Protected-output GBNF builder SHA-256:
+
+`d1c025c49fe14937b3eba2611383baf982a4df2bc542c6c9aa64700a32b1f64f`
+
+Observed grammar identity:
+
+`cda50abd374699110f57d663410d928026882f09801004ef92ae52246ffc17d4`
+
+Observed request SHA-256:
+
+`16d63d904cbf4f805af1f1e9ca42870df8488f43e60960b9e0ac8503941521e0`
+
+Observed response SHA-256:
+
+`230f240eda0024395bcd1ea01a72fe2b98002c149320535adc154e0ae9ec3bb9`
+
+Observed generated content SHA-256:
+
+`d191bc259d7e8d1fffe597dda207caae5119ce83da5f2493745c5f24efcdfcd9`
+
+Boundary:
+
+`FULL_GBNF_RUNTIME_PASS != PROTECTED_CONSOLIDATOR_REAL_MODEL_VALIDATED`
+
+This checkpoint proves that the committed complete protected-output GBNF v1
+can be transported to and accepted by the real local llama.cpp/Qwen runtime
+for the committed synthetic case.
+
+It does not validate the protected consolidator end-to-end.
+
+Protected consolidator:
+
+`UNCHANGED / NOT EXECUTED`
+
+PostgreSQL:
+
+`NOT ACCESSED`
+
+Production:
+
+`UNCHANGED`
+
+FINDING-05:
+
+`REPOSITORY_VALIDATED / REAL_MODEL_REVALIDATION_BLOCKED`
+
+NEXT_ACTION:
+
+`IMPLEMENT_PROTECTED_CONSOLIDATOR_GBNF_TRANSPORT_REPOSITORY_ONLY`

@@ -125,6 +125,33 @@ A documentação do Maestro deve ser retomada somente após a estabilização do
 
 ## Checkpoint atual
 
+**MIMIR-V1-PROTECTED-OUTPUT-GBNF-RUNTIME-V1-CONTROLLED-VALIDATION-01 — VALIDATED em 2026-10-02.**
+
+- base HEAD: `2a321ec6b353d86214f20912d223939743183a44`;
+- complete committed protected-output GBNF v1 accepted by real llama.cpp/Qwen runtime;
+- exactly one synthetic request;
+- HTTP 200;
+- finish_reason `stop`;
+- runtime status PASS;
+- no automatic retry;
+- no second request;
+- runtime evidence SHA-256: `40b6fd7dabc5bf9174f2c469f37678f014fc668553aea245de3d1624b16cbdfb`;
+- runtime harness SHA-256: `da6e0f0e7bdcbd6e5ca0237df29c5e47feb171bdcb703bca8228a95b85676498`;
+- builder SHA-256: `d1c025c49fe14937b3eba2611383baf982a4df2bc542c6c9aa64700a32b1f64f`;
+- protected consolidator unchanged and not executed;
+- PostgreSQL not accessed;
+- production unchanged;
+- `FULL_GBNF_RUNTIME_PASS != PROTECTED_CONSOLIDATOR_REAL_MODEL_VALIDATED`;
+- FINDING-05 remains `REPOSITORY_VALIDATED / REAL_MODEL_REVALIDATION_BLOCKED`.
+
+Evidence:
+
+`docs/review/operations/2026-10-02-protected-output-gbnf-runtime-v1-controlled-validation-01.md`
+
+**NEXT_ACTION atual:** `IMPLEMENT_PROTECTED_CONSOLIDATOR_GBNF_TRANSPORT_REPOSITORY_ONLY`.
+
+## Checkpoint histórico — MIMIR-V1-PROTECTED-OUTPUT-GBNF-RUNTIME-V1-REPOSITORY-VALIDATION-01
+
 **MIMIR-V1-PROTECTED-OUTPUT-GBNF-RUNTIME-V1-REPOSITORY-VALIDATION-01 — REPOSITORY_VALIDATED_RUNTIME_VALIDATION_PENDING em 2026-10-02.**
 
 - implementation HEAD: `5ecb2b36b349b52416e347b15b7761801d09036c`;
