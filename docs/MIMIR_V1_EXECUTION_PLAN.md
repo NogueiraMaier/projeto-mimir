@@ -125,6 +125,40 @@ A documentação do Maestro deve ser retomada somente após a estabilização do
 
 ## Checkpoint atual
 
+**MIMIR-V1-RSK-P0-005-SYNTHETIC-TABLETOP-RECONCILIATION-01 — CLOSED / TECHNICALLY_TREATED / SYNTHETIC_TABLETOP_VALIDATED em 2026-10-02.**
+
+- source HEAD at execution: `80f0c42330ce6bf3365c974d4f3896234098b70f`;
+- exercise ID: `MIMIR-IR-TTX-001`;
+- execution timestamp: `2026-10-02T15:40:38Z`;
+- invocation count: `1`;
+- single-execution authorization: `CONSUMED`;
+- result: `PASS`;
+- failed requirements: `0`;
+- residue: `ZERO_UNEXPLAINED`;
+- automatic retry: `NO`;
+- execution log SHA-256: `90d203a5d36629c6da7e112f50c7abce82e04ce665df7338558d4fbef8d7489d`;
+- incident record SHA-256: `fe75525cb14f2a7e041e62ba1a34dd7d348032b1f4333c49601fd474fd5c56bf`;
+- evidence manifest SHA-256: `063f58968d453b47305fcd2525116c178022de5ed5555963f4c014e62cd0be79`;
+- formal approved incident-response plan remains unchanged:
+  `185480f739b1f33800f0fc91760dccbacf612f74fb1826d8a9b7609d3bcc3243`;
+- fixture SHA-256: `2c93342f96bc6e925e5a15d6b8e8fe85d36a051921a3644050dd31bd36f7ecec`;
+- harness SHA-256: `affc32a869d9a5f97eb2fd1567cf601c8fe6c8e5bfc033551e81cda150bccd94`;
+- validator SHA-256: `d8c1218cfd787879c03c81b41f4c24bea00b2e74fb1c047afeb36cbf6a5673a0`;
+- no Qwen, PostgreSQL, network, SSH, production or real-equipment access;
+- no real credential, service mutation, firewall mutation or unauthorized shell;
+- `RSK-P0-005 = CLOSED / TECHNICALLY_TREATED / SYNTHETIC_TABLETOP_VALIDATED`;
+- closure is technical treatment, not risk acceptance;
+- production validation / legal compliance are not claimed;
+- historical OPEN/BLOCKER records remain preserved;
+- RSK-P0-003 and RSK-P0-004 continue to block release;
+- Draft removal / merge / tag / deploy remain blocked.
+
+`TABLETOP_PASS + FINAL_RECONCILIATION = RSK-P0-005_TECHNICAL_TREATMENT_CLOSED`
+
+**NEXT_ACTION atual:** `INSPECT_RSK_P0_003_CURRENT_GOVERNANCE_STATE`.
+
+## Checkpoint histórico — MIMIR-V1-RSK-P0-005-TABLETOP-HARNESS-REPOSITORY-VALIDATION-01
+
 **MIMIR-V1-RSK-P0-005-TABLETOP-HARNESS-REPOSITORY-VALIDATION-01 — REPOSITORY_VALIDATED em 2026-10-02.**
 
 - implementation HEAD: `392810da4c1529ca365e8b38cfb78132fb8558d8`;

@@ -378,6 +378,62 @@ Ainda são necessários:
 4. classificação PASS/FAIL;
 5. reconciliação final de RSK-P0-005.
 
+### Atualização 2026-10-02 — reconciliação final RSK-P0-005
+
+O exercício sintético isolado `MIMIR-IR-TTX-001` foi executado exatamente uma
+vez sob autorização humana explícita.
+
+Resultado:
+
+`PASS`
+
+Falhas de critério:
+
+`0`
+
+Resíduo:
+
+`ZERO_UNEXPLAINED`
+
+Retry automático:
+
+`NO`
+
+Evidências:
+
+- execution log SHA-256: `90d203a5d36629c6da7e112f50c7abce82e04ce665df7338558d4fbef8d7489d`;
+- incident record SHA-256: `fe75525cb14f2a7e041e62ba1a34dd7d348032b1f4333c49601fd474fd5c56bf`;
+- evidence manifest SHA-256: `063f58968d453b47305fcd2525116c178022de5ed5555963f4c014e62cd0be79`.
+
+A revisão das evidências confirmou preservação das fronteiras de autorização e
+ausência de acesso a produção, PostgreSQL, runtime de modelo, rede externa,
+SSH, equipamento real ou credencial real.
+
+Os requisitos previamente registrados para tratamento de `RSK-P0-005` foram
+satisfeitos:
+
+- plano formal;
+- validação repository-only;
+- aprovação humana;
+- exercício isolado;
+- PASS;
+- evidência preservada;
+- reconciliação final.
+
+Estado técnico atual:
+
+`RSK-P0-005 = CLOSED / TECHNICALLY_TREATED / SYNTHETIC_TABLETOP_VALIDATED`
+
+O fechamento é por tratamento técnico comprovado, não por aceite de risco.
+
+Não há alegação de validação produtiva, conformidade legal ou conformidade
+LGPD.
+
+Os registros históricos `OPEN / BLOCKER` permanecem preservados.
+
+`RSK-P0-003` e `RSK-P0-004` continuam bloqueando release, merge, stable tag e
+deployment produtivo.
+
 ## 9. Restrições obrigatórias da v1
 
 Enquanto gaps não forem tratados em checkpoints próprios:
