@@ -46,18 +46,31 @@ def main() -> int:
         max_candidates=3,
     )
 
-    response_format = request["response_format"]
+    assert "response_format" not in request
 
-    assert response_format["type"] == "json_schema"
+    grammar = request["grammar"]
 
-    assert set(response_format) == {
-        "type",
-        "schema",
-    }
+    expected_grammar = (
+        MODULE.build_protected_output_grammar(
+            event_id=event_id,
+            content_sha256=content_sha256,
+            max_candidates=3,
+        )
+    )
 
-    assert "json_schema" not in response_format
+    assert grammar == expected_grammar
+    assert grammar.endswith("\n")
+    assert grammar.count(str(event_id)) == 1
+    assert grammar.count(content_sha256) == 1
 
-    schema = response_format["schema"]
+    assert "source_session_id" not in grammar
+    assert "source_excerpt_hash" not in grammar
+
+    schema = MODULE.build_response_schema(
+        event_id=event_id,
+        content_sha256=content_sha256,
+        max_candidates=3,
+    )
 
     assert schema["additionalProperties"] is False
 

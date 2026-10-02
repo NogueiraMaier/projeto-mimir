@@ -328,6 +328,30 @@ class ProtectedConsolidatorV1Tests(unittest.TestCase):
                 request["chat_template_kwargs"],
                 {"enable_thinking": False},
             )
+            self.assertNotIn(
+                "response_format",
+                request,
+            )
+            self.assertIn(
+                "grammar",
+                request,
+            )
+            self.assertIn(
+                EVENT_ID,
+                request["grammar"],
+            )
+            self.assertIn(
+                SOURCE_HASH,
+                request["grammar"],
+            )
+            self.assertNotIn(
+                "source_session_id",
+                request["grammar"],
+            )
+            self.assertNotIn(
+                "source_excerpt_hash",
+                request["grammar"],
+            )
             envelope = json.loads(
                 request["messages"][1]["content"]
             )
