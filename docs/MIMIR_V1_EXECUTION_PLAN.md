@@ -125,6 +125,33 @@ A documentação do Maestro deve ser retomada somente após a estabilização do
 
 ## Checkpoint atual
 
+**MIMIR-V1-PROTECTED-CONSOLIDATOR-REALMODEL-REVALIDATION-02 — BLOCKED em 2026-10-01.**
+
+- implementation/source HEAD:
+  `b0d69856ce42a4463330d37180cc9a76a3dc507f`;
+- local implementation commits remained unpushed at checkpoint creation;
+- repository validation after the transport change: 12/12 PASS;
+- integrated synthetic LAB with real Qwen: FAIL-CLOSED at
+  `candidate 1 viola schema fechado`;
+- synthetic cleanup: PASS / residue 0;
+- production remained schema `1..12`, `mimir_ops=false`;
+- FINDING-05: `REPOSITORY_VALIDATED / REAL_MODEL_REVALIDATION_BLOCKED`;
+- explicit GBNF remains unvalidated;
+- PR remains Draft;
+- release blockers RSK-P0-003/004/005 remain unchanged;
+- no merge, tag, deployment or production migration is authorized.
+
+Evidence:
+
+`docs/review/operations/2026-10-01-protected-consolidator-realmodel-revalidation-02.md`
+
+**NEXT_ACTION atual:** Projetar e implementar no repositório um harness sintético versionado de compatibilidade GBNF para o runtime Qwen em 127.0.0.1:18782, sem PostgreSQL, começando por uma grammar mínima conhecida e expandindo construções incrementalmente. O harness deve tratar HTTPError, URLError e TimeoutError de forma fail-closed, preservar evidência estrutural sem conteúdo confidencial e ser validado antes de qualquer nova alteração no protected consolidator.
+
+A revalidação real-model somente poderá continuar depois que o harness
+diagnóstico versionado produzir um resultado controlado e reproduzível.
+
+## Checkpoint histórico — MIMIR-V1-P1-PR-REVIEW-01
+
 **MIMIR-V1-P1-PR-REVIEW-01 — REVIEWED / RELEASE_BLOCKED em 2026-10-01.**
 
 - validated/base HEAD:

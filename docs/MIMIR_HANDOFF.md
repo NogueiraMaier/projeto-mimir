@@ -3291,3 +3291,103 @@ Requirements:
 - zero automatic promotion;
 - PR remains Draft;
 - no deployment.
+
+## MIMIR-V1-PROTECTED-CONSOLIDATOR-REALMODEL-REVALIDATION-02
+
+Date: 2026-10-01
+
+Status:
+
+`BLOCKED`
+
+Branch:
+
+`feat/mimir-operational-foundation`
+
+Implementation/source HEAD:
+
+`b0d69856ce42a4463330d37180cc9a76a3dc507f`
+
+Local Git state at continuity reconciliation:
+
+- worktree clean;
+- local branch ahead of remote by 2 commits before this documentation commit;
+- `93a0a1a15c7639eb182fab6e922ef23fe73a5fee` — hardened real-model FINDING-05 assertions;
+- `b0d69856ce42a4463330d37180cc9a76a3dc507f` — structured-output transport change;
+- neither local implementation commit had been pushed at this checkpoint.
+
+Repository validation:
+
+- protected consolidator repository validation: PASS;
+- JSON schema repository contract: PASS;
+- protected Python suite: 12/12 PASS;
+- trusted FINDING-05 membership/hash enforcement preserved.
+
+Integrated real-model state:
+
+`REAL_MODEL_REVALIDATION_BLOCKED`
+
+Observed real-model failures:
+
+1. complex nested structured-output request could fail grammar initialization;
+2. direct schema transport returned HTTP 200 but did not enforce the complete
+   candidate shape;
+3. integrated LAB on `b0d69856ce42a4463330d37180cc9a76a3dc507f` failed closed at
+   `candidate 1 viola schema fechado`;
+4. `maxLength` 2048/1999/1024 did not change the failure;
+5. alternate structured-output transports failed or remained structurally
+   invalid;
+6. explicit GBNF is not validated;
+7. latest exploratory GBNF fallback ended in an unhandled diagnostic timeout.
+
+Safety state:
+
+- `synthetic_residue=0` after integrated LAB;
+- production remained schema `1..12`;
+- production `mimir_ops=false`;
+- no automatic promotion demonstrated;
+- no deployment;
+- protected consolidator remains NOT DEPLOYED.
+
+FINDING-05 state:
+
+`REPOSITORY_VALIDATED / REAL_MODEL_REVALIDATION_BLOCKED`
+
+Important boundary:
+
+`REPOSITORY_VALIDATED != REAL_MODEL_VALIDATED`
+
+`BLOCKED != PASS`
+
+`NOT_DEPLOYED != PRODUCTION_VALIDATED`
+
+Failure history and detailed evidence:
+
+`docs/review/operations/2026-10-01-protected-consolidator-realmodel-revalidation-02.md`
+
+Decision:
+
+- stop ad-hoc real-model probes;
+- preserve the trusted closed-schema validator;
+- do not relax evidence binding or human-review requirements;
+- characterize the real runtime with a versioned synthetic compatibility
+  harness before modifying the consolidator again.
+
+ROADMAP:
+
+No change. This checkpoint changes the immediate operational NEXT_ACTION, not
+the medium/long-term product horizon.
+
+NEXT_ACTION:
+
+Projetar e implementar no repositório um harness sintético versionado de compatibilidade GBNF para o runtime Qwen em 127.0.0.1:18782, sem PostgreSQL, começando por uma grammar mínima conhecida e expandindo construções incrementalmente. O harness deve tratar HTTPError, URLError e TimeoutError de forma fail-closed, preservar evidência estrutural sem conteúdo confidencial e ser validado antes de qualquer nova alteração no protected consolidator.
+
+Restrictions remain:
+
+- PR stays Draft;
+- no push until this local checkpoint is reviewed;
+- no merge;
+- no stable tag;
+- no production deployment;
+- no production migrations 014/015/016;
+- no production `mimir_ops`.

@@ -581,3 +581,22 @@ Evidência da rodada: [review/operations/2026-09-24.md](review/operations/2026-0
 - **RELEASE:** blocked by existing security/risk gates.
 - **NEXT:** integrated synthetic real-model revalidation of the protected
   consolidator while PR #1 remains Draft.
+
+## MIMIR-V1-PROTECTED-CONSOLIDATOR-REALMODEL-REVALIDATION-02
+
+- **STATUS:** BLOCKED.
+- **IMPLEMENTATION/SOURCE HEAD:** `b0d69856ce42a4463330d37180cc9a76a3dc507f`.
+- **LOCAL COMMITS:** `93a0a1a15c7639eb182fab6e922ef23fe73a5fee` + `b0d69856ce42a4463330d37180cc9a76a3dc507f` remained
+  unpushed before the continuity documentation commit.
+- **REPOSITORY VALIDATION:** PASS, protected suite 12/12.
+- **REAL QWEN LAB:** FAIL-CLOSED at `candidate 1 viola schema fechado`.
+- **FINDING-05:** REPOSITORY_VALIDATED / REAL_MODEL_REVALIDATION_BLOCKED.
+- **STRUCTURED OUTPUT:** no tested full-contract JSON-Schema transport proved
+  reliable on the current real runtime.
+- **GBNF:** exploratory only; NOT VALIDATED.
+- **SYNTHETIC CLEANUP:** residue 0.
+- **PRODUCTION:** unchanged at schema `1..12`, `mimir_ops=false`.
+- **DEPLOYMENT:** not performed.
+- **PR / RELEASE:** PR remains Draft; release remains blocked.
+- **EVIDENCE:** `docs/review/operations/2026-10-01-protected-consolidator-realmodel-revalidation-02.md`.
+- **NEXT:** Projetar e implementar no repositório um harness sintético versionado de compatibilidade GBNF para o runtime Qwen em 127.0.0.1:18782, sem PostgreSQL, começando por uma grammar mínima conhecida e expandindo construções incrementalmente. O harness deve tratar HTTPError, URLError e TimeoutError de forma fail-closed, preservar evidência estrutural sem conteúdo confidencial e ser validado antes de qualquer nova alteração no protected consolidator.

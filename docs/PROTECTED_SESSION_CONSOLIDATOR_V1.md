@@ -1,6 +1,6 @@
 # Mímir — Contrato do Consolidator Local de Sessões Protegidas v1
 
-Status: **REPOSITORY_VALIDATED / REAL_MODEL_REVALIDATION_PENDING / NOT_DEPLOYED**
+Status: **REPOSITORY_VALIDATED / REAL_MODEL_REVALIDATION_BLOCKED / NOT_DEPLOYED**
 
 Escopo: exclusivo do Projeto Mímir.
 
@@ -19,7 +19,12 @@ Estado de revisão em 2026-10-01:
 - o consolidator confirma que o trecho pertence literalmente à fonte;
 - somente então calcula e emite `source_excerpt_hash`;
 - o trecho confidencial não é emitido no resultado canônico;
-- revalidação integrada com Qwen real permanece necessária;
+- revalidação integrada com Qwen real foi executada e permanece bloqueada;
+- o trusted validator rejeitou output real que violou o schema fechado;
+- nenhum transporte JSON-Schema testado provou enforcement confiável do
+  contrato completo no runtime atual;
+- GBNF explícita permanece não validada;
+- evidência: `docs/review/operations/2026-10-01-protected-consolidator-realmodel-revalidation-02.md`;
 - nenhum deployment de produção é inferido.
 
 ## 1. Objetivo
