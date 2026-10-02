@@ -4865,3 +4865,46 @@ Production deployment remains blocked.
 ## NEXT_ACTION
 
 `REQUEST_HUMAN_APPROVAL_RSK_P0_005_INCIDENT_RESPONSE_PLAN`
+
+## MIMIR-V1-RSK-P0-005-HUMAN-APPROVAL-AND-EXERCISE-DESIGN-01
+
+Date: 2026-10-02
+
+Status:
+
+`PLAN_APPROVED / EXERCISE_DESIGN_PROPOSED`
+
+Source HEAD:
+
+`60db0b7ef89963cb95f956a2cf85b473986756fe`
+
+Approved incident-response plan SHA-256:
+
+`185480f739b1f33800f0fc91760dccbacf612f74fb1826d8a9b7609d3bcc3243`
+
+Human approval:
+
+`Aprovo o plano de resposta a incidentes do Mímir v1 e autorizo o desenho do exercício sintético do RSK-P0-005.`
+
+Approval scope:
+
+- formal Mímir v1 incident-response plan approved;
+- design of synthetic RSK-P0-005 exercise authorized;
+- exercise execution NOT authorized;
+- production/runtime/PostgreSQL/Qwen/network/equipment access NOT authorized.
+
+Exercise design:
+
+`MIMIR-IR-TTX-001`
+
+Mode:
+
+`ISOLATED_SYNTHETIC_TABLETOP`
+
+Risk remains:
+
+`RSK-P0-005 = OPEN / BLOCKER`
+
+NEXT_ACTION:
+
+`IMPLEMENT_RSK_P0_005_SYNTHETIC_EXERCISE_HARNESS_REPOSITORY_ONLY`

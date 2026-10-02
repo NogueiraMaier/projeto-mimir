@@ -125,6 +125,26 @@ A documentação do Maestro deve ser retomada somente após a estabilização do
 
 ## Checkpoint atual
 
+**MIMIR-V1-RSK-P0-005-HUMAN-APPROVAL-AND-EXERCISE-DESIGN-01 — PLAN_APPROVED / EXERCISE_DESIGN_PROPOSED em 2026-10-02.**
+
+- source HEAD: `60db0b7ef89963cb95f956a2cf85b473986756fe`;
+- incident-response plan SHA-256: `185480f739b1f33800f0fc91760dccbacf612f74fb1826d8a9b7609d3bcc3243`;
+- repository validation previously PASS;
+- human approval recorded;
+- `docs/INCIDENT_RESPONSE.md` accepted as the formal Mímir v1 incident-response plan;
+- design of synthetic exercise authorized;
+- exercise `MIMIR-IR-TTX-001` designed as isolated/repository-first;
+- exercise execution not authorized;
+- no Qwen, PostgreSQL, production, network or real equipment access;
+- `RSK-P0-005` remains `OPEN / BLOCKER`;
+- Draft removal / merge / tag / deploy remain blocked.
+
+`PLAN_APPROVED != INCIDENT_EXERCISE_VALIDATED`
+
+**NEXT_ACTION atual:** `IMPLEMENT_RSK_P0_005_SYNTHETIC_EXERCISE_HARNESS_REPOSITORY_ONLY`.
+
+## Checkpoint histórico — MIMIR-V1-RSK-P0-005-INCIDENT-RESPONSE-PLAN-REPOSITORY-VALIDATION-01
+
 **MIMIR-V1-RSK-P0-005-INCIDENT-RESPONSE-PLAN-REPOSITORY-VALIDATION-01 — REPOSITORY_VALIDATED em 2026-10-02.**
 
 - design commit: `16ddf1361c9ce4f53cca37953dfb1bcbef6d90f3`;

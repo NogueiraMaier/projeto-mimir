@@ -306,6 +306,40 @@ O risco não está encerrado.
 `RSK-P0-005` permanece blocker até aprovação humana, exercício isolado PASS e
 reconciliação final do risco.
 
+### Atualização 2026-10-02 — aprovação humana e exercício RSK-P0-005
+
+O plano formal de resposta a incidentes:
+
+`docs/INCIDENT_RESPONSE.md`
+
+SHA-256:
+
+`185480f739b1f33800f0fc91760dccbacf612f74fb1826d8a9b7609d3bcc3243`
+
+foi aprovado explicitamente pelo responsável humano.
+
+Estado do plano:
+
+`REPOSITORY_VALIDATED / HUMAN_APPROVED`
+
+Também foi autorizado o desenho do exercício sintético, registrado como:
+
+`MIMIR-IR-TTX-001`
+
+A execução do exercício NÃO está autorizada por esta decisão.
+
+Estado do exercício:
+
+`DESIGN_PROPOSED / NOT_EXECUTED`
+
+Estado do risco:
+
+`RSK-P0-005 = OPEN / BLOCKER`
+
+Ainda são necessários implementação repository-only do exercício, validação do
+harness, autorização explícita de execução, exercício controlado e reconciliação
+final da evidência.
+
 ## 9. Restrições obrigatórias da v1
 
 Enquanto gaps não forem tratados em checkpoints próprios:
