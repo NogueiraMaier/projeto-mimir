@@ -600,3 +600,21 @@ Evidência da rodada: [review/operations/2026-09-24.md](review/operations/2026-0
 - **PR / RELEASE:** PR remains Draft; release remains blocked.
 - **EVIDENCE:** `docs/review/operations/2026-10-01-protected-consolidator-realmodel-revalidation-02.md`.
 - **NEXT:** Projetar e implementar no repositório um harness sintético versionado de compatibilidade GBNF para o runtime Qwen em 127.0.0.1:18782, sem PostgreSQL, começando por uma grammar mínima conhecida e expandindo construções incrementalmente. O harness deve tratar HTTPError, URLError e TimeoutError de forma fail-closed, preservar evidência estrutural sem conteúdo confidencial e ser validado antes de qualquer nova alteração no protected consolidator.
+
+## MIMIR-V1-GBNF-RUNTIME-COMPATIBILITY-01
+
+- **STATUS:** REPOSITORY_VALIDATED / REAL_RUNTIME_VALIDATION_PENDING.
+- **CODE HEAD:** `720556e0fad34a3d5d9f3602d094da2bd3c8d20f`.
+- **IMPLEMENTATION:** versioned synthetic GBNF runtime compatibility harness.
+- **REPOSITORY VALIDATION:** PASS.
+- **UNIT TESTS:** 15/15 PASS.
+- **NETWORK ISOLATION:** PASS.
+- **REAL QWEN RUNTIME:** NOT RUN.
+- **POSTGRESQL:** NOT ACCESSED.
+- **PRODUCTION:** UNCHANGED.
+- **PROTECTED CONSOLIDATOR:** unchanged / NOT DEPLOYED.
+- **FINDING-05:** REPOSITORY_VALIDATED / REAL_MODEL_REVALIDATION_BLOCKED.
+- **PR:** remains Draft.
+- **PUSH:** not performed.
+- **EVIDENCE:** `docs/review/operations/2026-10-01-gbnf-runtime-compatibility-01.md`.
+- **NEXT:** Executar de forma controlada o harness versionado `tools/memory/mimir-gbnf-runtime-compatibility.py` contra o runtime Qwen local `127.0.0.1:18782`, sem PostgreSQL e usando somente os casos sintéticos G00..G07. Registrar apenas hashes, tamanhos, status HTTP, marcadores estruturais e classificação por caso; não registrar conteúdo bruto do modelo. Não alterar o protected consolidator durante essa execução. O resultado deve distinguir HARNESS_EXECUTION de RUNTIME_COMPATIBILITY e ser documentado antes de qualquer mudança no consolidator.

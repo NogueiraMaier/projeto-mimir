@@ -3391,3 +3391,64 @@ Restrictions remain:
 - no production deployment;
 - no production migrations 014/015/016;
 - no production `mimir_ops`.
+
+## MIMIR-V1-GBNF-RUNTIME-COMPATIBILITY-01
+
+Date: 2026-10-01
+
+Status:
+
+`REPOSITORY_VALIDATED / REAL_RUNTIME_VALIDATION_PENDING`
+
+Branch:
+
+`feat/mimir-operational-foundation`
+
+Code HEAD:
+
+`720556e0fad34a3d5d9f3602d094da2bd3c8d20f`
+
+Implementation:
+
+- added `tools/memory/mimir-gbnf-runtime-compatibility.py`;
+- added `tools/memory/test_mimir_gbnf_runtime_compatibility.py`;
+- added `tools/memory/validate-gbnf-runtime-compatibility-repository.sh`;
+- existing protected consolidator files were not modified.
+
+Repository validation:
+
+- Python syntax: PASS;
+- static repository policy: PASS;
+- isolated network namespace: PASS;
+- loopback active inside isolated namespace;
+- `127.0.0.1:18782` confirmed free inside isolated namespace;
+- unit tests: 15/15 PASS;
+- committed repository validation: PASS.
+
+Runtime state:
+
+`REAL_RUNTIME_VALIDATION_PENDING`
+
+Important boundaries:
+
+- repository validation does not establish real-runtime compatibility;
+- no Qwen request was performed during repository validation;
+- PostgreSQL was not accessed;
+- production was not accessed;
+- protected consolidator remains NOT DEPLOYED;
+- FINDING-05 remains `REPOSITORY_VALIDATED / REAL_MODEL_REVALIDATION_BLOCKED`;
+- PR remains Draft;
+- no push, merge, stable tag or production deployment is authorized.
+
+Harness evidence:
+
+- harness SHA-256:
+  `edd0552edbf4b79ab9051e47c3ae080736b4e174d89ca5a6ba06e779bee0cffc`;
+- unit-test SHA-256:
+  `91fbbfbf1d0c521f38d3795fec1cd75e0bdaabf88d7e51adfbba38f2230ee6e1`;
+- repository-validator SHA-256:
+  `b37d750f1b024ffafce1abe0ece877799256913e4f2e210e1c6d83ecf7e0fc87`.
+
+NEXT_ACTION:
+
+Executar de forma controlada o harness versionado `tools/memory/mimir-gbnf-runtime-compatibility.py` contra o runtime Qwen local `127.0.0.1:18782`, sem PostgreSQL e usando somente os casos sintéticos G00..G07. Registrar apenas hashes, tamanhos, status HTTP, marcadores estruturais e classificação por caso; não registrar conteúdo bruto do modelo. Não alterar o protected consolidator durante essa execução. O resultado deve distinguir HARNESS_EXECUTION de RUNTIME_COMPATIBILITY e ser documentado antes de qualquer mudança no consolidator.

@@ -125,6 +125,28 @@ A documentação do Maestro deve ser retomada somente após a estabilização do
 
 ## Checkpoint atual
 
+**MIMIR-V1-GBNF-RUNTIME-COMPATIBILITY-01 — REPOSITORY_VALIDATED / REAL_RUNTIME_VALIDATION_PENDING em 2026-10-01.**
+
+- code HEAD: `720556e0fad34a3d5d9f3602d094da2bd3c8d20f`;
+- GBNF compatibility harness committed;
+- repository validation: PASS;
+- isolated unit tests: 15/15 PASS;
+- Qwen real runtime: NOT RUN;
+- PostgreSQL: NOT ACCESSED;
+- production: UNCHANGED;
+- protected consolidator: NOT MODIFIED / NOT DEPLOYED;
+- FINDING-05 remains `REPOSITORY_VALIDATED / REAL_MODEL_REVALIDATION_BLOCKED`;
+- PR remains Draft;
+- no push, merge, stable tag or production deployment is authorized.
+
+Evidence:
+
+`docs/review/operations/2026-10-01-gbnf-runtime-compatibility-01.md`
+
+**NEXT_ACTION atual:** Executar de forma controlada o harness versionado `tools/memory/mimir-gbnf-runtime-compatibility.py` contra o runtime Qwen local `127.0.0.1:18782`, sem PostgreSQL e usando somente os casos sintéticos G00..G07. Registrar apenas hashes, tamanhos, status HTTP, marcadores estruturais e classificação por caso; não registrar conteúdo bruto do modelo. Não alterar o protected consolidator durante essa execução. O resultado deve distinguir HARNESS_EXECUTION de RUNTIME_COMPATIBILITY e ser documentado antes de qualquer mudança no consolidator.
+
+## Checkpoint histórico — MIMIR-V1-PROTECTED-CONSOLIDATOR-REALMODEL-REVALIDATION-02
+
 **MIMIR-V1-PROTECTED-CONSOLIDATOR-REALMODEL-REVALIDATION-02 — BLOCKED em 2026-10-01.**
 
 - implementation/source HEAD:
