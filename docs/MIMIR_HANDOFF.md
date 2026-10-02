@@ -4229,3 +4229,116 @@ Push:
 
 After explicit authorization, perform a fresh remote fetch, verify no remote
 divergence, and push the feature branch without force.
+
+## MIMIR-V1-PROTECTED-CONSOLIDATOR-REALMODEL-REVALIDATION-03
+
+Date: 2026-10-02
+
+Status:
+
+`VALIDATED`
+
+Branch:
+
+`feat/mimir-operational-foundation`
+
+Source HEAD:
+
+`535d101ce85fcd87d3081788971b21fb35d8df6c`
+
+## Result
+
+A controlled real-model execution of the committed protected consolidator
+trusted path completed successfully against the local Qwen/llama.cpp runtime.
+
+Exactly one real model request is represented by the preserved evidence.
+
+Validated path:
+
+`build_request() -> GBNF -> Qwen -> extract_message_content() -> validate_output()`
+
+Observed result:
+
+- HTTP/model path PASS;
+- exactly one candidate;
+- trusted `validate_output()` PASS;
+- source event binding PASS;
+- source content SHA-256 binding PASS;
+- literal source excerpt binding PASS;
+- trusted evidence canonicalization PASS;
+- canonical evidence kind `source_excerpt_hash`;
+- raw excerpt absent from canonical output;
+- source content absent from canonical output;
+- trust class remained `UNTRUSTED_OBSERVATION`;
+- human review remained mandatory.
+
+## FINDING-05
+
+Previous state:
+
+`REPOSITORY_VALIDATED / REAL_MODEL_REVALIDATION_BLOCKED`
+
+Current state:
+
+`CLOSED / REAL_MODEL_REVALIDATED`
+
+The real model successfully produced output that passed the trusted literal
+source-excerpt binding and trusted canonical evidence-hash derivation.
+
+## Evidence
+
+Evidence SHA-256:
+
+`72d95e7e58adb6851a5d485f0ea97bd7a209858792fa6f9254ce7238a387fa2f`
+
+Protected consolidator SHA-256:
+
+`d699a65b07c58faac5b740492feebc8f0da7c87ab71ea188cb083f1660a046fd`
+
+Protected-output GBNF builder SHA-256:
+
+`d1c025c49fe14937b3eba2611383baf982a4df2bc542c6c9aa64700a32b1f64f`
+
+No second Qwen request was performed.
+
+## Scope boundary
+
+This checkpoint validates the real-model trusted consolidator path.
+
+It does not claim:
+
+- PostgreSQL CLI end-to-end validation;
+- production deployment validation;
+- production migration validation.
+
+`REAL_MODEL_TRUSTED_PATH_VALIDATED != CLI_POSTGRESQL_E2E_VALIDATED`
+
+PostgreSQL:
+
+`NOT ACCESSED`
+
+Production:
+
+`UNCHANGED`
+
+Remote feature branch before this checkpoint:
+
+`SYNCED at 535d101ce85fcd87d3081788971b21fb35d8df6c`
+
+PR:
+
+`REMAINS DRAFT`
+
+## Preserved operational incident
+
+The first shell attempt after the model execution stopped at the
+source-of-truth guard because the evidence target already existed.
+
+Subsequent read-only classification proved that the existing file contained
+the completed single authorized Qwen request and a full PASS result.
+
+The evidence file was preserved and no retry was performed.
+
+## NEXT_ACTION
+
+`PLAN_PROTECTED_CONSOLIDATOR_CLI_POSTGRESQL_E2E_LAB`

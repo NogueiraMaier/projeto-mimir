@@ -125,6 +125,32 @@ A documentação do Maestro deve ser retomada somente após a estabilização do
 
 ## Checkpoint atual
 
+**MIMIR-V1-PROTECTED-CONSOLIDATOR-REALMODEL-REVALIDATION-03 — VALIDATED em 2026-10-02.**
+
+- source HEAD: `535d101ce85fcd87d3081788971b21fb35d8df6c`;
+- protected consolidator GBNF transport used against the real local model;
+- exactly one authorized Qwen request;
+- no retry;
+- trusted `validate_output()` PASS;
+- one candidate returned;
+- source-event binding PASS;
+- source-content SHA-256 binding PASS;
+- literal `source_excerpt` binding PASS;
+- trusted conversion to `source_excerpt_hash` PASS;
+- raw excerpt absent from canonical output;
+- mandatory human review preserved;
+- FINDING-05: `CLOSED / REAL_MODEL_REVALIDATED`;
+- evidence SHA-256: `72d95e7e58adb6851a5d485f0ea97bd7a209858792fa6f9254ce7238a387fa2f`;
+- PostgreSQL not accessed;
+- CLI + PostgreSQL E2E not validated in this phase;
+- production unchanged;
+- remote feature branch was synchronized at `535d101ce85fcd87d3081788971b21fb35d8df6c` before this checkpoint;
+- PR remains Draft.
+
+**NEXT_ACTION atual:** `PLAN_PROTECTED_CONSOLIDATOR_CLI_POSTGRESQL_E2E_LAB`.
+
+## Checkpoint histórico — MIMIR-V1-PROTECTED-CONSOLIDATOR-GBNF-TRANSPORT-REPOSITORY-VALIDATION-01
+
 **MIMIR-V1-PROTECTED-CONSOLIDATOR-GBNF-TRANSPORT-REPOSITORY-VALIDATION-01 — REPOSITORY_VALIDATED_REAL_MODEL_VALIDATION_PENDING em 2026-10-02.**
 
 - implementation HEAD: `79d370a736dba287a7a5cc3d9712b337c7c4cebc`;
