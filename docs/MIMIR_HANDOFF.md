@@ -4093,3 +4093,139 @@ FINDING-05:
 NEXT_ACTION:
 
 `IMPLEMENT_PROTECTED_CONSOLIDATOR_GBNF_TRANSPORT_REPOSITORY_ONLY`
+
+## MIMIR-V1-PROTECTED-CONSOLIDATOR-GBNF-TRANSPORT-REPOSITORY-VALIDATION-01
+
+Date: 2026-10-02
+
+Status:
+
+`REPOSITORY_VALIDATED_REAL_MODEL_VALIDATION_PENDING`
+
+Branch:
+
+`feat/mimir-operational-foundation`
+
+Implementation HEAD:
+
+`79d370a736dba287a7a5cc3d9712b337c7c4cebc`
+
+## Change
+
+The protected consolidator transport was changed from llama.cpp
+`response_format/json_schema` transport to the already versioned and
+runtime-validated protected-output GBNF v1 transport.
+
+The trusted semantic boundary remains unchanged:
+
+- `build_response_schema()` retained;
+- `validate_output()` retained as semantic authority;
+- source-content SHA binding retained;
+- exact source excerpt binding retained;
+- trusted canonical `source_excerpt_hash` derivation retained;
+- human-review requirement retained;
+- trust-class enforcement retained;
+- secret-output gate retained;
+- no automatic memory promotion introduced.
+
+## Identities
+
+Protected consolidator SHA-256:
+
+`d699a65b07c58faac5b740492feebc8f0da7c87ab71ea188cb083f1660a046fd`
+
+Main protected-consolidator test SHA-256:
+
+`2bba8f585708f1fc88c0e2531edabf901f377463233812e9b69ca48b4c3799f9`
+
+Transport/schema contract test SHA-256:
+
+`90e6e8e04a68287e4396c832aa82fb012a43129b927f8c15501ffd9f042ab172`
+
+Repository validator SHA-256, unchanged:
+
+`a6ddef3ca89bf8d97802c3f57865da97a0c4bdeca8b103480900c28c11df00d9`
+
+Protected-output GBNF v1 builder SHA-256, unchanged:
+
+`d1c025c49fe14937b3eba2611383baf982a4df2bc542c6c9aa64700a32b1f64f`
+
+Repository validation evidence SHA-256:
+
+`d2a3edbff98f8784c8029b0e3ae6f95ae90bb71dba724149bcdf74aeb4c12044`
+
+## Validation
+
+Repository validation:
+
+`PASS`
+
+Existing protected-consolidator suite:
+
+`12/12 PASS`
+
+Execution occurred in the repository validator's isolated network namespace.
+
+Real Qwen request during this phase:
+
+`NOT PERFORMED`
+
+The previously completed full GBNF runtime validation was not repeated.
+
+## Preserved failures
+
+Two implementation attempts failed before any repository write:
+
+1. `FAIL:consolidator:response_format block`
+   - root cause: stale anchor expected the older nested json_schema envelope;
+   - actual local contract used direct `response_format.type=json_schema`
+     plus top-level `schema`;
+   - result: `NO_WRITE`, worktree remained clean.
+
+2. `FAIL:contract_test:contract-transport:count=0`
+   - root cause: stale anchor omitted the contract test's explicit
+     `set(response_format)` and `"json_schema" not in response_format`
+     assertions;
+   - result: `NO_WRITE`, worktree remained clean.
+
+The exact local anchors were recovered read-only before the successful v3
+implementation.
+
+## Current boundary
+
+Protected consolidator transport:
+
+`GBNF`
+
+Protected consolidator real-model validation:
+
+`PENDING`
+
+FINDING-05:
+
+`STILL_OPEN`
+
+`FULL_GBNF_RUNTIME_PASS != PROTECTED_CONSOLIDATOR_REAL_MODEL_VALIDATED`
+
+PostgreSQL:
+
+`NOT ACCESSED`
+
+Production:
+
+`UNCHANGED`
+
+PR:
+
+`REMAINS_DRAFT`
+
+Push:
+
+`NOT_PERFORMED`
+
+## NEXT_ACTION
+
+`FRESH_FETCH_GUARD_THEN_PUSH_AFTER_EXPLICIT_AUTHORIZATION`
+
+After explicit authorization, perform a fresh remote fetch, verify no remote
+divergence, and push the feature branch without force.

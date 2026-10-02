@@ -125,6 +125,39 @@ A documentação do Maestro deve ser retomada somente após a estabilização do
 
 ## Checkpoint atual
 
+**MIMIR-V1-PROTECTED-CONSOLIDATOR-GBNF-TRANSPORT-REPOSITORY-VALIDATION-01 — REPOSITORY_VALIDATED_REAL_MODEL_VALIDATION_PENDING em 2026-10-02.**
+
+- implementation HEAD: `79d370a736dba287a7a5cc3d9712b337c7c4cebc`;
+- protected consolidator transport migrated from `response_format/json_schema`
+  to the versioned protected-output GBNF v1;
+- `build_response_schema()` retained;
+- trusted `validate_output()` retained as semantic authority;
+- consolidator SHA-256: `d699a65b07c58faac5b740492feebc8f0da7c87ab71ea188cb083f1660a046fd`;
+- main test SHA-256: `2bba8f585708f1fc88c0e2531edabf901f377463233812e9b69ca48b4c3799f9`;
+- contract test SHA-256: `90e6e8e04a68287e4396c832aa82fb012a43129b927f8c15501ffd9f042ab172`;
+- validator SHA-256 unchanged: `a6ddef3ca89bf8d97802c3f57865da97a0c4bdeca8b103480900c28c11df00d9`;
+- GBNF builder SHA-256 unchanged: `d1c025c49fe14937b3eba2611383baf982a4df2bc542c6c9aa64700a32b1f64f`;
+- repository evidence SHA-256: `d2a3edbff98f8784c8029b0e3ae6f95ae90bb71dba724149bcdf74aeb4c12044`;
+- repository validation PASS;
+- 12/12 protected-consolidator tests PASS;
+- full GBNF runtime validation was not repeated;
+- real Qwen request was not performed in this phase;
+- protected consolidator real-model validation remains PENDING;
+- FINDING-05 remains open;
+- two prior patch attempts are preserved as anchor mismatch / NO_WRITE;
+- PostgreSQL not accessed;
+- production unchanged;
+- PR remains Draft;
+- push not performed.
+
+Evidence:
+
+`docs/review/operations/2026-10-02-protected-consolidator-gbnf-transport-repository-validation-01.md`
+
+**NEXT_ACTION atual:** `FRESH_FETCH_GUARD_THEN_PUSH_AFTER_EXPLICIT_AUTHORIZATION`.
+
+## Checkpoint histórico — MIMIR-V1-PROTECTED-OUTPUT-GBNF-RUNTIME-V1-CONTROLLED-VALIDATION-01
+
 **MIMIR-V1-PROTECTED-OUTPUT-GBNF-RUNTIME-V1-CONTROLLED-VALIDATION-01 — VALIDATED em 2026-10-02.**
 
 - base HEAD: `2a321ec6b353d86214f20912d223939743183a44`;
