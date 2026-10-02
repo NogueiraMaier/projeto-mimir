@@ -125,6 +125,32 @@ A documentação do Maestro deve ser retomada somente após a estabilização do
 
 ## Checkpoint atual
 
+**MIMIR-V1-RSK-P0-003-PRIVACY-GOVERNANCE-TREATMENT-DESIGN-01 — PROPOSED em 2026-10-02.**
+
+- source HEAD: `f9b2ad20dd58e43cafb4550eb288b036816ac516`;
+- RSK-P0-003 remains `OPEN / BLOCKER`;
+- privacy controls exist but remain partial/distributed;
+- canonical formal privacy governance is not yet proven;
+- no legal or LGPD-compliance conclusion is made;
+- treatment path chosen instead of risk acceptance;
+- target canonical governance:
+  `docs/PRIVACY_GOVERNANCE.md`;
+- target sanitized processing register:
+  `docs/DATA_INVENTORY_LGPD.md`;
+- target repository-only validator under `tools/security/`;
+- existing incident-response and retention controls must be reused;
+- legal basis must never be automatically inferred;
+- international-transfer uncertainty must remain explicit when not proven;
+- competent human privacy-governance approval is required after repository
+  validation;
+- historical P0 evidence remains immutable;
+- RSK-P0-004 remains a production-release blocker;
+- Draft removal / merge / tag / deploy remain blocked.
+
+**NEXT_ACTION atual:** `IMPLEMENT_RSK_P0_003_PRIVACY_GOVERNANCE_REPOSITORY_ONLY`.
+
+## Checkpoint histórico — MIMIR-V1-RSK-P0-005-SYNTHETIC-TABLETOP-RECONCILIATION-01
+
 **MIMIR-V1-RSK-P0-005-SYNTHETIC-TABLETOP-RECONCILIATION-01 — CLOSED / TECHNICALLY_TREATED / SYNTHETIC_TABLETOP_VALIDATED em 2026-10-02.**
 
 - source HEAD at execution: `80f0c42330ce6bf3365c974d4f3896234098b70f`;

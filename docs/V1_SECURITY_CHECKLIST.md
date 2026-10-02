@@ -434,6 +434,42 @@ Os registros históricos `OPEN / BLOCKER` permanecem preservados.
 `RSK-P0-003` e `RSK-P0-004` continuam bloqueando release, merge, stable tag e
 deployment produtivo.
 
+### Atualização 2026-10-02 — desenho de tratamento RSK-P0-003
+
+A inspeção atual confirmou que existem controles e conceitos de privacidade
+distribuídos no repositório, porém a governança formal aprovada e comprovada
+ainda não está estabelecida.
+
+Estado:
+
+`RSK-P0-003 = OPEN / BLOCKER`
+
+Tratamento proposto:
+
+1. governança canônica de privacidade;
+2. registro sanitizado das atividades de tratamento;
+3. autoridade e papéis explícitos;
+4. controlador/operador por atividade quando aplicável;
+5. finalidade e decisão de base legal por revisão humana competente;
+6. direitos dos titulares;
+7. retenção e descarte governados;
+8. integração com resposta a incidentes;
+9. governança de terceiros;
+10. estado explícito de transferência internacional;
+11. revisão periódica/evidência;
+12. validator repository-only;
+13. aprovação humana competente separada;
+14. reconciliação final.
+
+A implementação não poderá inferir automaticamente base legal, necessidade de
+encarregado, comunicação à ANPD ou conformidade LGPD.
+
+A presença de termos nos documentos atuais não será considerada prova de
+governança formal.
+
+O tratamento proposto não altera os registros históricos P0 e não constitui
+aceite de risco.
+
 ## 9. Restrições obrigatórias da v1
 
 Enquanto gaps não forem tratados em checkpoints próprios:

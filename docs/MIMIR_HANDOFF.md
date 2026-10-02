@@ -5145,3 +5145,35 @@ blocked.
 ## NEXT_ACTION
 
 `INSPECT_RSK_P0_003_CURRENT_GOVERNANCE_STATE`
+
+## MIMIR-V1-RSK-P0-003-PRIVACY-GOVERNANCE-TREATMENT-DESIGN-01
+
+Date: 2026-10-02
+
+Status:
+
+`PROPOSED`
+
+Risk:
+
+`RSK-P0-003 = OPEN / BLOCKER`
+
+Repository inspection found partial/distributed privacy controls but no proven
+formal approved governance package.
+
+Design decision:
+
+- create canonical `docs/PRIVACY_GOVERNANCE.md`;
+- create sanitized `docs/DATA_INVENTORY_LGPD.md`;
+- create repository-only governance validator;
+- reuse incident-response and retention controls already present;
+- prohibit automatic legal-basis inference;
+- represent international-transfer uncertainty explicitly;
+- require competent human governance approval after repository validation;
+- preserve historical P0 records unchanged.
+
+This design does not claim LGPD compliance and does not close RSK-P0-003.
+
+NEXT_ACTION:
+
+`IMPLEMENT_RSK_P0_003_PRIVACY_GOVERNANCE_REPOSITORY_ONLY`

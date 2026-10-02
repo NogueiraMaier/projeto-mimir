@@ -940,3 +940,18 @@ Evidência da rodada: [review/operations/2026-09-24.md](review/operations/2026-0
 - **RSK-P0-004:** remains PARTIALLY_TREATED / production-release blocker.
 - **RELEASE:** remains blocked.
 - **NEXT:** `INSPECT_RSK_P0_003_CURRENT_GOVERNANCE_STATE`.
+
+## MIMIR-V1-RSK-P0-003-PRIVACY-GOVERNANCE-TREATMENT-DESIGN-01
+
+- **STATUS:** PROPOSED.
+- **RSK-P0-003:** OPEN / BLOCKER.
+- **EXISTING CONTROLS:** partial and distributed.
+- **FORMAL GOVERNANCE:** not yet proven.
+- **LEGAL CONCLUSION:** none.
+- **RISK ACCEPTANCE:** none.
+- **TARGET:** formal privacy governance + sanitized treatment register +
+  repository validator.
+- **HUMAN APPROVAL:** required after implementation/validation.
+- **RSK-P0-004:** remains production-release blocker.
+- **RELEASE:** remains blocked.
+- **NEXT:** `IMPLEMENT_RSK_P0_003_PRIVACY_GOVERNANCE_REPOSITORY_ONLY`.
