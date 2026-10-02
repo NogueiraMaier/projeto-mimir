@@ -618,3 +618,25 @@ Evidência da rodada: [review/operations/2026-09-24.md](review/operations/2026-0
 - **PUSH:** not performed.
 - **EVIDENCE:** `docs/review/operations/2026-10-01-gbnf-runtime-compatibility-01.md`.
 - **NEXT:** Executar de forma controlada o harness versionado `tools/memory/mimir-gbnf-runtime-compatibility.py` contra o runtime Qwen local `127.0.0.1:18782`, sem PostgreSQL e usando somente os casos sintéticos G00..G07. Registrar apenas hashes, tamanhos, status HTTP, marcadores estruturais e classificação por caso; não registrar conteúdo bruto do modelo. Não alterar o protected consolidator durante essa execução. O resultado deve distinguir HARNESS_EXECUTION de RUNTIME_COMPATIBILITY e ser documentado antes de qualquer mudança no consolidator.
+
+## MIMIR-V1-GBNF-RUNTIME-COMPATIBILITY-02
+
+- **STATUS:** VALIDATED.
+- **SCOPE:** real Qwen GBNF runtime compatibility G00..G07.
+- **BASE HEAD:** `6d238430b95db40e4568ee6c8032b29c2a82a9e8`.
+- **HARNESS EXECUTION:** PASS.
+- **G00..G07:** 8/8 PASS.
+- **CONTIGUOUS PASS THROUGH:** G07.
+- **RUNTIME COMPATIBILITY:** ALL_CASES_PASS.
+- **HTTP:** 200 for all eight cases.
+- **FINISH REASON:** `stop` for all eight cases.
+- **STRUCTURE MARKER:** `OPENAI_CHAT_CONTENT` for all eight cases.
+- **EVIDENCE SHA-256:** `9a88a6343ff127716b258c822d0dc7dceac547c0a3c83509a81593a5a458ae1a`.
+- **POSTGRESQL:** NOT ACCESSED.
+- **PRODUCTION:** UNCHANGED.
+- **PROTECTED CONSOLIDATOR:** NOT MODIFIED / NOT DEPLOYED.
+- **FINDING-05:** REPOSITORY_VALIDATED / REAL_MODEL_REVALIDATION_BLOCKED.
+- **PR:** remains Draft.
+- **PUSH:** not performed.
+- **EVIDENCE:** `docs/review/operations/2026-10-01-gbnf-runtime-compatibility-02.md`.
+- **NEXT:** Inspecionar e projetar no repositório uma grammar GBNF versionada equivalente ao contrato fechado do protected consolidator, derivada do schema/validator atualmente confiável. A nova grammar deve preservar todos os campos obrigatórios, additionalProperties=false, candidate e evidence structure, source_session_id/source_event_id, evidence kind source_excerpt_hash e SHA-256 lowercase de 64 caracteres. Primeiro validar essa grammar somente em testes de repositório positivos e negativos; não alterar ainda o transporte do protected consolidator, não executar PostgreSQL e não fazer nova chamada ao modelo real.

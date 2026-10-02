@@ -3452,3 +3452,117 @@ Harness evidence:
 NEXT_ACTION:
 
 Executar de forma controlada o harness versionado `tools/memory/mimir-gbnf-runtime-compatibility.py` contra o runtime Qwen local `127.0.0.1:18782`, sem PostgreSQL e usando somente os casos sintéticos G00..G07. Registrar apenas hashes, tamanhos, status HTTP, marcadores estruturais e classificação por caso; não registrar conteúdo bruto do modelo. Não alterar o protected consolidator durante essa execução. O resultado deve distinguir HARNESS_EXECUTION de RUNTIME_COMPATIBILITY e ser documentado antes de qualquer mudança no consolidator.
+
+## MIMIR-V1-GBNF-RUNTIME-COMPATIBILITY-02
+
+Date: 2026-10-01
+
+Status:
+
+`VALIDATED`
+
+Scope:
+
+`REAL_QWEN_GBNF_RUNTIME_COMPATIBILITY_G00_G07`
+
+Branch:
+
+`feat/mimir-operational-foundation`
+
+Checkpoint base HEAD:
+
+`6d238430b95db40e4568ee6c8032b29c2a82a9e8`
+
+Runtime endpoint:
+
+`http://127.0.0.1:18782/v1/chat/completions`
+
+Runtime model:
+
+`/var/lib/openclaw/models/Qwen3-4B-Q4_K_M.gguf`
+
+Result:
+
+- Qwen health HTTP 200: PASS;
+- harness process RC 0: PASS;
+- HARNESS_EXECUTION: PASS;
+- G00: PASS;
+- G01: PASS;
+- G02: PASS;
+- G03: PASS;
+- G04: PASS;
+- G05: PASS;
+- G06: PASS;
+- G07: PASS;
+- CONTIGUOUS_PASS_THROUGH: G07;
+- RUNTIME_COMPATIBILITY: ALL_CASES_PASS;
+- every case returned HTTP 200;
+- every case returned finish_reason `stop`;
+- every case returned structure marker `OPENAI_CHAT_CONTENT`;
+- no case returned an error marker.
+
+Runtime evidence:
+
+- log:
+  `/var/tmp/mimir-gbnf-runtime-compatibility-run-20261001.log`;
+- log SHA-256:
+  `9a88a6343ff127716b258c822d0dc7dceac547c0a3c83509a81593a5a458ae1a`;
+- log bytes: 4339;
+- log lines: 11;
+- evidence contains hashes, sizes and structural metadata only;
+- no model content was copied into continuity documentation.
+
+Conclusion:
+
+The installed Qwen/llama.cpp runtime supports every GBNF construction
+represented by the versioned G00..G07 matrix, including bounded repetition
+and the nested bounded JSON case.
+
+This supersedes the previous exploratory suspicion that bounded repetition
+might be unsupported. Earlier ad-hoc GBNF probes remain historical failed or
+inconclusive experiments; they are not rewritten or erased.
+
+Important boundary:
+
+`GBNF_RUNTIME_COMPATIBILITY_VALIDATED != PROTECTED_CONSOLIDATOR_VALIDATED`
+
+This checkpoint does not prove that a production-equivalent protected
+consolidator grammar exists yet, does not validate the protected
+consolidator with the real model and does not close FINDING-05.
+
+FINDING-05 remains:
+
+`REPOSITORY_VALIDATED / REAL_MODEL_REVALIDATION_BLOCKED`
+
+Production impact:
+
+- PostgreSQL not accessed by the harness;
+- production not accessed;
+- protected consolidator not modified;
+- protected consolidator remains NOT_DEPLOYED;
+- no deployment;
+- no production migration;
+- no production role change;
+- no memory promotion;
+- PR remains Draft;
+- no push;
+- no merge;
+- no stable tag.
+
+NEXT_ACTION:
+
+Inspecionar e projetar no repositório uma grammar GBNF versionada equivalente ao contrato fechado do protected consolidator, derivada do schema/validator atualmente confiável. A nova grammar deve preservar todos os campos obrigatórios, additionalProperties=false, candidate e evidence structure, source_session_id/source_event_id, evidence kind source_excerpt_hash e SHA-256 lowercase de 64 caracteres. Primeiro validar essa grammar somente em testes de repositório positivos e negativos; não alterar ainda o transporte do protected consolidator, não executar PostgreSQL e não fazer nova chamada ao modelo real.
+
+Documentation validation incident:
+
+- first documentation validation attempt: FAIL;
+- failure marker: `FAIL:PLAN:log_sha`;
+- root cause: the generated current checkpoint in
+  `docs/MIMIR_V1_EXECUTION_PLAN.md` referenced the evidence review but omitted
+  the runtime evidence log SHA-256 while the structural validator required
+  that identity in every continuity document;
+- correction: added the exact runtime evidence log SHA-256
+  `9a88a6343ff127716b258c822d0dc7dceac547c0a3c83509a81593a5a458ae1a` to the current execution-plan checkpoint;
+- no Qwen runtime re-execution was performed;
+- no code, PostgreSQL, protected consolidator or production state changed as
+  part of this correction.

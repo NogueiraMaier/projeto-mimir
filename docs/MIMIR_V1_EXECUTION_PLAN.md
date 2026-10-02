@@ -125,6 +125,33 @@ A documentação do Maestro deve ser retomada somente após a estabilização do
 
 ## Checkpoint atual
 
+**MIMIR-V1-GBNF-RUNTIME-COMPATIBILITY-02 — VALIDATED em 2026-10-01.**
+
+- base HEAD: `6d238430b95db40e4568ee6c8032b29c2a82a9e8`;
+- real Qwen GBNF runtime compatibility matrix G00..G07: 8/8 PASS;
+- harness execution: PASS;
+- contiguous pass through: G07;
+- runtime compatibility: ALL_CASES_PASS;
+- all eight cases: HTTP 200 / finish_reason stop;
+- PostgreSQL: NOT ACCESSED;
+- production: UNCHANGED;
+- protected consolidator: NOT MODIFIED / NOT DEPLOYED;
+- FINDING-05 remains `REPOSITORY_VALIDATED / REAL_MODEL_REVALIDATION_BLOCKED`;
+- PR remains Draft;
+- no push, merge, stable tag or production deployment is authorized.
+
+Evidence:
+
+`docs/review/operations/2026-10-01-gbnf-runtime-compatibility-02.md`
+
+Evidence log SHA-256:
+
+`9a88a6343ff127716b258c822d0dc7dceac547c0a3c83509a81593a5a458ae1a`
+
+**NEXT_ACTION atual:** Inspecionar e projetar no repositório uma grammar GBNF versionada equivalente ao contrato fechado do protected consolidator, derivada do schema/validator atualmente confiável. A nova grammar deve preservar todos os campos obrigatórios, additionalProperties=false, candidate e evidence structure, source_session_id/source_event_id, evidence kind source_excerpt_hash e SHA-256 lowercase de 64 caracteres. Primeiro validar essa grammar somente em testes de repositório positivos e negativos; não alterar ainda o transporte do protected consolidator, não executar PostgreSQL e não fazer nova chamada ao modelo real.
+
+## Checkpoint histórico — MIMIR-V1-GBNF-RUNTIME-COMPATIBILITY-01
+
 **MIMIR-V1-GBNF-RUNTIME-COMPATIBILITY-01 — REPOSITORY_VALIDATED / REAL_RUNTIME_VALIDATION_PENDING em 2026-10-01.**
 
 - code HEAD: `720556e0fad34a3d5d9f3602d094da2bd3c8d20f`;
