@@ -104,7 +104,8 @@ SQL
 
     echo "synthetic_residue=${RESIDUE:-unknown}"
 
-    rm -rf -- "$RUN"
+    echo "preserved_run_dir=$RUN"
+    echo "preserved_run_artifacts=YES"
 
     exit "$RC"
 }
