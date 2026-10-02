@@ -125,6 +125,33 @@ A documentação do Maestro deve ser retomada somente após a estabilização do
 
 ## Checkpoint atual
 
+**MIMIR-V1-RSK-P0-005-INCIDENT-RESPONSE-PLAN-REPOSITORY-VALIDATION-01 — REPOSITORY_VALIDATED em 2026-10-02.**
+
+- design commit: `16ddf1361c9ce4f53cca37953dfb1bcbef6d90f3`;
+- implementation HEAD: `51908050a4b20203e8fbd0cde49ce2381b4347d3`;
+- canonical plan: `docs/INCIDENT_RESPONSE.md`;
+- plan SHA-256: `185480f739b1f33800f0fc91760dccbacf612f74fb1826d8a9b7609d3bcc3243`;
+- repository-only validation completed;
+- structural contract PASS;
+- non-overclaim boundaries PASS;
+- design -> implementation traceability PASS;
+- existing security/runbook/retention/checklist alignment PASS;
+- sensitive-value scan and repository hygiene PASS;
+- initial validator false negative preserved without changing source documents;
+- initial evidence SHA-256: `be3685c5502c3404c8ec04f5cdb68da61c9c20aac321fe6ffd8a0868b9915c2e`;
+- continuation evidence SHA-256: `082ab72c99e5fb8471190ecf1cdfe43c186dca6120960ececf10fffa883267c9`;
+- human approval remains PENDING;
+- isolated incident exercise remains PENDING;
+- `RSK-P0-005` remains `OPEN / BLOCKER`;
+- production unchanged;
+- Draft removal / merge / tag / deploy remain blocked.
+
+`PLAN_REPOSITORY_VALIDATED != RSK_P0_005_CLOSED`
+
+**NEXT_ACTION atual:** `REQUEST_HUMAN_APPROVAL_RSK_P0_005_INCIDENT_RESPONSE_PLAN`.
+
+## Checkpoint histórico — MIMIR-V1-PROTECTED-CONSOLIDATOR-CLI-POSTGRESQL-E2E-LAB-01
+
 **MIMIR-V1-PROTECTED-CONSOLIDATOR-CLI-POSTGRESQL-E2E-LAB-01 — VALIDATED em 2026-10-02.**
 
 - source HEAD: `b25b9cf7fb3b4c9c37075793678fe1e95f80a953`;

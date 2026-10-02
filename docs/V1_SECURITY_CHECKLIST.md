@@ -283,6 +283,29 @@ Estado:
 
 `BLOCKER`
 
+### Atualização 2026-10-02 — RSK-P0-005
+
+O estado histórico acima foi preservado.
+
+Desde aquela reconciliação:
+
+- o plano formal foi implementado em `docs/INCIDENT_RESPONSE.md`;
+- o plano possui SHA-256 `185480f739b1f33800f0fc91760dccbacf612f74fb1826d8a9b7609d3bcc3243`;
+- a validação repository-only do plano foi concluída em PASS;
+- a rastreabilidade com o design e os controles existentes foi validada;
+- nenhuma execução de incidente/tabletop ocorreu;
+- aprovação humana do plano permanece pendente;
+- o exercício sintético isolado permanece pendente.
+
+Estado reconciliado:
+
+`PLAN_REPOSITORY_VALIDATED / OPEN_BLOCKER`
+
+O risco não está encerrado.
+
+`RSK-P0-005` permanece blocker até aprovação humana, exercício isolado PASS e
+reconciliação final do risco.
+
 ## 9. Restrições obrigatórias da v1
 
 Enquanto gaps não forem tratados em checkpoints próprios:
