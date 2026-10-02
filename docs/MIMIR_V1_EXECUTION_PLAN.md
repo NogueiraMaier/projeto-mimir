@@ -125,6 +125,35 @@ A documentação do Maestro deve ser retomada somente após a estabilização do
 
 ## Checkpoint atual
 
+**MIMIR-V1-PROTECTED-OUTPUT-GBNF-RUNTIME-HARNESS-DESIGN-01 — PROPOSED em 2026-10-02.**
+
+- base HEAD: `1702aff81fcb0d1da36ae0eac8b9c3e03072dd67`;
+- compatibility/runtime inspection is COMPLETE;
+- do not repeat the inspection while source hashes remain unchanged;
+- compatibility harness SHA-256: `edd0552edbf4b79ab9051e47c3ae080736b4e174d89ca5a6ba06e779bee0cffc`;
+- protected-output GBNF builder SHA-256: `d1c025c49fe14937b3eba2611383baf982a4df2bc542c6c9aa64700a32b1f64f`;
+- inspection evidence SHA-256: `0e72de241ec6846d550b518cc65c9d9528393f6a987b5f707cab25edb40824f4`;
+- exact reusable-block evidence SHA-256: `0a3e9d0c00ac87d5f6f3d739608f989064d735882be6b59844fa7d2f7481028f`;
+- reuse the validated G00..G07 transport and result-classification semantics;
+- do not modify the existing G00..G07 harness;
+- implement a new dedicated full-grammar runtime harness;
+- repository-only validation comes before any Qwen request;
+- protected consolidator remains UNCHANGED / NOT DEPLOYED;
+- PostgreSQL remains untouched;
+- full protected-output GBNF runtime validation remains PENDING;
+- `FULL_GBNF_RUNTIME_PASS != PROTECTED_CONSOLIDATOR_REAL_MODEL_VALIDATED`;
+- FINDING-05 remains `REPOSITORY_VALIDATED / REAL_MODEL_REVALIDATION_BLOCKED`;
+- PR remains Draft;
+- push not performed.
+
+Evidence:
+
+`docs/review/operations/2026-10-02-protected-output-gbnf-runtime-harness-design-01.md`
+
+**NEXT_ACTION atual:** `IMPLEMENT_PROTECTED_OUTPUT_GBNF_RUNTIME_V1_HARNESS_REPOSITORY_ONLY`.
+
+## Checkpoint histórico — MIMIR-V1-PROTECTED-OUTPUT-GBNF-V1-REPOSITORY-VALIDATION-01
+
 **MIMIR-V1-PROTECTED-OUTPUT-GBNF-V1-REPOSITORY-VALIDATION-01 — REPOSITORY_VALIDATED_RUNTIME_VALIDATION_PENDING em 2026-10-02.**
 
 - implementation HEAD: `c3afe5e0dcdbe6f8728a437a002b06c4112bba4a`;

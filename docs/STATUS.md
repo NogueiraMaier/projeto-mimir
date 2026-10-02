@@ -691,3 +691,25 @@ Evidência da rodada: [review/operations/2026-09-24.md](review/operations/2026-0
 - **FAILURE EVIDENCE 2:** `4f15be4ea3081015e30cde972a9533504206aec6f03318465851fa899d1b5a0e`.
 - **CORRECTED REVIEW EVIDENCE:** `dca76997174dc2d748aaf1e64250f1cec6b5978c922cd68e1a510ffb94e5296e`.
 - **NEXT:** Projetar e executar uma validação controlada da grammar protected-output GBNF v1 contra o parser/runtime real do llama.cpp usando apenas dados sintéticos, sem PostgreSQL e sem alterar o protected consolidator. A validação deve usar a grammar produzida pelo builder commitado, preservar source_event_id/source_content_sha256 sintéticos, não usar dados protegidos e distinguir parser/runtime PASS de protected-consolidator real-model validation. Não alterar ainda mimir-consolidate-protected-v1.py.
+
+## MIMIR-V1-PROTECTED-OUTPUT-GBNF-RUNTIME-HARNESS-DESIGN-01
+
+- **STATUS:** PROPOSED.
+- **BASE HEAD:** `1702aff81fcb0d1da36ae0eac8b9c3e03072dd67`.
+- **INSPECTION:** COMPLETE.
+- **INSPECTION REPEAT:** NOT REQUIRED while source hashes remain unchanged.
+- **COMPAT HARNESS SHA-256:** `edd0552edbf4b79ab9051e47c3ae080736b4e174d89ca5a6ba06e779bee0cffc`.
+- **GBNF BUILDER SHA-256:** `d1c025c49fe14937b3eba2611383baf982a4df2bc542c6c9aa64700a32b1f64f`.
+- **INSPECTION EVIDENCE 1:** `0e72de241ec6846d550b518cc65c9d9528393f6a987b5f707cab25edb40824f4`.
+- **INSPECTION EVIDENCE 2:** `0a3e9d0c00ac87d5f6f3d739608f989064d735882be6b59844fa7d2f7481028f`.
+- **DECISION:** implement a dedicated versioned full-grammar runtime harness.
+- **EXISTING G00..G07 HARNESS:** NOT MODIFIED.
+- **REPOSITORY-ONLY FIRST:** YES.
+- **QWEN RUNTIME:** NOT EXECUTED.
+- **POSTGRESQL:** NOT ACCESSED.
+- **PROTECTED CONSOLIDATOR:** UNCHANGED / NOT DEPLOYED.
+- **FULL GBNF RUNTIME VALIDATION:** PENDING.
+- **FINDING-05:** REPOSITORY_VALIDATED / REAL_MODEL_REVALIDATION_BLOCKED.
+- **PR:** remains Draft.
+- **PUSH:** not performed.
+- **NEXT:** `IMPLEMENT_PROTECTED_OUTPUT_GBNF_RUNTIME_V1_HARNESS_REPOSITORY_ONLY`.
