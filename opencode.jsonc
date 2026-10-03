@@ -1,0 +1,231 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+
+  // ==========================================================================
+  // Projeto Mimir - politica de seguranca project-local
+  // Autoridade: OpenCode 2.0.21 instalado localmente (schema/binary).
+  //
+  // Semantics (proven localmente na 2.0.21):
+  //   - permission e um record: { "<action>": effect | { "<resource glob>": effect } }
+  //   - efeitos validos: "ask" | "allow" | "deny"
+  //   - ordem das regras = ordem de insercao neste objeto; a ULTIMA regra
+  //     compativel vence (last-match-wins).
+  //   - action "bash" normaliza para "shell", "task" normaliza para "subagent";
+  //     aqui usamos diretamente os nomes de runtime ("shell", "subagent").
+  //   - NAO ha nenhuma chave "model" neste nivel: o roteamento global
+  //     permanece intacto (unico model novo: implement-fallback).
+  //
+  // Trust model (implementado em 2026-10-03 apos falha de ASK em runtime):
+  //   DENY_BY_DEFAULT + EXPLICIT_ALLOW_ONLY +
+  //   EXTERNAL_HUMAN_GATE_FOR_GIT_AND_OPS.
+  //   ASK_RULE_COUNT = 0: ASK nao e usado como fronteira de seguranca.
+  //   Fluxo de mutacao:
+  //     OPENCODE_PREPARES_CHANGE
+  //     -> HUMAN_REVIEWS_DIFF
+  //     -> HUMAN_RUNS_GUARDED_GIT_OR_OPS_COMMAND_IN_TERMINAL
+  //     -> OPENCODE_CONTINUES_FROM_RESULT
+  //   Shell = DENY para TODOS os agentes (zero allowlist): elimina bypass por
+  //   redirecionamento, opcoes de output, argumentos inesperados, leitura e
+  //   escrita indireta e comandos compostos. Git e validacoes shell rodam
+  //   somente no terminal humano externo (chave SSH com passphrase humana;
+  //   o OpenCode nao solicita, nao armazena e nao usa essa passphrase).
+  // ==========================================================================
+
+  "permission": {
+    // DENY_BY_DEFAULT: nenhuma acao tem ALLOW implicito (EXPLICIT_ALLOW_ONLY).
+    "*": "deny",
+
+    // --- leitura (superficie de dados controlada) --------------------------
+    // Patterns .env nao sao relaxados. Cobertura em subdiretorio so entra
+    // quando a sintaxe de glob for comprovada localmente.
+    "read": {
+      "*": "allow",
+      "*.env": "deny",
+      "*.env.*": "deny"
+    },
+
+    "glob": "allow",
+    "grep": "allow",
+    "list": "allow",
+    "lsp": "allow",
+    "question": "allow",
+    "skill": "allow",
+
+    // BUILD coordena, mas nao muta: allowlist explicita de subagentes.
+    // Ordem = last-match-wins: "*" deny PRIMEIRO, allows explicitos DEPOIS.
+    "subagent": {
+      "*": "deny",
+      "inspect": "allow",
+      "inspect-fallback": "allow",
+      "design": "allow",
+      "architect": "allow",
+      "database": "allow",
+      "security-reviewer": "allow",
+      "implement": "allow",
+      "implement-fallback": "allow",
+      "quick": "allow"
+    },
+
+    // BUILD nao edita: mutacao de fonte e exclusiva do IMPLEMENT.
+    "edit": "deny",
+
+    // Shell = DENY ALL para todos os agentes: nenhuma regra allow.
+    "shell": "deny",
+
+    // --- diretorios externos (DENY por padrao) -----------------------------
+    // Somente excecoes estritamente de runtime, ja comprovadas na 2.0.21.
+    // Nao ha acesso generico a HOME, /tmp, /etc, /var ou ~/.ssh.
+    "~": "deny",
+    "external_directory": {
+      "*": "deny",
+      "~/.local/share/opencode/tool-output/*": "allow",
+      "/tmp/opencode/*": "allow"
+    },
+
+    // --- rede / code mode --------------------------------------------------
+    // execute = DENY porque o Code Mode expoe um fetch "crudo" que nao passa
+    // pelo assert de permissao do webfetch na versao 2.0.21.
+    "webfetch": "deny",
+    "websearch": "deny",
+    "browser": "deny",
+    "execute": "deny",
+
+    // --- MCP (tool permission) --------------------------------------------
+    // Defense-in-depth; o bloqueio primario e mcp.servers.*.disabled.
+    "context7_*": "deny",
+    "playwright_*": "deny",
+    "mind_*": "deny",
+    "opencode_list_mcp_resources": "deny",
+    "opencode_read_mcp_resource": "deny"
+  },
+
+  // ==========================================================================
+  // MCP - desabilitado project-localmente (defense-in-depth)
+  // Definicoes preservadas (type/command/url) e apenas marcadas disabled.
+  // Requer restart do OpenCode para surtir efeito no runtime.
+  // ==========================================================================
+  "mcp": {
+    "servers": {
+      "context7": {
+        "type": "remote",
+        "url": "https://mcp.context7.com/mcp",
+        "disabled": true
+      },
+      "playwright": {
+        "type": "local",
+        "command": ["npx", "-y", "@playwright/mcp@latest"],
+        "disabled": true
+      },
+      "mind": {
+        "type": "local",
+        "command": ["/home/jarvisdev/projects/mind/mind", "mcp"],
+        "disabled": true
+      }
+    }
+  },
+
+  // ==========================================================================
+  // Overrides por agente (project-local)
+  // Ordem efetiva comprovada:
+  //   defaults do OpenCode
+  //   -> regras builtin dos agentes (pre-plugins)
+  //   -> permission raiz (camada de projeto)
+  //   -> agentes .md globais em ~/.config/opencode/agents
+  //   -> regras por agente deste arquivo (post-plugin, por ultimo)
+  // Por isso os overrides por agente sao obrigatorios para vencer
+  // "allow edit *" do implement.md global.
+  //
+  // Campo "model" apenas em implement-fallback; os demais agentes preservam
+  // o roteamento global.
+  // ==========================================================================
+  "agents": {
+    // ---- agentes somente-leitura -----------------------------------------
+    "inspect": {
+      "mode": "subagent",
+      "permissions": [
+        { "action": "edit", "resource": "*", "effect": "deny" },
+        { "action": "shell", "resource": "*", "effect": "deny" },
+        { "action": "subagent", "resource": "*", "effect": "deny" }
+      ]
+    },
+    "inspect-fallback": {
+      "mode": "subagent",
+      "permissions": [
+        { "action": "edit", "resource": "*", "effect": "deny" },
+        { "action": "shell", "resource": "*", "effect": "deny" },
+        { "action": "subagent", "resource": "*", "effect": "deny" }
+      ]
+    },
+    "design": {
+      "mode": "subagent",
+      "permissions": [
+        { "action": "edit", "resource": "*", "effect": "deny" },
+        { "action": "shell", "resource": "*", "effect": "deny" },
+        { "action": "subagent", "resource": "*", "effect": "deny" }
+      ]
+    },
+    "architect": {
+      "mode": "subagent",
+      "permissions": [
+        { "action": "edit", "resource": "*", "effect": "deny" },
+        { "action": "shell", "resource": "*", "effect": "deny" },
+        { "action": "subagent", "resource": "*", "effect": "deny" }
+      ]
+    },
+    "database": {
+      "mode": "subagent",
+      "permissions": [
+        { "action": "edit", "resource": "*", "effect": "deny" },
+        { "action": "shell", "resource": "*", "effect": "deny" },
+        { "action": "subagent", "resource": "*", "effect": "deny" }
+      ]
+    },
+    "security-reviewer": {
+      "mode": "subagent",
+      "permissions": [
+        { "action": "edit", "resource": "*", "effect": "deny" },
+        { "action": "shell", "resource": "*", "effect": "deny" },
+        { "action": "subagent", "resource": "*", "effect": "deny" }
+      ]
+    },
+
+    // ---- IMPLEMENT (primario) --------------------------------------------
+    // Modelo global preservado; edit = ALLOW (unico caminho deliberado de
+    // mutacao de fonte, confinado ao projeto pelo external_directory DENY).
+    // shell/git/rede/MCP/execute = DENY: IMPLEMENT nao executa git nem shell;
+    // git e validacoes rodam no terminal humano externo, que revisa o diff.
+    "implement": {
+      "mode": "subagent",
+      "permissions": [
+        { "action": "edit", "resource": "*", "effect": "allow" },
+        { "action": "shell", "resource": "*", "effect": "deny" },
+        { "action": "subagent", "resource": "*", "effect": "deny" }
+      ]
+    },
+
+    // ---- IMPLEMENT FALLBACK (novo) ---------------------------------------
+    // Modo EXPLICIT_SUBAGENT: sem fallback automatico.
+    // BUILD deve invocar implement-fallback deliberadamente.
+    // Mesma postura de seguranca do IMPLEMENT.
+    "implement-fallback": {
+      "description": "Fallback de implementacao controlado para uso explicito quando IMPLEMENT estiver indisponivel ou falhar conforme a politica do projeto",
+      "mode": "subagent",
+      "model": "opencode/longcat-2.5-preview-free",
+      "permissions": [
+        { "action": "edit", "resource": "*", "effect": "allow" },
+        { "action": "shell", "resource": "*", "effect": "deny" },
+        { "action": "subagent", "resource": "*", "effect": "deny" }
+      ]
+    },
+
+    // ---- QUICK (tools = deny all) ----------------------------------------
+    // Nega apenas FERRAMENTAS; nao altera o model provider local qwen-local
+    // nem a inferencia via llama.cpp em http://127.0.0.1:18782/v1.
+    "quick": {
+      "mode": "subagent",
+      "permissions": [
+        { "action": "*", "resource": "*", "effect": "deny" }
+      ]
+    }
+  }
+}
