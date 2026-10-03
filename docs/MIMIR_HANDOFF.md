@@ -5177,3 +5177,57 @@ This design does not claim LGPD compliance and does not close RSK-P0-003.
 NEXT_ACTION:
 
 `IMPLEMENT_RSK_P0_003_PRIVACY_GOVERNANCE_REPOSITORY_ONLY`
+
+## MIMIR-V1-RSK-P0-003-PRIVACY-GOVERNANCE-REPOSITORY-VALIDATION-01
+
+Date: 2026-10-03
+
+Status:
+
+`REPOSITORY_VALIDATED / HUMAN_APPROVAL_PENDING`
+
+Implementation commit:
+
+`34f78b80cd77e675a699001e43e0cf556ad091c0`
+
+Artifacts and SHA-256:
+
+- `docs/PRIVACY_GOVERNANCE.md` —
+  `2a17f99fa60ed02f5564672faa2895b634e2d9cf22c9a7f3c89e50ebf8275d04`;
+- `docs/DATA_INVENTORY_LGPD.md` —
+  `695fba430edd1a5dfa096410afed324887af5acc0c601bfc62b8213d2cbec048`;
+- `tools/security/validate-rsk-p0-003-privacy-governance.py` —
+  `a1cd31d1b692e937b5e782510ef5afdd687891acdae14ded44fda648a1e71cab`;
+- `tools/security/test_validate_rsk_p0_003_privacy_governance.py` —
+  `f4b1a86a281fcbe2d951a57a4ec39824a85cf5c361ce787a8633927dc52d1536`.
+
+Repository-only validation passed: py_compile PASS, validator positive case
+PASS, 10/10 tests PASS, context-aware overclaim regression PASS and 12/12
+processing activities with the expected lifecycle matrix.
+
+The first commit attempt stopped at `git diff --cached --check` because of
+trailing whitespace in the two Markdown artifacts. The failure is preserved.
+Only trailing whitespace was removed, with no semantic change, and the full
+repository-only validation then passed again with 10/10 tests.
+
+Current boundary:
+
+- `RSK-P0-003 = OPEN / BLOCKER`;
+- `RISK_ACCEPTANCE = NOT_USED`;
+- `COMPETENT_PRIVACY_AUTHORITY = PENDING_COMPETENT_REVIEW`;
+- `DPO_STATE = PENDING_COMPETENT_REVIEW`;
+- `COMPETENT_HUMAN_APPROVAL = PENDING`;
+- `LEGAL_CONCLUSION = NO`;
+- `LGPD_COMPLIANCE_CLAIM = NO`;
+- `PRODUCTION_VALIDATION = NO`;
+- no network, PostgreSQL, Qwen, production or push was used by this validation.
+
+`IMPLEMENTED != COMPETENTLY_APPROVED`
+
+`REPOSITORY_VALIDATED != LEGALLY_COMPLIANT`
+
+`REPOSITORY_VALIDATED != PRODUCTION_VALIDATED`
+
+NEXT_ACTION:
+
+`REQUEST_HUMAN_APPROVAL_RSK_P0_003_PRIVACY_GOVERNANCE_PACKAGE`

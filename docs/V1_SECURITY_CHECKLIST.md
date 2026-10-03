@@ -470,6 +470,38 @@ governança formal.
 O tratamento proposto não altera os registros históricos P0 e não constitui
 aceite de risco.
 
+### Atualização 2026-10-03 — validação repository-only RSK-P0-003
+
+Checkpoint:
+
+`MIMIR-V1-RSK-P0-003-PRIVACY-GOVERNANCE-REPOSITORY-VALIDATION-01`
+
+Estado comprovado no repositório:
+
+- `FORMAL_GOVERNANCE_PACKAGE = REPOSITORY_VALIDATED`;
+- `COMPETENT_HUMAN_APPROVAL = PENDING`;
+- `COMPETENT_PRIVACY_AUTHORITY = PENDING_COMPETENT_REVIEW`;
+- `DPO_STATE = PENDING_COMPETENT_REVIEW`;
+- `RSK-P0-003 = OPEN / BLOCKER`;
+- `RISK_ACCEPTANCE = NOT_USED`;
+- `LEGAL_CONCLUSION = NO`;
+- `LGPD_COMPLIANCE_CLAIM = NO`;
+- `PRODUCTION_VALIDATION = NO`;
+- 12/12 atividades e matriz de lifecycle states validadas;
+- validator estático repository-only e testes 10/10 aprovados;
+- nenhum dado pessoal bruto, segredo, valor de credencial ou identificador
+  governamental presente no pacote.
+
+A primeira tentativa de commit foi interrompida por trailing whitespace. A
+correção removeu somente whitespace final, sem mudança semântica, e a
+revalidação passou integralmente. Este checkpoint comprova somente
+`REPOSITORY_PACKAGE_STRUCTURALLY_VALIDATED`; não comprova aprovação competente,
+conclusão legal, validação produtiva ou encerramento do risco.
+
+NEXT_ACTION:
+
+`REQUEST_HUMAN_APPROVAL_RSK_P0_003_PRIVACY_GOVERNANCE_PACKAGE`
+
 ## 9. Restrições obrigatórias da v1
 
 Enquanto gaps não forem tratados em checkpoints próprios:

@@ -125,29 +125,41 @@ A documentação do Maestro deve ser retomada somente após a estabilização do
 
 ## Checkpoint atual
 
+**MIMIR-V1-RSK-P0-003-PRIVACY-GOVERNANCE-REPOSITORY-VALIDATION-01 — REPOSITORY_VALIDATED / HUMAN_APPROVAL_PENDING em 2026-10-03.**
+
+- source HEAD: `34f78b80cd77e675a699001e43e0cf556ad091c0`;
+- implementation commit: `34f78b80cd77e675a699001e43e0cf556ad091c0`;
+- pacote de governança e inventário sanitizado implementado;
+- validator estático repository-only implementado;
+- validação: PASS; testes: 10/10 PASS; atividades: 12/12;
+- matriz de lifecycle states validada sem promover LAB, legado ou planejamento
+  a produção;
+- FAIL anterior de trailing whitespace preservado; correção exclusivamente de
+  whitespace e revalidação 10/10 PASS;
+- `FORMAL_GOVERNANCE_PACKAGE = REPOSITORY_VALIDATED`;
+- `COMPETENT_HUMAN_APPROVAL = PENDING`;
+- `RSK-P0-003 = OPEN / BLOCKER`;
+- `RISK_ACCEPTANCE = NOT_USED`;
+- `LEGAL_CONCLUSION = NO`;
+- `LGPD_COMPLIANCE_CLAIM = NO`;
+- `PRODUCTION_VALIDATION = NO`;
+- review: `docs/review/security/2026-10-03-rsk-p0-003-privacy-governance-repository-validation-01.md`;
+- nenhum push realizado neste checkpoint.
+
+**NEXT_ACTION atual:** `REQUEST_HUMAN_APPROVAL_RSK_P0_003_PRIVACY_GOVERNANCE_PACKAGE`.
+
+## Checkpoint histórico — MIMIR-V1-RSK-P0-003-PRIVACY-GOVERNANCE-TREATMENT-DESIGN-01
+
 **MIMIR-V1-RSK-P0-003-PRIVACY-GOVERNANCE-TREATMENT-DESIGN-01 — PROPOSED em 2026-10-02.**
 
 - source HEAD: `f9b2ad20dd58e43cafb4550eb288b036816ac516`;
-- RSK-P0-003 remains `OPEN / BLOCKER`;
-- privacy controls exist but remain partial/distributed;
-- canonical formal privacy governance is not yet proven;
-- no legal or LGPD-compliance conclusion is made;
-- treatment path chosen instead of risk acceptance;
-- target canonical governance:
-  `docs/PRIVACY_GOVERNANCE.md`;
-- target sanitized processing register:
-  `docs/DATA_INVENTORY_LGPD.md`;
-- target repository-only validator under `tools/security/`;
-- existing incident-response and retention controls must be reused;
-- legal basis must never be automatically inferred;
-- international-transfer uncertainty must remain explicit when not proven;
-- competent human privacy-governance approval is required after repository
-  validation;
-- historical P0 evidence remains immutable;
-- RSK-P0-004 remains a production-release blocker;
-- Draft removal / merge / tag / deploy remain blocked.
+- tratamento repository-first definido sem aceite de risco;
+- governança canônica, inventário sanitizado e validator repository-only
+  definidos como artefatos-alvo;
+- aprovação humana competente definida como etapa separada;
+- `RSK-P0-003 = OPEN / BLOCKER`.
 
-**NEXT_ACTION atual:** `IMPLEMENT_RSK_P0_003_PRIVACY_GOVERNANCE_REPOSITORY_ONLY`.
+**NEXT_ACTION histórico:** `IMPLEMENT_RSK_P0_003_PRIVACY_GOVERNANCE_REPOSITORY_ONLY`.
 
 ## Checkpoint histórico — MIMIR-V1-RSK-P0-005-SYNTHETIC-TABLETOP-RECONCILIATION-01
 
