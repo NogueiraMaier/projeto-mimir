@@ -68,6 +68,27 @@ As fases são cumulativas, proporcionais ao contexto de pequenas empresas e depe
 
 **Ponto de aprovação humana:** cliente, proprietário do projeto, segurança e privacidade decidem iniciar, pausar, encerrar ou ampliar. Qualquer produção posterior exige novo plano, nova autorização e controle de mudança próprio.
 
+## FASE-P4 — Mímir Security Assessment & SOC Coordinator
+
+**Objetivo:** transformar as capacidades planejadas de agente SOC, OSINT autorizado, gestão de vulnerabilidades e Cyber-Lab em uma coordenação defensiva governada, sem conceder shell arbitrário ou escopo livre ao agente.
+
+**Especificação:** `docs/cybersecurity/MIMIR_SECURITY_ASSESSMENT_SOC.md`.
+
+**Entregáveis:** Security Assessment Orchestrator; Security Scope Registry; Tool Policy Engine; Evidence Collector; Security Correlator; Finding Manager; identidade de rede canônica; catálogo de ferramentas OSINT/SOC/vulnerability assessment; perfis PASSIVE e SAFE; enriquecimento CVE/CPE/CVSS/KEV; reteste; integração por API com sistema-os quando autorizada.
+
+**Caso obrigatório de segurança:** detectar spoofing de IP alegado por `X-Forwarded-For`, `Forwarded`, `X-Real-IP`, `CF-Connecting-IP` e headers equivalentes, verificando cadeia de proxies confiáveis, identidade usada pelo rate limit, integridade do audit log e semântica de IP em sessão.
+
+**Dependências:** P1 a P3 conforme aplicáveis; inventário de ativos; dono e tenant resolvidos; política de autorização; Cyber-Lab isolado; armazenamento de evidência; sincronização de tempo; fontes de inteligência aprovadas; plano de interrupção e incidente.
+
+**Riscos:** scan fora do escopo, indisponibilidade, falso positivo, atribuição incorreta de vulnerabilidade, vazamento de evidência, abuso de credencial, confusão entre IP alegado e IP observado, expansão automática de autorização e fechamento indevido de finding.
+
+**Evidências:** policy decisions, logs de execução, request_id, trace_id, hashes, amostras sanitizadas, resultados reproduzíveis, finding com cadeia de evidência, bloqueios de escopo e reteste.
+
+**Critério de aceitação:** nenhum alvo é derivado de texto livre; todo teste ativo resolve `asset_id` em inventário autorizado; ferramentas são tipadas e restritas; claimed_ip nunca substitui peer_ip sem política de proxy confiável; findings separam evidência, inferência, confiança e severidade; ações sensíveis passam por aprovação humana; fechamento exige validação e reteste.
+
+**Ponto de aprovação humana:** nenhuma varredura ativa, teste autenticado, alteração de firewall, patch, desativação de serviço ou ação corretiva sensível é liberada por esta documentação. Cada capacidade operacional exige autorização própria e evidência de controles.
+
+
 ## Portões entre fases
 
 Uma fase não avança por calendário ou pela simples criação de documentos. O portão exige evidência do critério de aceitação, riscos residuais explícitos e decisão humana registrada. Reprovação mantém a fase aberta; exceção deve ter escopo, justificativa, compensação, aprovador e validade.
