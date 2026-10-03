@@ -130,6 +130,23 @@ Toda ação exigirá:
 6. Evidências.
 7. Relatório técnico.
 
+## Security Assessment & SOC Coordinator
+
+Capacidade planejada e ainda não implementada.
+
+Especificação: `docs/cybersecurity/MIMIR_SECURITY_ASSESSMENT_SOC.md`.
+
+Regras adicionais:
+
+- Mímir coordena ferramentas defensivas, sem shell arbitrário.
+- Avaliação ativa usa ativo inventariado e autorizado, nunca alvo livre informado pelo modelo.
+- `peer_ip`, `claimed_ip` e `client_ip` são identidades distintas.
+- Headers de encaminhamento não são autoridade sem validação do proxy confiável.
+- Testes de spoofing de IP por headers, rate limit, audit log e sessão integram a evolução.
+- OSINT passivo não concede autorização para scan ativo.
+- Ação corretiva sensível exige aprovação humana e executor restrito.
+- Finding crítico não é encerrado sem evidência de mitigação e reteste.
+
 ## Camada operacional — revisão local 2026-09-22
 
 IMPLEMENTADO no repositório; NÃO VALIDADO EM PRODUÇÃO. A execução operacional

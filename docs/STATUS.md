@@ -1005,3 +1005,14 @@ Evidência da rodada: [review/operations/2026-09-24.md](review/operations/2026-0
 - **OTHER BLOCKER:** RSK-P0-004 unchanged.
 - **GIT:** no fetch, commit or push in this phase.
 - **NEXT:** `FRESH_FETCH_GUARD_BEFORE_COMMIT_RSK_P0_003_HUMAN_APPROVAL_AND_RECONCILIATION`.
+
+## Evolução planejada de Security Assessment e SOC
+
+- Especificação registrada em 2026-10-03.
+- Mímir será coordenador de avaliação, não scanner monolítico.
+- Escopo previsto: OSINT autorizado, vulnerability assessment, SOC, correlação, findings e reteste.
+- Caso obrigatório: spoofing de IP alegado por headers HTTP e efeitos em proxy trust, rate limit, auditoria e sessão.
+- Ferramentas ativas exigirão ativo inventariado, política, autorização e limites.
+- Integração futura com sistema-os será por API, sem credencial direta do banco.
+- Estado técnico: não implementado.
+- Evidência documental: docs/cybersecurity/MIMIR_SECURITY_ASSESSMENT_SOC.md
