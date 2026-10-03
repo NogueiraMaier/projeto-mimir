@@ -33,3 +33,4 @@ Criar o cliente de ingestão protegida e o consolidador local de sessões, sem p
 - Navegador e OSINT isolados
 - SOC e SIEM
 - Cyber-Lab em máquina separada
+- Mímir Security Assessment & SOC Coordinator, com OSINT autorizado, vulnerability assessment, correlação SOC, findings rastreáveis, perfis SAFE de scan e reteste. Especificação: `docs/cybersecurity/MIMIR_SECURITY_ASSESSMENT_SOC.md`
