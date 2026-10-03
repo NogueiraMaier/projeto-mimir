@@ -1,0 +1,194 @@
+name: repository-ci
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - feat/mimir-operational-foundation
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: repository-ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  python-repository-tests:
+    name: Python repository tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+      - name: Python 3.12
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: "3.12"
+
+      - name: Python syntax
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import subprocess
+
+          files = subprocess.check_output(
+              ["git", "ls-files", "*.py"],
+              text=True,
+          ).splitlines()
+
+          for name in files:
+              source = Path(name).read_text(encoding="utf-8")
+              compile(source, name, "exec")
+
+          print(f"PYTHON_SYNTAX=PASS files={len(files)}")
+          PY
+
+      - name: Memory unit tests
+        shell: bash
+        run: |
+          python -B -m unittest discover \
+            -s tools/memory \
+            -p 'test_*.py' \
+            -v
+
+      - name: Protected consolidator schema contract
+        shell: bash
+        run: |
+          python -B \
+            tools/memory/test_mimir_consolidate_protected_json_schema.py
+
+      - name: Operations unit tests
+        shell: bash
+        run: |
+          python -B -m unittest discover \
+            -s tools/ops \
+            -p 'test_*.py' \
+            -v
+
+      - name: Validator repository tests
+        shell: bash
+        working-directory: tools/validation
+        run: |
+          python -B -m unittest -v \
+            test_validate_vps_readonly.ValidatorTests.test_syntax \
+            test_validate_vps_readonly.ValidatorTests.test_help_and_rejected_arguments_do_not_probe \
+            test_validate_vps_readonly.ValidatorTests.test_plugin_build_artifact_and_structure \
+            test_validate_vps_readonly.ValidatorTests.test_schema_history_with_simulated_privileges \
+            test_validate_vps_readonly.ValidatorTests.test_no_deployment_mutations
+
+      # test_local_inspection_explicitly_skips_database_and_hides_environment
+      # is intentionally host-specific. validate-vps-readonly.sh sanitizes PATH
+      # to the Gentoo/VPS system paths and must not be made to impersonate that
+      # environment on a generic GitHub Ubuntu runner.
+
+  repository-syntax:
+    name: Shell and Node repository checks
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+      - name: Node 22
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: "22"
+
+      - name: Shell syntax
+        shell: bash
+        run: |
+          count=0
+
+          while IFS= read -r file; do
+            bash -n "$file"
+            count=$((count + 1))
+          done < <(git ls-files '*.sh')
+
+          echo "SHELL_SYNTAX=PASS files=$count"
+
+      - name: Node syntax
+        shell: bash
+        run: |
+          count=0
+
+          while IFS= read -r file; do
+            node --check "$file"
+            count=$((count + 1))
+          done < <(git ls-files '*.mjs')
+
+          echo "NODE_SYNTAX=PASS files=$count"
+
+      - name: Embedding provider transport tests
+        shell: bash
+        run: |
+          node --test \
+            tools/memory/test_mimir_generate_embeddings.mjs
+
+      - name: Evidence classifier self-test
+        shell: bash
+        run: |
+          node \
+            tools/memory/mimir-evidence-shadow-evaluate.mjs \
+            --self-test-classifier
+
+  plugin:
+    name: Mimir memory plugin
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+      - name: Node 22
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: "22"
+
+      - name: Install pinned CI dependencies
+        shell: bash
+        run: |
+          npm install \
+            --prefix plugins/mimir-memory \
+            --ignore-scripts \
+            --no-audit \
+            --no-fund \
+            --no-package-lock \
+            --no-save \
+            --legacy-peer-deps \
+            openclaw@2026.9.5 \
+            typebox@1.1.38 \
+            typescript@5.9.3 \
+            vitest@4.1.9 \
+            @types/node@24.13.3 \
+            undici-types@7.18.2
+
+      - name: Plugin tests
+        shell: bash
+        run: |
+          npm test --prefix plugins/mimir-memory
+
+      - name: Plugin build
+        shell: bash
+        run: |
+          npm run build --prefix plugins/mimir-memory
+
+      - name: Repository mutation guard
+        shell: bash
+        run: |
+          if [[ -n "$(git status --porcelain)" ]]; then
+            echo "ERRO: testes/build alteraram arquivos versionáveis"
+            git status --short
+            exit 1
+          fi
+
+          echo "REPOSITORY_MUTATION_GUARD=PASS"

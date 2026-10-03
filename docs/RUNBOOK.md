@@ -68,19 +68,50 @@ Comparar os hashes local e remoto:
     test "$local_commit" = "$remote_commit"
 
 
+## CI do repositório
+
+Workflow canônico:
+
+`.github/workflows/repository-ci.yml`
+
+Antes de fechar um marco de CI, exigir PASS do workflow no commit técnico
+correspondente. Para branches com PR aberta, conferir tanto o evento `push`
+quanto o evento `pull_request`.
+
+Jobs esperados:
+
+- Python repository tests;
+- Shell and Node repository checks;
+- Mimir memory plugin.
+
+O CI repository-only não substitui validação específica do VPS/Gentoo,
+PostgreSQL persistente, OpenRC, runtime OpenClaw ou equipamento externo.
+
+Falha de CI deve preservar evidência, ser corrigida em novo commit e ser
+retestada antes de atualizar o milestone para PASS.
+
 ## Validar ingestão protegida
 
-Versão do esquema:
+Produção permanece em `schema_version 1..12`; a migration 014 e o writer v2
+foram validados somente em laboratório e não devem ser aplicados sem autorização
+separada.
 
-    psql -X -d mimir_memory -c         "SELECT version, description FROM mimir.schema_version WHERE version = 8;"
+Privilégio direto esperado:
 
-Privilégios da fonte:
+    psql -X -d mimir_memory -c "SELECT has_table_privilege('mimir_app', 'mimir.session_sources', 'SELECT');"
 
-    psql -X -d mimir_memory -c         "SELECT has_table_privilege('mimir_app', 'mimir.session_sources', 'SELECT');"
+A resposta esperada é `false`.
 
-A resposta esperada para SELECT é false.
+No laboratório com migration 014, validar também:
 
-Nenhuma sessão deve ser importada sem execução explícita do cliente de ingestão.
+    psql -X -d mimir_memory -c "SELECT has_function_privilege('mimir_app', 'mimir.ingest_session_v2(uuid,text,text,text,text,integer,integer,integer,bigint,timestamptz,text,integer,integer,integer,integer)', 'EXECUTE');"
+
+O resultado esperado no lab é `true`, enquanto EXECUTE no ingresso legado deve
+ser `false`.
+
+Nenhuma sessão real deve ser importada sem seleção explícita de
+`session_key/session_id`, fingerprints esperados e aprovação do dry-run. A
+ingestão não promove memória automaticamente.
 
 ## Regra de alteração
 
@@ -97,3 +128,100 @@ Nenhuma sessão deve ser importada sem execução explícita do cliente de inges
 11. Criar uma tag para marcos estáveis.
 12. Enviar ao repositório remoto público.
 13. Comparar os hashes local e remoto.
+
+## Validação operacional antes de implantação da 013
+
+Estado: IMPLEMENTADO localmente, NÃO VALIDADO EM PRODUÇÃO. Os procedimentos
+históricos de reinício e publicação acima não fazem parte da revisão local.
+Nenhuma migration, configuração, reinício ou push foi executado nessa etapa.
+
+Primeiro comando posterior, já no VPS e sob identidade peer autorizada:
+
+```bash
+cd /var/lib/openclaw/workspace
+bash tools/validation/validate-vps-readonly.sh --db-user mimir_app
+```
+
+O validador não aplica SQL de alteração, não executa scripts de serviço, não
+reinicia OpenClaw, não muda branch, não acessa equipamentos e não lê configuração
+com segredos. Use `--skip-db` para excluir conexão PostgreSQL. Falhas devem ser
+revisadas antes de qualquer correção. Presença de artefatos não confirma plugin
+carregado; versão 13 registrada não identifica a revisão aplicada da migration.
+Antes de consultar o histórico, o validador verifica SELECT em `schema_version`.
+Sem esse privilégio, emite PARTIAL e exige inspeção administrativa read-only
+separada para confirmar versões. Isso é esperado para `mimir_app` após a 009;
+não conceder SELECT para eliminar o PARTIAL. Com leitura autorizada, verifica
+a presença das versões 1–12 e informa separadamente a presença da 013.
+
+O schema é separado do provisionamento cluster-global: `013_operational_inventory.sql`
+cria apenas objetos; `013_operational_role.sql` cria `mimir_ops`, concede CONNECT
+no banco corrente e aplica os grants mínimos. A role permanece inicialmente
+desabilitada; revisão de schema, backup/restauração, grants e peer precisa
+preceder a habilitação.
+Não aplicar 013 sobre versão 13 existente: ela recusa reexecução deliberadamente.
+A migration operacional exige a versão 12; as versões 009–012 pertencem à memória.
+
+Consulta posterior de intervenção sob identidade operacional habilitada:
+
+```bash
+python3 tools/ops/mimir-ops.py ops history DEVICE_UUID
+python3 tools/ops/mimir-ops.py ops report INTERVENTION_UUID --format markdown
+```
+
+## Retenção operacional v1
+
+A política canônica está em [OPERATIONS_RETENTION.md](OPERATIONS_RETENTION.md).
+
+Enquanto a v1 estiver ativa:
+
+- não configurar purge automático de `ops_interventions`, `ops_actions`,
+  `ops_evidence`, `ops_reports` ou `ops_audit`;
+- preservar intervenções failed/interrupted e seus journals;
+- não usar a role `mimir_ops` para exclusão administrativa;
+- não versionar evidências/relatórios reais no Git;
+- tratar exports e backups operacionais como confidenciais;
+- laboratório totalmente sintético só pode ser removido após registrar as
+  evidências necessárias e concluir os testes de recuperação previstos.
+
+Qualquer purge futuro precisa ser procedimento administrativo versionado,
+pré-visualizado, auditado e validado em laboratório. A v1 não implementa esse
+mecanismo.
+
+Após timeout, perda de auditoria ou confirmação incerta da transação, não
+repetir EXECUTE. Consultar o diário pelo UUID, verificar o dispositivo sob
+nova autorização e registrar reconciliação administrativa preservando evidências.
+Rollback é manual; backup implementado cobre apenas hostname em execução.
+Procedimentos, simulações e requisitos: [OPERATIONS.md](OPERATIONS.md).
+
+## Versionamento de migrations
+
+Nenhuma migration pode ser aplicada a um ambiente persistente antes de
+existir como arquivo versionado no repositório.
+
+Recuperação histórica: [migrations 009–012](recovery/MEMORY_MIGRATIONS_009_012_RECOVERY.md).
+
+## Recuperação da memória v1
+
+A recuperação validada do baseline `1..12` possui dois caminhos:
+
+1. custom-format dump PostgreSQL, desde que as roles cluster-global necessárias
+   sejam previamente provisionadas com o contrato versionado;
+2. reconstrução pelo Git usando `memory_v1_canonical.sql` e migrations
+   `002..012`.
+
+Antes de qualquer restore:
+
+- usar cluster PostgreSQL descartável e porta diferente de 5432;
+- confirmar `data_directory` antes de executar SQL;
+- manter produção somente leitura;
+- validar o SHA-256 do dump quando houver;
+- não usar `--no-owner` para ocultar ausência de roles;
+- executar Git pela identidade proprietária do checkout;
+- não relaxar permissões do checkout para `postgres`; quando necessário,
+  fornecer SQL ao `psql` via stdin;
+- comparar versões, schema, owners, ACLs, roles e memberships;
+- remover apenas os LABs criados especificamente para o restore após preservar
+  as evidências.
+
+O checkpoint `MIMIR-V1-P1-RESTORE-01` validou equivalência entre dump e
+reconstrução Git. Ele não autoriza restore de produção.

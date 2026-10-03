@@ -16,3 +16,6 @@ __pycache__/
 
 # Backups transacionais locais
 backups/
+
+# Evidências e relatórios operacionais locais
+reports/ops/

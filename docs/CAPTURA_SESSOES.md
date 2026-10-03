@@ -1,5 +1,44 @@
 # Captura segura de sessões do OpenClaw
 
+## Estado atual — 26 de setembro de 2026
+
+O fluxo descrito originalmente abaixo documenta a implementação **v1 legado**
+baseada em `sessions.json` + `UUID.jsonl`.
+
+No OpenClaw 2026.9.5 esse layout deixou de ser a fonte canônica. O read-path
+atual é o coletor v2:
+
+```text
+tools/memory/mimir-capture-sessions-v2.py
+```
+
+Ele usa somente interfaces suportadas:
+
+```text
+openclaw sessions --agent main --limit all --json
+gateway call chat.history
+```
+
+Validação isolada contra o Gateway real:
+
+- 18 sessões consideradas;
+- 12 ready;
+- 0 blocked;
+- 6 skipped por status não elegível;
+- 0 errors;
+- nenhuma escrita PostgreSQL;
+- nenhum staging;
+- nenhum acesso SQL direto ao SQLite;
+- nenhuma transcrição exibida.
+
+As 12 sessões concluídas preservaram `senderIsOwner=true`, paginação,
+ID/seq/timestamp e ausência de truncamento. Telegram confirmou exclusão de
+`system`, `toolResult`, `thinking` e `toolCall`.
+
+O contrato atual está em
+[SESSION_INGESTION_V2.md](SESSION_INGESTION_V2.md).
+
+
 Data da implementação: 30 de julho de 2026
 
 ## Objetivo

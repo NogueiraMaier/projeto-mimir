@@ -1,19 +1,11 @@
 #!/usr/bin/env node
 
 import { spawnSync } from "node:child_process";
-import { createRequire } from "node:module";
-import { pathToFileURL } from "node:url";
 import fs from "node:fs";
 
-const MODEL_PATH =
-    "/var/lib/openclaw/.node-llama-cpp/models/" +
-    "hf_ggml-org_embeddinggemma-300m-qat-Q8_0.gguf";
-
-const MODEL_ID =
-    "hf:ggml-org/embeddinggemma-300m-qat-q8_0-GGUF/" +
-    "embeddinggemma-300m-qat-Q8_0.gguf";
-
 const PSQL = "/usr/lib64/postgresql-17/bin/psql";
+const EMBEDDING_DIMENSIONS = 768;
+const MAX_REQUEST_BYTES = 256 * 1024;
 
 function fail(message) {
     console.error(`ERRO: ${message}`);
@@ -21,38 +13,9 @@ function fail(message) {
 }
 
 function parseArguments(argv) {
-    let limit = 5;
-    let minSimilarity = 0.35;
     let json = false;
-    const queryParts = [];
 
-    for (let index = 0; index < argv.length; index += 1) {
-        const argument = argv[index];
-
-        if (argument === "--limit") {
-            const value = argv[index + 1];
-
-            if (value === undefined) {
-                fail("--limit exige um valor");
-            }
-
-            limit = Number.parseInt(value, 10);
-            index += 1;
-            continue;
-        }
-
-        if (argument === "--min-similarity") {
-            const value = argv[index + 1];
-
-            if (value === undefined) {
-                fail("--min-similarity exige um valor");
-            }
-
-            minSimilarity = Number.parseFloat(value);
-            index += 1;
-            continue;
-        }
-
+    for (const argument of argv) {
         if (argument === "--json") {
             json = true;
             continue;
@@ -61,53 +24,162 @@ function parseArguments(argv) {
         if (argument === "--help") {
             console.log(
                 "Uso:\n" +
-                "  mimir-semantic-search.mjs [opções] \"consulta\"\n\n" +
-                "Opções:\n" +
-                "  --limit N                 Máximo de resultados, 1 a 20\n" +
-                "  --min-similarity N        Similaridade mínima, 0 a 1\n" +
-                "  --json                    Saída estruturada em JSON\n"
+                "  mimir-semantic-search.mjs [--json]\n\n" +
+                "Entrada:\n" +
+                "  JSON via stdin com query, model, embedding, " +
+                "limit e min_similarity.\n\n" +
+                "O embedding deve ser gerado pelo runtime gerenciado " +
+                "do OpenClaw antes desta etapa.\n"
             );
             process.exit(0);
         }
 
-        if (argument.startsWith("-")) {
-            fail(`argumento desconhecido: ${argument}`);
-        }
-
-        queryParts.push(argument);
+        fail(`argumento desconhecido: ${argument}`);
     }
 
-    if (!Number.isInteger(limit) || limit < 1 || limit > 20) {
-        fail("--limit deve estar entre 1 e 20");
+    return { json };
+}
+
+function isObject(value) {
+    return (
+        typeof value === "object" &&
+        value !== null &&
+        !Array.isArray(value)
+    );
+}
+
+function vectorNorm(vector) {
+    return Math.sqrt(
+        vector.reduce(
+            (total, value) => total + value * value,
+            0
+        )
+    );
+}
+
+function parseRequest() {
+    if (process.stdin.isTTY) {
+        fail("requisição JSON não informada em stdin");
+    }
+
+    const raw = fs.readFileSync(0, "utf8");
+
+    if (Buffer.byteLength(raw, "utf8") > MAX_REQUEST_BYTES) {
+        fail("requisição excede o limite de tamanho");
+    }
+
+    let request;
+
+    try {
+        request = JSON.parse(raw);
+    } catch {
+        fail("requisição JSON inválida");
+    }
+
+    if (!isObject(request)) {
+        fail("requisição deve ser um objeto JSON");
+    }
+
+    const query =
+        typeof request.query === "string"
+            ? request.query.trim()
+            : "";
+    const model =
+        typeof request.model === "string"
+            ? request.model.trim()
+            : "";
+    const embedding = request.embedding;
+    const limit = request.limit;
+    const minSimilarity = request.min_similarity;
+
+    if (query.length < 3 || query.length > 4000) {
+        fail("query deve possuir entre 3 e 4000 caracteres");
+    }
+
+    if (!model || model.length > 1024) {
+        fail("model inválido");
     }
 
     if (
-        !Number.isFinite(minSimilarity) ||
-        minSimilarity < 0 ||
-        minSimilarity > 1
+        !Array.isArray(embedding) ||
+        embedding.length !== EMBEDDING_DIMENSIONS ||
+        !embedding.every(
+            (value) =>
+                typeof value === "number" &&
+                Number.isFinite(value)
+        )
     ) {
-        fail("--min-similarity deve estar entre 0 e 1");
+        fail(
+            "embedding deve conter exatamente " +
+            `${EMBEDDING_DIMENSIONS} números finitos`
+        );
     }
 
-    let query = queryParts.join(" ").trim();
+    const norm = vectorNorm(embedding);
 
-    if (!query && !process.stdin.isTTY) {
-        query = fs.readFileSync(0, "utf8").trim();
+    if (!Number.isFinite(norm) || norm <= 0) {
+        fail("embedding possui norma inválida");
     }
 
-    if (!query) {
-        fail("consulta não informada");
+    if (
+        !Number.isInteger(limit) ||
+        limit < 1 ||
+        limit > 10
+    ) {
+        fail("limit deve estar entre 1 e 10");
     }
 
-    if (query.length > 4000) {
-        fail("consulta excede 4000 caracteres");
+    if (
+        typeof minSimilarity !== "number" ||
+        !Number.isFinite(minSimilarity) ||
+        minSimilarity < 0.2 ||
+        minSimilarity > 0.95
+    ) {
+        fail("min_similarity deve estar entre 0.2 e 0.95");
     }
 
     return {
         query,
+        model,
+        embedding,
         limit,
         minSimilarity,
-        json,
+    };
+}
+
+function readEnv(name, fallback) {
+    const value = process.env[name]?.trim();
+    return value || fallback;
+}
+
+function createPsqlEnv() {
+    return {
+        HOME: "/var/lib/openclaw",
+        USER: "openclaw",
+        LOGNAME: "openclaw",
+        PATH:
+            "/usr/local/sbin:/usr/local/bin:" +
+            "/usr/sbin:/usr/bin:/sbin:/bin",
+        LANG: "C.UTF-8",
+        LC_ALL: "C.UTF-8",
+        PGHOST: readEnv("PGHOST", "/run/postgresql"),
+        PGPORT: readEnv("PGPORT", "5432"),
+        PGDATABASE: readEnv("PGDATABASE", "mimir_memory"),
+        PGUSER: readEnv("PGUSER", "mimir_search"),
+        PGAPPNAME: readEnv(
+            "PGAPPNAME",
+            "mimir-semantic-search"
+        ),
+        PGCONNECT_TIMEOUT: readEnv(
+            "PGCONNECT_TIMEOUT",
+            "5"
+        ),
+        PGOPTIONS: readEnv(
+            "PGOPTIONS",
+            "-c default_transaction_read_only=on " +
+            "-c statement_timeout=60000 " +
+            "-c lock_timeout=5000"
+        ),
     };
 }
 
@@ -118,12 +190,6 @@ function runPsql(sql, variables = {}) {
         "-q",
         "-A",
         "-t",
-        "-h",
-        "/run/postgresql",
-        "-U",
-        "mimir_search",
-        "-d",
-        "mimir_memory",
         "-v",
         "ON_ERROR_STOP=1",
     ];
@@ -141,11 +207,9 @@ function runPsql(sql, variables = {}) {
         {
             input: sql,
             encoding: "utf8",
-            env: {
-                ...process.env,
-                PGCONNECT_TIMEOUT: "5",
-                PGAPPNAME: "mimir-semantic-search",
-            },
+            env: createPsqlEnv(),
+            timeout: 75_000,
+            killSignal: "SIGKILL",
             maxBuffer: 16 * 1024 * 1024,
         }
     );
@@ -162,15 +226,6 @@ function runPsql(sql, variables = {}) {
     }
 
     return result.stdout.trim();
-}
-
-function vectorNorm(vector) {
-    return Math.sqrt(
-        vector.reduce(
-            (total, value) => total + value * value,
-            0
-        )
-    );
 }
 
 function vectorToPgLiteral(vector) {
@@ -227,11 +282,13 @@ FROM mimir.search_active_memory(
 
 function printHumanResults(
     query,
+    model,
     limit,
     minSimilarity,
     results
 ) {
     console.log(`Consulta: ${query}`);
+    console.log(`Modelo: ${model}`);
     console.log(`Limite: ${limit}`);
     console.log(
         `Similaridade mínima: ${minSimilarity}`
@@ -278,119 +335,47 @@ function printHumanResults(
 }
 
 async function main() {
+    const { json } = parseArguments(
+        process.argv.slice(2)
+    );
     const {
         query,
+        model,
+        embedding,
         limit,
         minSimilarity,
-        json,
-    } = parseArguments(process.argv.slice(2));
+    } = parseRequest();
 
-    if (!fs.existsSync(MODEL_PATH)) {
-        fail(`modelo não encontrado: ${MODEL_PATH}`);
-    }
-
-    const requireFromOpenClaw = createRequire(
-        "/opt/openclaw/package.json"
+    const results = searchDatabase(
+        embedding,
+        limit,
+        minSimilarity
     );
 
-    const modulePath = requireFromOpenClaw.resolve(
-        "node-llama-cpp"
-    );
-
-    const { getLlama } = await import(
-        pathToFileURL(modulePath).href
-    );
-
-    let llama;
-    let model;
-    let context;
-
-    try {
-        llama = await getLlama({
-            gpu: false,
-        });
-
-        model = await llama.loadModel({
-            modelPath: MODEL_PATH,
-        });
-
-        context = await model.createEmbeddingContext();
-
-        const embeddingInput =
-            `task: search result | query: ${query}`;
-
-        const embeddingResult =
-            await context.getEmbeddingFor(
-                embeddingInput
-            );
-
-        const vector = Array.from(
-            embeddingResult.vector
+    if (json) {
+        console.log(
+            JSON.stringify(
+                {
+                    query,
+                    model,
+                    dimensions: embedding.length,
+                    limit,
+                    min_similarity: minSimilarity,
+                    result_count: results.length,
+                    results,
+                },
+                null,
+                2
+            )
         );
-
-        const norm = vectorNorm(vector);
-
-        if (vector.length !== 768) {
-            throw new Error(
-                `embedding possui ${vector.length} dimensões; ` +
-                "esperado: 768"
-            );
-        }
-
-        if (!vector.every(Number.isFinite)) {
-            throw new Error(
-                "embedding contém valores não finitos"
-            );
-        }
-
-        if (!Number.isFinite(norm) || norm <= 0) {
-            throw new Error(
-                "embedding possui norma inválida"
-            );
-        }
-
-        const results = searchDatabase(
-            vector,
+    } else {
+        printHumanResults(
+            query,
+            model,
             limit,
-            minSimilarity
+            minSimilarity,
+            results
         );
-
-        if (json) {
-            console.log(
-                JSON.stringify(
-                    {
-                        query,
-                        model: MODEL_ID,
-                        dimensions: vector.length,
-                        limit,
-                        min_similarity: minSimilarity,
-                        result_count: results.length,
-                        results,
-                    },
-                    null,
-                    2
-                )
-            );
-        } else {
-            printHumanResults(
-                query,
-                limit,
-                minSimilarity,
-                results
-            );
-        }
-    } finally {
-        try {
-            await context?.dispose?.();
-        } catch {}
-
-        try {
-            await model?.dispose?.();
-        } catch {}
-
-        try {
-            await llama?.dispose?.();
-        } catch {}
     }
 }
 
