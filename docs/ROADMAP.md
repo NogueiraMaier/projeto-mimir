@@ -169,3 +169,29 @@ documentados na reconciliação final estiverem abertos.
 Próxima etapa:
 
 revisar PR #1 mantendo Draft.
+
+## OpenCode hard-deny project policy — 2026-10-03
+
+The project-local OpenCode security policy is now implemented and validated
+under a deny-by-default model. ASK is not used as a security boundary. Git and
+operational mutations remain behind an external human terminal gate.
+
+Checkpoint policy commit:
+
+`6de5b06ae4dd00b4dd00b92ce2135dcdab04699a`
+
+Static validation, controlled IMPLEMENT native-edit validation and QUICK local
+Qwen inference validation passed. The long-lived OpenCode daemon predated the
+policy, so an explicit configuration reload was performed successfully after
+policy creation. Post-reload registry introspection by a temporary parser was
+inconclusive because of CLI JSON-shape mismatch and does not override the
+runtime enforcement evidence.
+
+Do not repeat the completed policy tests unless the policy or a directly
+relevant runtime component changes.
+
+Production remains unchanged. RSK-P0-004 remains a release blocker.
+
+Next:
+
+`COMMIT_OPENCODE_HARD_DENY_CONTINUITY_CHECKPOINT_THEN_FRESH_FETCH_GUARD_AND_PUSH`

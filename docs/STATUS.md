@@ -1016,3 +1016,44 @@ Evidência da rodada: [review/operations/2026-09-24.md](review/operations/2026-0
 - Integração futura com sistema-os será por API, sem credencial direta do banco.
 - Estado técnico: não implementado.
 - Evidência documental: docs/cybersecurity/MIMIR_SECURITY_ASSESSMENT_SOC.md
+
+## MIMIR-V1-OPENCODE-HARD-DENY-POLICY-VALIDATION-01
+
+- **DATE:** 2026-10-03.
+- **STATUS:** `VALIDATED / LOCAL_POLICY_COMMITTED / PUSH_PENDING`.
+- **POLICY COMMIT:** `6de5b06ae4dd00b4dd00b92ce2135dcdab04699a`.
+- **POLICY SHA-256:** `a16de25598a7ade1cb22d493fe3974b46f96b6ac16e4a16234c392d8d4263738`.
+- **TRUST MODEL:** `DENY_BY_DEFAULT + EXPLICIT_ALLOW_ONLY +
+  EXTERNAL_HUMAN_GATE_FOR_GIT_AND_OPS`.
+- **ASK:** removed as a security boundary after preserved runtime failure;
+  accepted policy contains zero ASK rules.
+- **STATIC VALIDATION:** PASS.
+- **BUILD:** prohibited shell/edit capabilities not exposed.
+- **ARCHITECT:** policy read PASS; prohibited edit/shell capabilities not
+  exposed.
+- **IMPLEMENT:** native edit PASS; exact probe PASS; child-session tools were
+  only `patch` and `read`; no shell or subagent event observed.
+- **IMPLEMENT SESSION:** `ses_efc702557ffe8ZNP6gKnoBN4Ps`.
+- **IMPLEMENT SESSION EXPORT SHA-256:**
+  `a89bd835e5ad5df6b1961d060d1e9122f6a85ae6832f04bc959cb27dcb989b71`.
+- **QUICK:** Qwen3 4B Local runtime PASS with exact
+  `QUICK_LOCAL_QWEN_RUNTIME_PASS`; no tool use observed.
+- **GIT AUTHORITY:** remains outside OpenCode behind the human terminal gate.
+- **DAEMON PROVENANCE:** daemon predates policy.
+- **EXPLICIT CONFIG RELOAD:** PASS; OpenCode returned
+  `Configuration reloaded`.
+- **POST-RELOAD AGENT REGISTRY INSPECTION:** INCONCLUSIVE because the temporary
+  parser did not recognize the CLI's JSON list shape; not treated as a policy
+  failure.
+- **REPEAT POLICY TESTS:** prohibited absent policy/relevant-runtime change or a
+  new narrow regression requirement.
+- **PRODUCTION:** unchanged / not validated.
+- **RSK-P0-003:** remains `CLOSED / TECHNICALLY_TREATED /
+  PRIVACY_GOVERNANCE_APPROVED`.
+- **RSK-P0-005:** remains `CLOSED / TECHNICALLY_TREATED /
+  SYNTHETIC_TABLETOP_VALIDATED`.
+- **RSK-P0-004:** remains `PARTIALLY_TREATED / production-release blocker`.
+- **REMOTE SECURITY EVOLUTION:** Security Assessment/SOC documentation from
+  `main` already reconciled additively at
+  `0c9a0fa32db5da4eab0d1a34218dc25a8a406207`.
+- **NEXT:** `COMMIT_OPENCODE_HARD_DENY_CONTINUITY_CHECKPOINT_THEN_FRESH_FETCH_GUARD_AND_PUSH`.

@@ -1398,3 +1398,74 @@ Next:
 
 Continue with the next incomplete functional milestone in the v1 execution
 plan. Do not spend additional work on this timeout path without a regression.
+
+## MIMIR-V1-OPENCODE-HARD-DENY-POLICY-VALIDATION-01
+
+Status: `VALIDATED / LOCAL_POLICY_COMMITTED / PUSH_PENDING`
+
+Policy commit:
+
+`6de5b06ae4dd00b4dd00b92ce2135dcdab04699a`
+
+Policy SHA-256:
+
+`a16de25598a7ade1cb22d493fe3974b46f96b6ac16e4a16234c392d8d4263738`
+
+Security model:
+
+`DENY_BY_DEFAULT + EXPLICIT_ALLOW_ONLY + EXTERNAL_HUMAN_GATE_FOR_GIT_AND_OPS`
+
+Validation:
+
+- static policy contract: PASS;
+- ASK security-boundary design: rejected after preserved runtime failure;
+- ASK rule count in accepted policy: zero;
+- BUILD prohibited shell/edit capability: not exposed;
+- ARCHITECT policy read: PASS;
+- ARCHITECT prohibited edit/shell capability: not exposed;
+- IMPLEMENT native edit: PASS;
+- IMPLEMENT exact probe-content verification: PASS;
+- IMPLEMENT shell capability: not exposed in validated child session;
+- IMPLEMENT subagent delegation: not exposed in validated child session;
+- sanitized IMPLEMENT session tool events: `patch`, `read` only;
+- QUICK local Qwen inference: PASS;
+- QUICK tools: none observed;
+- Git mutation by OpenCode: none;
+- production: unchanged.
+
+IMPLEMENT evidence session:
+
+`ses_efc702557ffe8ZNP6gKnoBN4Ps`
+
+Session-export SHA-256:
+
+`a89bd835e5ad5df6b1961d060d1e9122f6a85ae6832f04bc959cb27dcb989b71`
+
+QUICK result:
+
+`QUICK_LOCAL_QWEN_RUNTIME_PASS`
+
+Configuration provenance:
+
+- shared OpenCode daemon started before policy creation;
+- explicit project-context `opencode reload` after policy creation: PASS;
+- command returned `Configuration reloaded`;
+- temporary post-reload agent-registry parser was incompatible with the JSON
+  list shape returned by the CLI and is recorded as inconclusive;
+- no completed permission or Qwen test is to be repeated merely to compensate
+  for that inspection-parser mismatch.
+
+Operational rule:
+
+OpenCode does not receive Git mutation or operational shell authority under this
+policy. Mutable Git and operational actions remain at the human terminal gate.
+
+Release boundary remains unchanged:
+
+`PRODUCTION_VALIDATION=NO`
+
+`RSK-P0-004=PARTIALLY_TREATED / PRODUCTION_RELEASE_BLOCKER`
+
+NEXT_ACTION:
+
+`COMMIT_OPENCODE_HARD_DENY_CONTINUITY_CHECKPOINT_THEN_FRESH_FETCH_GUARD_AND_PUSH`

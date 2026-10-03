@@ -5282,3 +5282,137 @@ Review:
 NEXT_ACTION:
 
 `FRESH_FETCH_GUARD_BEFORE_COMMIT_RSK_P0_003_HUMAN_APPROVAL_AND_RECONCILIATION`
+
+## MIMIR-V1-OPENCODE-HARD-DENY-POLICY-VALIDATION-01
+
+Date: 2026-10-03
+
+Status:
+
+`VALIDATED / LOCAL_POLICY_COMMITTED / PUSH_PENDING`
+
+Policy implementation commit:
+
+`6de5b06ae4dd00b4dd00b92ce2135dcdab04699a`
+
+Policy artifact:
+
+`opencode.jsonc`
+
+Policy SHA-256:
+
+`a16de25598a7ade1cb22d493fe3974b46f96b6ac16e4a16234c392d8d4263738`
+
+Trust model:
+
+`DENY_BY_DEFAULT + EXPLICIT_ALLOW_ONLY + EXTERNAL_HUMAN_GATE_FOR_GIT_AND_OPS`
+
+The previous ASK-based design was rejected after runtime validation showed that
+an ASK-classified Git operation could execute without an interactive permission
+boundary. That historical failure is preserved and must not be repeated merely
+for confirmation.
+
+The accepted policy removes ASK as a security boundary:
+
+- root default permission is deny;
+- shell is denied for BUILD, IMPLEMENT, fallback and read-only agents;
+- BUILD cannot edit;
+- read-only agents cannot edit, shell or delegate;
+- IMPLEMENT and implement-fallback may use controlled native edit/read
+  capabilities but cannot use shell or delegate;
+- QUICK has all tool capabilities denied;
+- Git mutation and operational actions remain outside OpenCode behind the human
+  terminal gate;
+- project MCP servers are disabled;
+- external-directory access defaults to deny;
+- external web/execute capabilities remain denied by the project policy.
+
+Static policy validation:
+
+`OPENCODE_MIMIR_HARD_DENY_POLICY_STATIC_VALIDATION=PASS`
+
+Runtime validation was performed in isolated worktree:
+
+`/home/jarvisdev/projects/projeto-mimir-opencode-runtime-20261003`
+
+The primary development checkout was not used for disposable runtime probes.
+
+Runtime observations:
+
+- BUILD prohibited shell/edit capabilities were not exposed;
+- ARCHITECT could read the policy while prohibited edit/shell capabilities were
+  not exposed;
+- IMPLEMENT native edit created exactly
+  `.opencode-implement-allow-probe.txt`;
+- the probe contained exactly `IMPLEMENT_EDIT_RUNTIME_PASS`;
+- IMPLEMENT child-session export contained only `patch` and `read` tool events;
+- no shell event or subagent-delegation event was present in that export;
+- BUILD and ARCHITECT forbidden probe files remained absent;
+- no tracked repository file was modified by runtime validation.
+
+IMPLEMENT child session:
+
+`ses_efc702557ffe8ZNP6gKnoBN4Ps`
+
+Sanitized session export SHA-256:
+
+`a89bd835e5ad5df6b1961d060d1e9122f6a85ae6832f04bc959cb27dcb989b71`
+
+The user accidentally pasted the expected textual report into the parent
+session after the test. Independent filesystem evidence and the sanitized child
+session were therefore used instead of trusting that pasted report. The child
+export contained zero occurrences of the pasted expected report.
+
+QUICK runtime validation:
+
+`VALIDATE_OPENCODE_QUICK_LOCAL_QWEN_RUNTIME=PASS`
+
+Observed agent/model:
+
+`Quick / Qwen3 4B Local`
+
+Observed exact response:
+
+`QUICK_LOCAL_QWEN_RUNTIME_PASS`
+
+No tool use was observed in that controlled inference. Performance was slow
+(approximately 3m40s at the observed run), but functional correctness passed.
+Performance tuning is not part of this checkpoint.
+
+Configuration provenance:
+
+- the long-lived `opencode.exe serve --service` process predated creation of the
+  HARD-DENY policy;
+- log rotation did not preserve a conclusive project-policy-load event;
+- `opencode reload` was therefore executed explicitly from the isolated runtime
+  project after the policy existed and returned `Configuration reloaded`;
+- a subsequent `opencode debug agents` query returned valid JSON, but the
+  temporary inspection parser did not recognize the CLI's returned list shape;
+- that post-reload registry introspection is therefore `INCONCLUSIVE`, not
+  evidence of policy failure;
+- the effective runtime behavior already observed is consistent with the
+  committed HARD-DENY policy.
+
+Do not repeat the completed static, IMPLEMENT or QUICK tests unless the policy
+or a directly relevant runtime component changes, or a new failure requires a
+narrow regression test.
+
+Security/release boundary:
+
+- production configuration was not changed;
+- production validation is not claimed;
+- RSK-P0-003 remains `CLOSED / TECHNICALLY_TREATED /
+  PRIVACY_GOVERNANCE_APPROVED`;
+- RSK-P0-005 remains `CLOSED / TECHNICALLY_TREATED /
+  SYNTHETIC_TABLETOP_VALIDATED`;
+- RSK-P0-004 remains `PARTIALLY_TREATED` and a production-release blocker;
+- PR remains Draft;
+- no risk acceptance is implied.
+
+Remote security-assessment/SOC evolution from `main` had already been
+reconciled additively into the operational branch at commit
+`0c9a0fa32db5da4eab0d1a34218dc25a8a406207` before the OpenCode policy commit.
+
+NEXT_ACTION:
+
+`COMMIT_OPENCODE_HARD_DENY_CONTINUITY_CHECKPOINT_THEN_FRESH_FETCH_GUARD_AND_PUSH`
