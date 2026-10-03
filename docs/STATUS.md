@@ -93,3 +93,15 @@ Os documentos STATUS, RUNBOOK, ARCHITECTURE, SECURITY e ROADMAP devem ser atuali
 Criar o cliente de ingestão das sessões elegíveis, executar a primeira importação controlada e validar a consolidação local sem API externa.
 
 A automação não terá autorização para promover registros para active.
+
+
+## Evolução planejada de Security Assessment e SOC
+
+- Especificação registrada em 2026-10-03.
+- Mímir será coordenador de avaliação, não scanner monolítico.
+- Escopo previsto: OSINT autorizado, vulnerability assessment, SOC, correlação, findings e reteste.
+- Caso obrigatório: spoofing de IP alegado por headers HTTP e efeitos em proxy trust, rate limit, auditoria e sessão.
+- Ferramentas ativas exigirão ativo inventariado, política, autorização e limites.
+- Integração futura com sistema-os será por API, sem credencial direta do banco.
+- Estado técnico: não implementado.
+- Evidência documental: docs/cybersecurity/MIMIR_SECURITY_ASSESSMENT_SOC.md
