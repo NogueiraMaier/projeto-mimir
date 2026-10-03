@@ -631,3 +631,57 @@ Detectar
 ```
 
 A implementação somente deve ser declarada concluída após evidência operacional e testes correspondentes.
+
+
+## Session Security Assessment
+
+Status: capacidade planejada do Security Assessment Coordinator, não implementada.
+
+O coordenador deve avaliar aplicações autorizadas quanto a session fixation, session hijacking, replay de token rotacionado, falhas de logout, expiração, CSRF vinculado à sessão, cookie hardening e manipulação da identidade de rede usada pela sessão.
+
+Ferramentas planejadas:
+
+```text
+security.web.session_fixation_check
+security.web.session_rotation_check
+security.web.session_reuse_detection_check
+security.web.session_logout_revocation_check
+security.web.session_expiration_check
+security.web.session_cookie_security_check
+security.web.csrf_session_binding_check
+security.web.session_network_identity_check
+security.web.session_compromise_signals_check
+```
+
+Regras:
+
+- executar somente contra ativo e aplicação formalmente autorizados;
+- não tentar capturar cookie real de terceiro;
+- usar contas e sessões sintéticas ou de teste;
+- não tratar IP isolado como prova de sequestro;
+- distinguir `peer_ip`, `claimed_ip` e `client_ip`;
+- verificar se rotação invalida token anterior;
+- verificar se logout revoga no servidor;
+- verificar se token substituído gera evento de reuse quando a aplicação adota session lineage;
+- verificar se token CSRF de sessão A falha com sessão B;
+- verificar HttpOnly, Secure, SameSite e escopo do cookie;
+- registrar somente identificadores e evidências sanitizadas, nunca token bruto;
+- não executar contenção ou revogação em produção sem aprovação humana.
+
+Findings sugeridos:
+
+```text
+WEB.SESSION.FIXATION
+WEB.SESSION.ROTATION_FAILURE
+WEB.SESSION.RETIRED_TOKEN_REUSE_ACCEPTED
+WEB.SESSION.LOGOUT_NOT_REVOKED
+WEB.SESSION.EXPIRATION_FAILURE
+WEB.SESSION.COOKIE_HARDENING_WEAKNESS
+WEB.SESSION.CSRF_BINDING_FAILURE
+WEB.SESSION.NETWORK_IDENTITY_TRUST_FAILURE
+WEB.SESSION.COMPROMISE_DETECTION_GAP
+```
+
+A avaliação deve separar evidência observada, inferência, severidade e confiança.
+
+A capacidade deve ser validada primeiro em Cyber-Lab e ambiente controlado.
