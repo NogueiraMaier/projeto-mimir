@@ -125,28 +125,42 @@ A documentação do Maestro deve ser retomada somente após a estabilização do
 
 ## Checkpoint atual
 
+**MIMIR-V1-RSK-P0-003-HUMAN-APPROVAL-AND-RECONCILIATION-01 — LOCAL_RECONCILIATION_COMPLETE / REMOTE_GUARD_PENDING em 2026-10-03.**
+
+- source HEAD: `0574ab8e6c15eb62fd74c066a18b508b576c32e9`;
+- approved implementation commit:
+  `34f78b80cd77e675a699001e43e0cf556ad091c0`;
+- approved repository-validation checkpoint:
+  `0574ab8e6c15eb62fd74c066a18b508b576c32e9`;
+- human approval: `APPROVED` for internal Project Mímir governance;
+- approver identity reference: `Nogueira Maier`;
+- roles: Project/System Owner and Privacy Governance Owner;
+- `ROLE_OVERLAP = PRESENT`; `DECLARED_CONFLICT = NO_KNOWN_CONFLICT`;
+- independent review explicitly required: `NO`, under the documented
+  conflict-triggered compensating-review rule;
+- Phase A: validator PASS, tests 10/10 PASS, `git diff --check` PASS;
+- no lifecycle, legal-basis, international-transfer, `NOT_PROVEN`, DPO or
+  production state was promoted;
+- local technical state: `CLOSED / TECHNICALLY_TREATED /
+  PRIVACY_GOVERNANCE_APPROVED`;
+- `RISK_ACCEPTANCE = NOT_USED`; `DPO_STATE = PENDING_COMPETENT_REVIEW`;
+- `LEGAL_CONCLUSION = NO`; `LGPD_COMPLIANCE_CLAIM = NO`;
+- `PRODUCTION_VALIDATION = NO`;
+- RSK-P0-004 remains an independent blocker;
+- no fetch, commit or push in this phase.
+
+**NEXT_ACTION atual:** `FRESH_FETCH_GUARD_BEFORE_COMMIT_RSK_P0_003_HUMAN_APPROVAL_AND_RECONCILIATION`.
+
+## Checkpoint histórico — MIMIR-V1-RSK-P0-003-PRIVACY-GOVERNANCE-REPOSITORY-VALIDATION-01
+
 **MIMIR-V1-RSK-P0-003-PRIVACY-GOVERNANCE-REPOSITORY-VALIDATION-01 — REPOSITORY_VALIDATED / HUMAN_APPROVAL_PENDING em 2026-10-03.**
 
-- source HEAD: `34f78b80cd77e675a699001e43e0cf556ad091c0`;
 - implementation commit: `34f78b80cd77e675a699001e43e0cf556ad091c0`;
-- pacote de governança e inventário sanitizado implementado;
-- validator estático repository-only implementado;
-- validação: PASS; testes: 10/10 PASS; atividades: 12/12;
-- matriz de lifecycle states validada sem promover LAB, legado ou planejamento
-  a produção;
-- FAIL anterior de trailing whitespace preservado; correção exclusivamente de
-  whitespace e revalidação 10/10 PASS;
-- `FORMAL_GOVERNANCE_PACKAGE = REPOSITORY_VALIDATED`;
-- `COMPETENT_HUMAN_APPROVAL = PENDING`;
-- `RSK-P0-003 = OPEN / BLOCKER`;
-- `RISK_ACCEPTANCE = NOT_USED`;
-- `LEGAL_CONCLUSION = NO`;
-- `LGPD_COMPLIANCE_CLAIM = NO`;
-- `PRODUCTION_VALIDATION = NO`;
-- review: `docs/review/security/2026-10-03-rsk-p0-003-privacy-governance-repository-validation-01.md`;
-- nenhum push realizado neste checkpoint.
+- repository-only validation PASS; tests 10/10 PASS; activities 12/12;
+- `RSK-P0-003 = OPEN / BLOCKER` at that checkpoint;
+- competent human approval was still pending.
 
-**NEXT_ACTION atual:** `REQUEST_HUMAN_APPROVAL_RSK_P0_003_PRIVACY_GOVERNANCE_PACKAGE`.
+**NEXT_ACTION histórico:** `REQUEST_HUMAN_APPROVAL_RSK_P0_003_PRIVACY_GOVERNANCE_PACKAGE`.
 
 ## Checkpoint histórico — MIMIR-V1-RSK-P0-003-PRIVACY-GOVERNANCE-TREATMENT-DESIGN-01
 

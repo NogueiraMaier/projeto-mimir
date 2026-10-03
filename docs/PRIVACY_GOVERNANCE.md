@@ -170,6 +170,8 @@ origem do software, endpoint ou código histórico não provam transferência.
 
 ## Closure / approval state
 
+Approved-package snapshot state before human approval (preserved provenance):
+
 PACKAGE_APPROVAL_STATE: `PENDING_COMPETENT_REVIEW`
 COMPETENT_HUMAN_APPROVAL: `PENDING`
 LEGAL_CONCLUSION: `NO`
@@ -177,6 +179,51 @@ LGPD_COMPLIANCE_CLAIM: `NO`
 PRODUCTION_VALIDATION: `NO`
 RISK_ACCEPTANCE: `NOT_USED`
 
-RSK-P0-003 permanece `OPEN / BLOCKER`. O fechamento exige aprovação humana
-competente, evidência vinculada e reconciliação posterior. Este pacote não
-declara risco eliminado nem autoriza merge, release ou produção.
+The preserved state above identifies the package snapshot approved later at:
+
+- implementation commit:
+  `34f78b80cd77e675a699001e43e0cf556ad091c0`;
+- repository-validation checkpoint:
+  `0574ab8e6c15eb62fd74c066a18b508b576c32e9`.
+
+## Post-approval governance recording
+
+`POST_APPROVAL_GOVERNANCE_RECORDING`
+
+This section records subsequent governance evidence. It does not redefine the
+content of the approved package snapshot identified above.
+
+- `INTERNAL_GOVERNANCE_PACKAGE_APPROVAL = APPROVED`;
+- `APPROVER_IDENTITY_REFERENCE = Nogueira Maier`;
+- identity-reference source: repository-context `git config user.name` and
+  matching recent commit authorship, inspected locally without email;
+- approver roles: `Project/System Owner`, `Privacy Governance Owner`;
+- declared authority: internal Project Mímir privacy-governance approval;
+- `ROLE_OVERLAP = PRESENT`;
+- `DECLARED_CONFLICT = NO_KNOWN_CONFLICT`;
+- `INDEPENDENT_REVIEW_REQUIRED = NO`;
+- external legal review: `NOT_REQUIRED_FOR_INTERNAL_GOVERNANCE`;
+- `DPO_STATE = PENDING_COMPETENT_REVIEW`;
+- legal-basis states: unchanged;
+- international-transfer states: unchanged;
+- `NOT_PROVEN` states: preserved;
+- lifecycle states: unchanged;
+- production state: unchanged;
+- `RISK_ACCEPTANCE = NOT_USED`;
+- `LEGAL_CONCLUSION = NO`;
+- `LGPD_COMPLIANCE_CLAIM = NO`;
+- `PRODUCTION_VALIDATION = NO`.
+
+The control-model basis for the independent-review finding is
+`docs/cybersecurity/CONTROL_MODEL.md`, section “Registro obrigatório de
+avaliação”: role accumulation is permitted when documented; a compensating
+measure is required when a conflict of interests exists. The declared overlap
+is recorded, and no known conflict was declared. This finding does not waive a
+future review if new conflict evidence appears.
+
+Phase A repository validation passed, and explicit local reconciliation was
+completed. The resulting local technical state is `CLOSED /
+TECHNICALLY_TREATED / PRIVACY_GOVERNANCE_APPROVED`. This approval is internal
+governance approval only; it does not decide the DPO state, individual legal
+bases, international transfers, third-party facts, production validation or
+residual legal questions.

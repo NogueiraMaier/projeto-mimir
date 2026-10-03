@@ -502,6 +502,43 @@ NEXT_ACTION:
 
 `REQUEST_HUMAN_APPROVAL_RSK_P0_003_PRIVACY_GOVERNANCE_PACKAGE`
 
+### Atualização 2026-10-03 — aprovação humana e reconciliação local RSK-P0-003
+
+Checkpoint:
+
+`MIMIR-V1-RSK-P0-003-HUMAN-APPROVAL-AND-RECONCILIATION-01`
+
+- approved snapshot: implementation
+  `34f78b80cd77e675a699001e43e0cf556ad091c0` and repository-validation
+  checkpoint `0574ab8e6c15eb62fd74c066a18b508b576c32e9`;
+- internal human governance approval: `APPROVED`;
+- approver identity reference: `Nogueira Maier`;
+- roles: Project/System Owner and Privacy Governance Owner;
+- `ROLE_OVERLAP = PRESENT`;
+- `DECLARED_CONFLICT = NO_KNOWN_CONFLICT`;
+- `INDEPENDENT_REVIEW_REQUIRED = NO` under the versioned conflict-triggered
+  compensation rule;
+- Phase A repository validation: PASS; tests: 10/10 PASS;
+- DPO, legal-basis, international-transfer, `NOT_PROVEN`, third-party,
+  lifecycle and production states: unchanged;
+- explicit local reconciliation: PASS;
+- `RSK-P0-003 = CLOSED / TECHNICALLY_TREATED /
+  PRIVACY_GOVERNANCE_APPROVED`;
+- `RISK_ACCEPTANCE = NOT_USED`;
+- `DPO_STATE = PENDING_COMPETENT_REVIEW`;
+- `LEGAL_CONCLUSION = NO`;
+- `LGPD_COMPLIANCE_CLAIM = NO`;
+- `PRODUCTION_VALIDATION = NO`.
+
+The closure is limited to the defined local technical governance-treatment
+gate. It does not resolve the DPO decision, approve individual legal bases,
+prove international transfers or third-party facts, validate production or
+remove RSK-P0-004.
+
+NEXT_ACTION:
+
+`FRESH_FETCH_GUARD_BEFORE_COMMIT_RSK_P0_003_HUMAN_APPROVAL_AND_RECONCILIATION`
+
 ## 9. Restrições obrigatórias da v1
 
 Enquanto gaps não forem tratados em checkpoints próprios:
