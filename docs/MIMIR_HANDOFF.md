@@ -5416,3 +5416,23 @@ reconciled additively into the operational branch at commit
 NEXT_ACTION:
 
 `COMMIT_OPENCODE_HARD_DENY_CONTINUITY_CHECKPOINT_THEN_FRESH_FETCH_GUARD_AND_PUSH`
+
+## Parked strategic evolution — MIMIR-EVO-BUSINESS-PLATFORM-001
+
+Status:
+
+`PARKED / DOCUMENTED / NOT_IMPLEMENTED`
+
+Documento canônico:
+
+`docs/evolution/MIMIR_BUSINESS_PLATFORM_EVOLUTION_PROPOSAL_2026-10-03.md`
+
+Decisão de arquitetura:
+
+- a Mímir Business Platform é uma camada/produto separado sobre contratos versionados do Mímir Core;
+- não cria um segundo núcleo de orquestração;
+- prioridade padrão: `AFTER MIMIR CORE`;
+- um componente transversal pode ser antecipado somente quando necessário ao próprio Core, com gap comprovado e validação independente;
+- uma antecipação desse tipo não significa início da Business Platform.
+
+Esta entrada é somente um ponteiro de continuidade para futuras sessões. Ela não altera o `NEXT_ACTION` vigente, ROADMAP, STATUS, release gates, runtime ou produção.
