@@ -146,6 +146,7 @@ Regras adicionais:
 - OSINT passivo não concede autorização para scan ativo.
 - Ação corretiva sensível exige aprovação humana e executor restrito.
 - Finding crítico não é encerrado sem evidência de mitigação e reteste.
+- Testes de concorrência de sessão e consistência de revogação são planejados para o Cyber-Lab; contratos de cardinalidade de mutação serão validados com fail closed quando exigido, e requisições in-flight exigirão análise temporal e causal.
 
 ## Camada operacional — revisão local 2026-09-22
 

@@ -1012,6 +1012,7 @@ Evidência da rodada: [review/operations/2026-09-24.md](review/operations/2026-0
 - Mímir será coordenador de avaliação, não scanner monolítico.
 - Escopo previsto: OSINT autorizado, vulnerability assessment, SOC, correlação, findings e reteste.
 - Caso obrigatório: spoofing de IP alegado por headers HTTP e efeitos em proxy trust, rate limit, auditoria e sessão.
+- A especificação inclui `Session Concurrency / TOCTOU / Revocation Consistency`: `PLANEJADO / NOT_IMPLEMENTED`.
 - Ferramentas ativas exigirão ativo inventariado, política, autorização e limites.
 - Integração futura com sistema-os será por API, sem credencial direta do banco.
 - Estado técnico: não implementado.

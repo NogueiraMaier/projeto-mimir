@@ -685,3 +685,160 @@ WEB.SESSION.COMPROMISE_DETECTION_GAP
 A avaliação deve separar evidência observada, inferência, severidade e confiança.
 
 A capacidade deve ser validada primeiro em Cyber-Lab e ambiente controlado.
+
+### Session Concurrency Safety and Revocation Consistency
+
+Status: capacidade planejada da família existente de Session Security, `PLANNED / NOT_IMPLEMENTED`.
+
+#### Taxonomia de estado e semântica temporal
+
+A avaliação deve distinguir `estado observado`, `estado validado`, `estado alterado` e `estado usado`. Uma autenticação ou autorização anterior pode exigir revalidação no ponto de uso quando o estado de segurança muda concorrentemente.
+
+Uma requisição terminar depois de uma revogação não constitui, por si só, vulnerabilidade. A análise deve distinguir:
+
+- requisição iniciada antes da revogação;
+- autorização verificada antes da revogação;
+- ação protegida executada depois da revogação;
+- nova autorização executada depois da revogação.
+
+#### Ferramentas tipadas planejadas
+
+```text
+security.web.session_race_check
+security.web.session_revocation_race_check
+security.web.session_renewal_race_check
+security.web.session_post_revocation_action_check
+security.web.session_atomic_rotation_check
+security.web.security_mutation_cardinality_check
+```
+
+`security.web.session_race_check` é somente um `CLOSED AGGREGATOR PROFILE`, que compõe checks tipados e fechados. É proibido expor `run_race_attack(target, arbitrary_code)` ou qualquer executor arbitrário equivalente.
+
+#### Modelo neutro de backend
+
+O modelo deve abranger PostgreSQL/SQL, Redis, KV/session store distribuído, cache-backed store, session lineage/token family e outros stores transacionais ou versionados. O planejamento usa:
+
+```text
+session_model
+revocation_model
+mutation_backend
+mutation_outcome
+```
+
+A condição genérica compara a transição esperada do estado de segurança, a transição observada e a autorização ou uso subsequente. `affected_rows` é evidência opcional e específica de backend, não uma premissa do modelo.
+
+Exemplo SQL planejado: Request A valida a sessão; Request B executa logout/revoke; Request A tenta renewal/touch com `mutation_outcome=transition_not_applied` e `actual_affected_rows=0`. Se esse resultado for ignorado e a aplicação reemitir o cookie, continuar o middleware, recriar o contexto autenticado ou executar ação protegida, pode haver falha de consistência de revogação.
+
+Zero linhas afetadas, isoladamente, **não é vulnerabilidade**. Um finding exige transição esperada, transição observada e comportamento subsequente inseguro.
+
+#### Security Mutation Cardinality orientada por contrato
+
+A declaração obrigatória do contrato contém **somente**:
+
+```text
+cardinality_contract
+expected_min
+expected_max
+```
+
+Contratos planejados:
+
+```text
+exactly_one
+zero_or_one
+one_or_more
+backend_specific
+```
+
+`actual_affected_rows` observado e, opcionalmente, `expected_affected_rows` são evidências opcionais específicas de backends que expõem cardinalidade de linhas afetadas; não integram os campos obrigatórios da declaração.
+
+Exemplo: `exactly_one`, `expected_min=1`, `expected_max=1`, `actual_affected_rows=0` resulta em violação do contrato de mutação. Um resultado fora do contrato pode exigir fail closed conforme o contrato de segurança da aplicação.
+
+Anomalia de cardinalidade não determina severidade. Permanecem válidas as separações `severity != confidence` e `severity != cardinality anomaly`.
+
+Escopo futuro: sessão, logout, revoke, rotation, convite de uso único, password reset, confirmação MFA, consumo de token, approval, idempotency key, mudança de tenant e mudança de role/permission.
+
+#### Findings planejados
+
+```text
+WEB.SESSION.TOCTOU
+WEB.SESSION.REVOCATION_RACE
+WEB.SESSION.RENEWAL_RACE
+WEB.SESSION.RENEWAL_ZERO_ROW_IGNORED
+WEB.SESSION.POST_REVOCATION_ACTION
+WEB.SESSION.REVOKED_SESSION_RECREATED
+WEB.SESSION.ATOMIC_ROTATION_FAILURE
+WEB.AUTHZ.POINT_OF_USE_REVALIDATION_GAP
+WEB.SECURITY_MUTATION.CARDINALITY_NOT_ENFORCED
+```
+
+#### Evidência sanitizada
+
+Reutilizar os campos genéricos `assessment_id`, `finding_id`, `asset_id`, `result`, `confidence`, `evidence_ids` e `trace_id`. Acrescentar somente:
+
+```text
+application_id
+test_case
+request_a_id
+request_b_id
+session_reference
+session_model
+revocation_model
+mutation_backend
+mutation_outcome
+request_a_started_at
+authorization_checked_at
+session_revoked_at
+security_mutation_at
+business_action_at
+request_completed_at
+event_sequence
+trace_sequence
+clock_source
+clock_skew_bound_ms
+cardinality_contract
+expected_min
+expected_max
+expected_affected_rows
+actual_affected_rows
+cookie_reissued
+protected_action_executed
+```
+
+`expected_affected_rows` e `actual_affected_rows` são opcionais e somente se aplicam a backends que exponham cardinalidade de linhas afetadas. Nunca armazenar cookie bruto, token de sessão bruto, header `Authorization`, segredo CSRF, senha ou credencial real.
+
+#### Correlação e ordenação causal
+
+Reutilizar o Security Correlator existente para os eventos planejados:
+
+```text
+SESSION.REVOKED
+SESSION.ROTATED
+SESSION.REUSE_DETECTED
+PROTECTED_ACTION
+AUTHORIZATION_CHECK
+REQUEST_STARTED
+REQUEST_COMPLETED
+```
+
+A preferência de ordenação é: causal dentro da mesma requisição/trace; sequência monotônica/local; e wall clock entre serviços somente quando houver origem de relógio conhecida e limites conhecidos de sincronização/skew. Usar `event_sequence`, `trace_sequence`, `clock_source` e `clock_skew_bound_ms` quando aplicável.
+
+`t2_timestamp > t1_timestamp`, isoladamente, não prova autorização pós-revogação entre componentes não sincronizados. Um caso forte é `SESSION.REVOKED session=X` seguido por uma **nova** `AUTHORIZATION_CHECK session=X`, com ordenação causal que prove sua ocorrência após a revogação.
+
+#### Severidade
+
+- **CRITICAL:** ação sensível demonstrada depois de a autenticação dever estar revogada, incluindo ação sobre credencial, role/permission, tenant, operação financeira, fiscal, administrativa ou execução remota.
+- **HIGH:** sessão revogada renovada ou reutilizada, sem ação crítica demonstrada.
+- **MEDIUM:** inconsistência de auditoria ou telemetria, sem bypass de autorização demonstrado.
+
+Severidade permanece independente de confiança e de anomalia de cardinalidade: `severity != confidence` e `severity != cardinality anomaly`.
+
+#### Segurança da avaliação
+
+A avaliação exige `asset_id`, `application_id`, autorização pelo policy engine, ambiente autorizado, conta e sessão de teste, rate limit, Cyber-Lab, interleaving controlado, abort automático, evidência sanitizada, reteste separado e revisão humana. Não haverá correção automática em produção, shell arbitrário, persistência, exfiltração ou ação destrutiva.
+
+Reutilizar `peer_ip`, `claimed_ip`, `client_ip`, `proxy_chain` e `trusted_proxy` do modelo canônico existente, sem criar modelo paralelo.
+
+#### Aceitação futura
+
+A capacidade permanece `PLANNED / NOT_IMPLEMENTED` até haver validação em Cyber-Lab, interleaving reproduzível, evidência preservada, zero secrets, findings reproduzíveis, semântica explícita para requisições in-flight, cardinalidade validada contra o contrato declarado quando aplicável, reteste, bloqueio por política de tudo que estiver fora do escopo, ausência de correção automática em produção e revisão humana.

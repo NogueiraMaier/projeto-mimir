@@ -113,6 +113,7 @@ Estado P1 validado em 2026-09-29:
 - SOC e SIEM
 - Cyber-Lab em máquina separada
 - Mímir Security Assessment & SOC Coordinator, com OSINT autorizado, vulnerability assessment, correlação SOC, findings rastreáveis, perfis SAFE de scan e reteste. Especificação: `docs/cybersecurity/MIMIR_SECURITY_ASSESSMENT_SOC.md`
+  Inclui `Session Concurrency / TOCTOU / Revocation Consistency`, preservado como planejado e não implementado.
 
 ## Fundação operacional — situação em 2026-09-22
 
